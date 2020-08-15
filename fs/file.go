@@ -19,6 +19,11 @@ func binarySearch(searchIndex int, collection []int) (foundIndex int) {
 	return
 }
 
+type File interface {
+	Content() string
+	FindLineAndColumn(findingIndex int) (line int, column int)
+}
+
 // TextFile represents a file to be analyzed
 type TextFile struct {
 	DisplayName string // Holds only the single name of the file (e.g. handler.js)
@@ -63,6 +68,10 @@ func NewTextFile(filename string, content []byte) (*TextFile, error) {
 	}
 
 	return textfile, nil
+}
+
+func (textfile *TextFile) Content() string {
+	return textfile.RawString
 }
 
 func (textfile *TextFile) FindLineAndColumn(findingIndex int) (line, column int) {

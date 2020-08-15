@@ -60,7 +60,7 @@ func TestFindLineAndColumnWithAKotlinController(t *testing.T) {
 	nameVariableColumn := 71
 
 	// So we lookup for something in the file
-	// in this case the name: String variable
+	// in this case the 'name: String' variable
 	// and the method should return the correct line and column
 	// for where it is, in a human readable form.
 	nameStringExtractor := regexp.MustCompile(`name\:`)
