@@ -52,8 +52,10 @@ func (unit TextUnit) Type() engine.UnitType {
 	return engine.ProgramTextUnit
 }
 
-func (unit TextUnit) Eval(rule engine.Rule) []engine.Finding {
-	var unitFindings []engine.Finding
+func (unit TextUnit) Eval(rule engine.Rule) (unitFindings []engine.Finding) {
+	if len(unit.Files) <= 0 {
+		return unitFindings
+	}
 
 	chanSize := len(unit.Files) - 1
 	findingsChannel := make(chan []engine.Finding, chanSize)

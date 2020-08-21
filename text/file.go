@@ -35,7 +35,7 @@ type TextFile struct {
 	newlineEndingIndexes []int
 }
 
-func NewTextFile(relativeFilePath string, content []byte) (*TextFile, error) {
+func NewTextFile(relativeFilePath string, content []byte) (TextFile, error) {
 	var err error
 	var formattedPhysicalPath string
 
@@ -43,13 +43,13 @@ func NewTextFile(relativeFilePath string, content []byte) (*TextFile, error) {
 		formattedPhysicalPath, err = filepath.Abs(relativeFilePath)
 
 		if err != nil {
-			return nil, err
+			return TextFile{}, err
 		}
 	}
 
 	_, formattedFilename := filepath.Split(formattedPhysicalPath)
 
-	textfile := &TextFile{
+	textfile := TextFile{
 		PhysicalPath: formattedPhysicalPath,
 		RawString:    string(content),
 
@@ -104,4 +104,14 @@ func (textfile *TextFile) FindLineAndColumn(findingIndex int) (line, column int)
 	}
 
 	return
+}
+
+func ReadAndCreateTextFile(filename string) (TextFile, error) {
+	textFileContent, err := ReadTextFile(filename)
+
+	if err != nil {
+		return TextFile{}, err
+	}
+
+	return NewTextFile(filename, textFileContent)
 }

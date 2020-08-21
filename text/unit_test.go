@@ -1,6 +1,7 @@
 package text
 
 import (
+	"path/filepath"
 	"regexp"
 	"testing"
 
@@ -46,7 +47,7 @@ func (v *Version) CreateCobraCmd() *cobra.Command {
 		t.Error(err)
 	}
 
-	textUnit.Files = append(textUnit.Files, *goTextFile)
+	textUnit.Files = append(textUnit.Files, goTextFile)
 
 	var regularMatchRule TextRule = TextRule{}
 	regularMatchRule.Expressions = append(regularMatchRule.Expressions, regexp.MustCompile(`cmd\.Short`))
@@ -56,13 +57,50 @@ func (v *Version) CreateCobraCmd() *cobra.Command {
 
 	findings := engine.Run(program, rules)
 
+	for _, finding := range findings {
+		t.Log(finding.SourceLocation)
+	}
+
 	if len(findings) < 1 || len(findings) > 1 {
 		t.Fatal("Should find only 1 finding")
 	}
 
-	for _, finding := range findings {
-		t.Logf("Name: %s", finding.SourceLocation.Filename)
-		t.Logf("Line: %d", finding.SourceLocation.Line)
-		t.Logf("Column: %d", finding.SourceLocation.Column)
+}
+
+/*
+ *
+ *
+ * ******* Benchmarks ********
+ *
+ */
+
+func BenchmarkHeavyGolangWithSingleTextUnit(b *testing.B) {
+	benchFiles := []string{"benchmark.perf.go", "benchmark1.perf.go", "benchmark2.perf.go"}
+	var textUnit TextUnit = TextUnit{}
+
+	var summaryIdentifier TextRule = TextRule{}
+	summaryIdentifier.Expressions = append(summaryIdentifier.Expressions, regexp.MustCompile(`Summary`))
+
+	var instanceIdentifier TextRule = TextRule{}
+	instanceIdentifier.Expressions = append(instanceIdentifier.Expressions, regexp.MustCompile(`Instance`))
+
+	rules := []engine.Rule{summaryIdentifier, instanceIdentifier}
+
+	for _, benchFileName := range benchFiles {
+		benchFile, err := ReadAndCreateTextFile(filepath.Join("samples", benchFileName))
+
+		if err != nil {
+			b.Fatal(err)
+		}
+
+		textUnit.Files = append(textUnit.Files, benchFile)
+	}
+
+	program := []engine.Unit{textUnit}
+
+	b.ResetTimer()
+
+	for i := 0; i < b.N; i++ {
+		engine.Run(program, rules)
 	}
 }

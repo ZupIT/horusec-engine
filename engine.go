@@ -2,13 +2,7 @@ package engine
 
 type Unit interface {
 	Type() UnitType
-	Eval(rule Rule) []Finding
-}
-
-type Location struct {
-	Filename string
-	Line     int
-	Column   int
+	Eval(Rule) []Finding
 }
 
 type Finding struct {
@@ -28,7 +22,11 @@ func ExecRulesInDocumentUnit(rules []Rule, documentUnit Unit, findings chan<- []
 }
 
 func Run(document []Unit, rules []Rule) (documentFindings []Finding) {
-	numberOfUnits := len(document) - 1
+	if len(document) < 1 || len(rules) < 1 {
+		return []Finding{}
+	}
+
+	numberOfUnits := ((len(document)) * (len(rules)))
 
 	documentFindingsChannel := make(chan []Finding, numberOfUnits)
 
@@ -36,7 +34,7 @@ func Run(document []Unit, rules []Rule) (documentFindings []Finding) {
 		go ExecRulesInDocumentUnit(rules, documentUnit, documentFindingsChannel)
 	}
 
-	for i := 0; i <= numberOfUnits; i++ {
+	for i := 1; i <= numberOfUnits; i++ {
 		unitFindings := <-documentFindingsChannel
 		documentFindings = append(documentFindings, unitFindings...)
 	}

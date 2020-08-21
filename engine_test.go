@@ -47,7 +47,7 @@ func TestRunWithTextUnits(t *testing.T) {
 }
 
 func TestRunWith1000Units(t *testing.T) {
-	rules := []Rule{TestRule{}}
+	rules := []Rule{TestRule{}, TestRule{}, TestRule{}}
 	testProgram := []Unit{}
 
 	for i := 0; i < 1000; i++ {
@@ -56,7 +56,8 @@ func TestRunWith1000Units(t *testing.T) {
 
 	findings := Run(testProgram, rules)
 
-	if len(findings) != 1000 {
-		t.Fatal("Should find only 1000 finding")
+	if len(findings) != 3000 {
+		t.Fatal("Should find only 3000 finding")
 	}
+
 }
