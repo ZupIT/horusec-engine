@@ -8,12 +8,8 @@ var TestUnitType UnitType = 999
 
 type TestRule struct{}
 
-func (rule TestRule) IsFor() UnitType {
-	return TestUnitType
-}
-
-func (rule TestRule) Type() MatchType {
-	return Regular
+func (rule TestRule) IsFor(unitType UnitType) bool {
+	return TestUnitType == unitType
 }
 
 type TestUnit struct{}
@@ -23,15 +19,10 @@ func (unit TestUnit) Type() UnitType {
 }
 
 func (unit TestUnit) Eval(rule Rule) []Finding {
-	switch rule.Type() {
-	case Regular:
-		return []Finding{
-			Finding{
-				ID: "1",
-			},
-		}
-	default:
-		return []Finding{}
+	return []Finding{
+		Finding{
+			ID: "1",
+		},
 	}
 }
 

@@ -12,7 +12,7 @@ type Finding struct {
 
 func ExecRulesInDocumentUnit(rules []Rule, documentUnit Unit, findings chan<- []Finding) {
 	for _, rule := range rules {
-		if rule.IsFor() == documentUnit.Type() {
+		if rule.IsFor(documentUnit.Type()) {
 			go func() {
 				ruleFindings := documentUnit.Eval(rule)
 				findings <- ruleFindings

@@ -6,16 +6,21 @@ import (
 	"github.com/ZupIT/horus-engine"
 )
 
+type MatchType int
+
+const (
+	Regular MatchType = iota
+	NotMatch
+	OrMatch
+	AndMatch
+)
+
 type TextRule struct {
 	ID          string
 	Expressions []*regexp.Regexp
-	MatchType   engine.MatchType
+	Type        MatchType
 }
 
-func (rule TextRule) IsFor() engine.UnitType {
-	return engine.ProgramTextUnit
-}
-
-func (rule TextRule) Type() engine.MatchType {
-	return rule.MatchType
+func (rule TextRule) IsFor(unitType engine.UnitType) bool {
+	return engine.ProgramTextUnit == unitType
 }
