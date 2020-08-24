@@ -10,7 +10,33 @@ type Finding struct {
 	SourceLocation Location
 }
 
-func ExecRulesInDocumentUnit(rules []Rule, documentUnit Unit, findings chan<- []Finding) {
+type Report struct {
+	ID             string   // Comes from Advisory::GetID/0
+	Name           string   // Comes from Advisory::GetName/0
+	Description    string   // Comes from Advisory::GetDescription/0
+	SourceLocation Location // Comes from the Finding
+}
+
+func BuildReport(findings []Finding, advisories []Advisory) (programReport []Report) {
+	for _, finding := range findings {
+		for _, advisory := range advisories {
+			if finding.ID == advisory.GetID() {
+				report := Report{
+					ID:             advisory.GetID(),
+					Name:           advisory.GetName(),
+					Description:    advisory.GetDescription(),
+					SourceLocation: finding.SourceLocation,
+				}
+
+				programReport = append(programReport, report)
+			}
+		}
+	}
+
+	return programReport
+}
+
+func execRulesInDocumentUnit(rules []Rule, documentUnit Unit, findings chan<- []Finding) {
 	for _, rule := range rules {
 		if rule.IsFor(documentUnit.Type()) {
 			go func() {
@@ -31,7 +57,7 @@ func Run(document []Unit, rules []Rule) (documentFindings []Finding) {
 	documentFindingsChannel := make(chan []Finding, numberOfUnits)
 
 	for _, documentUnit := range document {
-		go ExecRulesInDocumentUnit(rules, documentUnit, documentFindingsChannel)
+		go execRulesInDocumentUnit(rules, documentUnit, documentFindingsChannel)
 	}
 
 	for i := 1; i <= numberOfUnits; i++ {
