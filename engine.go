@@ -18,8 +18,8 @@ type Report struct {
 }
 
 func BuildReport(findings []Finding, advisories []Advisory) (programReport []Report) {
-	for _, finding := range findings {
-		for _, advisory := range advisories {
+	for _, advisory := range advisories {
+		for _, finding := range findings {
 			if finding.ID == advisory.GetID() {
 				report := Report{
 					ID:             advisory.GetID(),
