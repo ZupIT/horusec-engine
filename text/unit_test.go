@@ -50,6 +50,7 @@ func (v *Version) CreateCobraCmd() *cobra.Command {
 	textUnit.Files = append(textUnit.Files, goTextFile)
 
 	var regularMatchRule TextRule = TextRule{}
+	regularMatchRule.Type = Regular
 	regularMatchRule.Expressions = append(regularMatchRule.Expressions, regexp.MustCompile(`cmd\.Short`))
 
 	rules := []engine.Rule{regularMatchRule}

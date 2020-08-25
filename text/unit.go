@@ -115,7 +115,9 @@ func (unit TextUnit) Eval(rule engine.Rule) (unitFindings []engine.Finding) {
 
 	if textRule, ok := rule.(TextRule); ok {
 		switch textRule.Type {
-		case Regular, OrMatch:
+		case Regular:
+			go unit.evalRegularRule(textRule, findingsChannel)
+		case OrMatch:
 			go unit.evalRegularRule(textRule, findingsChannel)
 		case NotMatch:
 			go unit.evalNotMatchRule(textRule, findingsChannel)
