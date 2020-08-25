@@ -45,6 +45,8 @@ func NewTextFile(relativeFilePath string, content []byte) (TextFile, error) {
 		if err != nil {
 			return TextFile{}, err
 		}
+	} else {
+		formattedPhysicalPath = relativeFilePath
 	}
 
 	_, formattedFilename := filepath.Split(formattedPhysicalPath)
@@ -67,11 +69,11 @@ func NewTextFile(relativeFilePath string, content []byte) (TextFile, error) {
 	return textfile, nil
 }
 
-func (textfile *TextFile) Content() string {
+func (textfile TextFile) Content() string {
 	return textfile.RawString
 }
 
-func (textfile *TextFile) FindLineAndColumn(findingIndex int) (line, column int) {
+func (textfile TextFile) FindLineAndColumn(findingIndex int) (line, column int) {
 	// findingIndex is the index of the beginning of the text we want to
 	// locate inside the file
 
