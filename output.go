@@ -5,20 +5,45 @@ import (
 	"os"
 )
 
-type Interface interface {
-	ParseOutputReportToJSONFile(report []Report, outputFilePath string) error
+type IOutput interface {
+	Value() []Finding
+	BuildReport(advisories []Advisory) []Report
+	GenerateReportInOutputFilePath(advisories []Advisory, outputFilePath string) error
 }
 
-type Output struct{}
-
-func NewOutput() Interface {
-	return &Output{}
+type Output struct{
+	findings []Finding
 }
 
-func (o *Output) ParseOutputReportToJSONFile(report []Report, outputFilePath string) error {
-	if report == nil {
-		report = []Report{}
+func NewOutput(findings []Finding) IOutput {
+	return &Output{
+		findings: findings,
 	}
+}
+
+func (o *Output) Value() []Finding {
+	return o.findings
+}
+
+func (o *Output) BuildReport(advisories []Advisory) (programReport []Report) {
+	for _, advisory := range advisories {
+		for _, finding := range o.findings {
+			if finding.ID == advisory.GetID() {
+				report := Report{
+					ID:             advisory.GetID(),
+					Name:           advisory.GetName(),
+					Description:    advisory.GetDescription(),
+					SourceLocation: finding.SourceLocation,
+				}
+				programReport = append(programReport, report)
+			}
+		}
+	}
+	return programReport
+}
+
+func (o *Output) GenerateReportInOutputFilePath(advisories []Advisory, outputFilePath string) error {
+	report := o.BuildReport(advisories)
 	bytesToWrite, err := json.MarshalIndent(report, "", "  ")
 	if err != nil {
 		return err
