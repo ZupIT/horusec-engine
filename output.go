@@ -11,6 +11,13 @@ type IOutput interface {
 	GenerateReportInOutputFilePath(advisories []Advisory, outputFilePath string) error
 }
 
+type Report struct {
+	ID             string   // Comes from Advisory::GetID/0
+	Name           string   // Comes from Advisory::GetName/0
+	Description    string   // Comes from Advisory::GetDescription/0
+	SourceLocation Location // Comes from the Finding
+}
+
 type Output struct{
 	findings []Finding
 }
