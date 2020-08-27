@@ -30,7 +30,7 @@ func TestRunWithTextUnits(t *testing.T) {
 	testProgram := []Unit{TestUnit{}}
 	rules := []Rule{TestRule{}}
 
-	findings := Run(testProgram, rules)
+	findings := Run(testProgram, rules).Value()
 
 	if len(findings) < 1 || len(findings) > 1 {
 		t.Fatal("Should find only 1 finding")
@@ -45,7 +45,7 @@ func TestRunWith1000Units(t *testing.T) {
 		testProgram = append(testProgram, TestUnit{})
 	}
 
-	findings := Run(testProgram, rules)
+	findings := Run(testProgram, rules).Value()
 
 	if len(findings) != 3000 {
 		t.Fatal("Should find only 3000 finding")
