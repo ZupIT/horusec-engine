@@ -1,6 +1,8 @@
 package text
 
 import (
+	"github.com/stretchr/testify/assert"
+	"path/filepath"
 	"regexp"
 	"testing"
 )
@@ -124,4 +126,29 @@ func TestNameFormattingAndDisplaying(t *testing.T) {
 			goTextFile.Name,
 		)
 	}
+}
+
+func TestTextFiles_GetAllFilesUnits(t *testing.T) {
+	t.Run("Should return unit with nine files when get any files", func(t *testing.T) {
+		path := "./samples"
+		path, err := filepath.Abs(path)
+		assert.NoError(t, err)
+		textUnit, err := WalkInPathAndGetTextUnit(path, []string{"**"})
+		assert.NoError(t, err)
+		assert.Equal(t, 9, len(textUnit.Files))
+	})
+	t.Run("Should return unit with tree files when get go files", func(t *testing.T) {
+		path := "./samples"
+		path, err := filepath.Abs(path)
+		assert.NoError(t, err)
+		textUnit, err := WalkInPathAndGetTextUnit(path, []string{".go"})
+		assert.NoError(t, err)
+		assert.Equal(t, 3, len(textUnit.Files))
+	})
+	t.Run("Should return error when path not exists", func(t *testing.T) {
+		path := "./not-exist-path.go"
+		units, err := WalkInPathAndGetTextUnit(path, []string{".go"})
+		assert.Error(t, err)
+		assert.Empty(t, units.Files)
+	})
 }
