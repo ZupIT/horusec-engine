@@ -1,5 +1,6 @@
 package engine
 
+
 type Unit interface {
 	Type() UnitType
 	Eval(Rule) []Finding
