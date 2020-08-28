@@ -133,7 +133,7 @@ func TestTextFiles_GetAllFilesUnits(t *testing.T) {
 		path := "./samples"
 		path, err := filepath.Abs(path)
 		assert.NoError(t, err)
-		textUnit, err := WalkInPathAndGetTextUnit(path, []string{"**"})
+		textUnit, err := LoadDirIntoSingleUnit(path, []string{"**"})
 		assert.NoError(t, err)
 		assert.Equal(t, 9, len(textUnit.Files))
 	})
@@ -141,13 +141,13 @@ func TestTextFiles_GetAllFilesUnits(t *testing.T) {
 		path := "./samples"
 		path, err := filepath.Abs(path)
 		assert.NoError(t, err)
-		textUnit, err := WalkInPathAndGetTextUnit(path, []string{".go"})
+		textUnit, err := LoadDirIntoSingleUnit(path, []string{".go"})
 		assert.NoError(t, err)
 		assert.Equal(t, 3, len(textUnit.Files))
 	})
 	t.Run("Should return error when path not exists", func(t *testing.T) {
 		path := "./not-exist-path.go"
-		units, err := WalkInPathAndGetTextUnit(path, []string{".go"})
+		units, err := LoadDirIntoSingleUnit(path, []string{".go"})
 		assert.Error(t, err)
 		assert.Empty(t, units.Files)
 	})

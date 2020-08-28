@@ -124,7 +124,7 @@ func ReadAndCreateTextFile(filename string) (TextFile, error) {
 //   Example: []string{".java"}
 // If an item of slice contains is equal the "**" it's will accept all extensions
 //   Example: []string{"**"}
-func WalkInPathAndGetTextUnit(path string, extensionsAccept []string) (TextUnit, error) {
+func LoadDirIntoSingleUnit(path string, extensionsAccept []string) (TextUnit, error) {
 	unit := TextUnit{}
 	err := filepath.Walk(path, func(path string, info os.FileInfo, err error) error {
 		if err != nil || info.IsDir() {

@@ -46,6 +46,9 @@ func (o *Output) BuildReport(advisories []Advisory) (programReport []Report) {
 			}
 		}
 	}
+	if programReport == nil {
+		return []Report{}
+	}
 	return programReport
 }
 
