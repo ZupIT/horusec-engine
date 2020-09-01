@@ -39,8 +39,9 @@ func BuildReport(findings []Finding, advisories []Advisory) (programReport []Rep
 func execRulesInDocumentUnit(rules []Rule, documentUnit Unit, findings chan<- []Finding) {
 	for _, rule := range rules {
 		if rule.IsFor(documentUnit.Type()) {
+			localRule := rule
 			go func() {
-				ruleFindings := documentUnit.Eval(rule)
+				ruleFindings := documentUnit.Eval(localRule)
 				findings <- ruleFindings
 			}()
 		}
@@ -57,7 +58,8 @@ func Run(document []Unit, rules []Rule) (documentFindings []Finding) {
 	documentFindingsChannel := make(chan []Finding, numberOfUnits)
 
 	for _, documentUnit := range document {
-		go execRulesInDocumentUnit(rules, documentUnit, documentFindingsChannel)
+		localDocumentUnit := documentUnit
+		go execRulesInDocumentUnit(rules, localDocumentUnit, documentFindingsChannel)
 	}
 
 	for i := 1; i <= numberOfUnits; i++ {
