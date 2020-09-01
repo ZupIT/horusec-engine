@@ -16,9 +16,9 @@ const (
 )
 
 type TextRule struct {
-	ID          string
-	Expressions []*regexp.Regexp
+	engine.Metadata
 	Type        MatchType
+	Expressions []*regexp.Regexp
 }
 
 func (rule TextRule) IsFor(unitType engine.UnitType) bool {

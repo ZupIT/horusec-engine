@@ -13,6 +13,8 @@ type Unit interface {
 
 type Finding struct {
 	ID             string
+	Name           string
+	Description    string
 	SourceLocation Location
 }
 

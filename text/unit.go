@@ -8,9 +8,11 @@ type TextUnit struct {
 	Files []TextFile
 }
 
-func newFinding(ID, filename string, line, column int) engine.Finding {
+func newFinding(ruleData TextRule, filename string, line, column int) engine.Finding {
 	return engine.Finding{
-		ID: ID,
+		ID:          ruleData.ID,
+		Name:        ruleData.Name,
+		Description: ruleData.Description,
 		SourceLocation: engine.Location{
 			Filename: filename,
 			Line:     line,
@@ -24,7 +26,7 @@ func createFindingsFromIndexes(findingIndexes [][]int, file TextFile, rule TextR
 		line, column := file.FindLineAndColumn(findingIndex[0])
 
 		finding := newFinding(
-			rule.ID,
+			rule,
 			file.DisplayName,
 			line,
 			column,
@@ -67,7 +69,7 @@ func (unit TextUnit) evalNotMatchRule(textRule TextRule, findingsChan chan<- []e
 				findingIndexes := expression.FindAllStringIndex(file.Content(), -1)
 
 				if findingIndexes == nil {
-					findings = append(findings, newFinding(textRule.ID, file.DisplayName, 0, 0))
+					findings = append(findings, newFinding(textRule, file.DisplayName, 0, 0))
 				}
 			}
 
