@@ -176,6 +176,61 @@ type Version struct {
 	}
 }
 
+func TestTextunitEvalWithRegularMatchWithMultipleRules(t *testing.T) {
+	javaFileContent := `package com.mycompany.app;
+
+import java.util.Random;
+
+/**
+ * Hello world!
+ *
+ */
+public class App 
+{
+    public static void main( String[] args )
+    {
+        String password = "Ch@ng3m3"
+        Random rand = new Random();
+        System.out.println(rand.nextInt(50));
+        System.out.println( "Hello World!" );
+        System.out.println( "Actual password" + password );
+    }
+}`
+
+	var textUnit TextUnit = TextUnit{}
+
+	javaFile, err := NewTextFile("example/src/main.java", []byte(javaFileContent))
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	textUnit.Files = append(textUnit.Files, javaFile)
+
+	var regularMatchRule TextRule = TextRule{}
+	regularMatchRule.Type = Regular
+	regularMatchRule.Description = "Hello from Go land"
+	regularMatchRule.Expressions = append(regularMatchRule.Expressions, regexp.MustCompile(`java\.util\.Random`))
+
+	var anotherRegularMatchRule TextRule = TextRule{}
+	anotherRegularMatchRule.Type = Regular
+	anotherRegularMatchRule.Expressions = append(anotherRegularMatchRule.Expressions, regexp.MustCompile(`(password\s*=\s*['|\"]\w+[[:print:]]*['|\"])|(pass\s*=\s*['|\"]\w+['|\"]\s)|(pwd\s*=\s*['|\"]\w+['|\"]\s)|(passwd\s*=\s*['|\"]\w+['|\"]\s)|(senha\s*=\s*['|\"]\w+['|\"])`))
+
+	rules := []engine.Rule{regularMatchRule, anotherRegularMatchRule}
+	program := []engine.Unit{textUnit}
+
+	findings := engine.Run(program, rules)
+
+	for _, finding := range findings {
+		t.Log(finding.SourceLocation)
+	}
+
+	if len(findings) < 2 || len(findings) > 2 {
+		t.Fatalf("Should find only 2 finding, but found %d", len(findings))
+	}
+
+}
+
 /*
  *
  *
