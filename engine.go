@@ -7,33 +7,9 @@ type Unit interface {
 
 type Finding struct {
 	ID             string
+	Name           string
+	Description    string
 	SourceLocation Location
-}
-
-type Report struct {
-	ID             string   // Comes from Advisory::GetID/0
-	Name           string   // Comes from Advisory::GetName/0
-	Description    string   // Comes from Advisory::GetDescription/0
-	SourceLocation Location // Comes from the Finding
-}
-
-func BuildReport(findings []Finding, advisories []Advisory) (programReport []Report) {
-	for _, advisory := range advisories {
-		for _, finding := range findings {
-			if finding.ID == advisory.GetID() {
-				report := Report{
-					ID:             advisory.GetID(),
-					Name:           advisory.GetName(),
-					Description:    advisory.GetDescription(),
-					SourceLocation: finding.SourceLocation,
-				}
-
-				programReport = append(programReport, report)
-			}
-		}
-	}
-
-	return programReport
 }
 
 func execRulesInDocumentUnit(rules []Rule, documentUnit Unit, findings chan<- []Finding) {
