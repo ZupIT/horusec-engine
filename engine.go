@@ -74,8 +74,8 @@ func Run(document []Unit, rules []Rule) (documentFindings []Finding) {
 
 func execRulesInDocumentUnit(rules []Rule, documentUnit Unit, findings chan<- []Finding) {
 	for _, rule := range rules {
-		if rule.IsFor(documentUnit.Type()) {
-			localRule := rule
+		localRule := rule
+		if localRule.IsFor(documentUnit.Type()) {
 			go func() {
 				ruleFindings := documentUnit.Eval(localRule)
 				findings <- ruleFindings

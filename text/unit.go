@@ -62,14 +62,15 @@ func (unit TextUnit) evalRegularRule(textRule TextRule, findingsChan chan<- []en
 
 func (unit TextUnit) evalNotMatchRule(textRule TextRule, findingsChan chan<- []engine.Finding) {
 	for _, file := range unit.Files {
+		localFile := file // Preventing Gorountines of accessing the shared memory bit :/
 		go func() {
 			var findings []engine.Finding
 
 			for _, expression := range textRule.Expressions {
-				findingIndexes := expression.FindAllStringIndex(file.Content(), -1)
+				findingIndexes := expression.FindAllStringIndex(localFile.Content(), -1)
 
 				if findingIndexes == nil {
-					findings = append(findings, newFinding(textRule, file.DisplayName, 0, 0))
+					findings = append(findings, newFinding(textRule, localFile.DisplayName, 0, 0))
 				}
 			}
 
@@ -81,15 +82,16 @@ func (unit TextUnit) evalNotMatchRule(textRule TextRule, findingsChan chan<- []e
 
 func (unit TextUnit) evalAndMatchRule(textRule TextRule, findingsChan chan<- []engine.Finding) {
 	for _, file := range unit.Files {
+		localFile := file // Preventing Gorountines of accessing the shared memory bit :/
 		go func() {
 			var findings []engine.Finding
 			haveFound := true
 
 			for _, expression := range textRule.Expressions {
-				findingIndexes := expression.FindAllStringIndex(file.Content(), -1)
+				findingIndexes := expression.FindAllStringIndex(localFile.Content(), -1)
 
 				if findingIndexes != nil {
-					ruleFindings := createFindingsFromIndexes(findingIndexes, file, textRule)
+					ruleFindings := createFindingsFromIndexes(findingIndexes, localFile, textRule)
 					findings = append(findings, ruleFindings...)
 
 					continue

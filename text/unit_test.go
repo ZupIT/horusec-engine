@@ -209,11 +209,12 @@ public class App
 
 	var regularMatchRule TextRule = TextRule{}
 	regularMatchRule.Type = Regular
-	regularMatchRule.Description = "Hello from Go land"
+	regularMatchRule.Description = "Finds java.util.Random imports"
 	regularMatchRule.Expressions = append(regularMatchRule.Expressions, regexp.MustCompile(`java\.util\.Random`))
 
 	var anotherRegularMatchRule TextRule = TextRule{}
 	anotherRegularMatchRule.Type = Regular
+	anotherRegularMatchRule.Description = "Finds hardcoded passwords"
 	anotherRegularMatchRule.Expressions = append(anotherRegularMatchRule.Expressions, regexp.MustCompile(`(password\s*=\s*['|\"]\w+[[:print:]]*['|\"])|(pass\s*=\s*['|\"]\w+['|\"]\s)|(pwd\s*=\s*['|\"]\w+['|\"]\s)|(passwd\s*=\s*['|\"]\w+['|\"]\s)|(senha\s*=\s*['|\"]\w+['|\"])`))
 
 	rules := []engine.Rule{regularMatchRule, anotherRegularMatchRule}
@@ -222,6 +223,7 @@ public class App
 	findings := engine.Run(program, rules)
 
 	for _, finding := range findings {
+		t.Log(finding.Description)
 		t.Log(finding.SourceLocation)
 	}
 
