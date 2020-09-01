@@ -26,6 +26,16 @@ func (unit TestUnit) Eval(rule Rule) []Finding {
 	}
 }
 
+type AdvisoryExample struct {
+	ID string
+	Name string
+	Description string
+}
+
+func (a *AdvisoryExample) GetID() string { return a.ID }
+func (a *AdvisoryExample) GetName() string { return a.Name }
+func (a *AdvisoryExample) GetDescription() string { return a.Description }
+
 func TestRunWithTextUnits(t *testing.T) {
 	testProgram := []Unit{TestUnit{}}
 	rules := []Rule{TestRule{}}
@@ -50,5 +60,4 @@ func TestRunWith1000Units(t *testing.T) {
 	if len(findings) != 3000 {
 		t.Fatal("Should find only 3000 finding")
 	}
-
 }

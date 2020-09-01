@@ -1,6 +1,7 @@
 package text
 
 import (
+	"os"
 	"path/filepath"
 	"regexp"
 	"sort"
@@ -9,6 +10,7 @@ import (
 var (
 	newlineFinder *regexp.Regexp = regexp.MustCompile("\x0a")
 )
+const AcceptAllExtensions string = "**"
 
 // binarySearch function uses this search algorithm to find the index of the matching element.
 func binarySearch(searchIndex int, collection []int) (foundIndex int) {
@@ -116,4 +118,53 @@ func ReadAndCreateTextFile(filename string) (TextFile, error) {
 	}
 
 	return NewTextFile(filename, textFileContent)
+}
+
+// The Param extensionAccept is an filter to check if you need get textUnit for file with this extesion
+//   Example: []string{".java"}
+// If an item of slice contains is equal the "**" it's will accept all extensions
+//   Example: []string{"**"}
+func LoadDirIntoSingleUnit(path string, extensionsAccept []string) (TextUnit, error) {
+	unit := TextUnit{}
+	err := filepath.Walk(path, func(path string, info os.FileInfo, err error) error {
+		if err != nil || info.IsDir() {
+			return err
+		}
+		textFile, err := validateAndGetTextFileByPath(path, extensionsAccept)
+		if err != nil || textFile == nil {
+			return err
+		}
+		unit.Files = append(unit.Files, *textFile)
+		return nil
+	})
+	return unit, err
+}
+
+func validateAndGetTextFileByPath(path string, extensionsAccept []string) (*TextFile, error) {
+	if checkIfEnableExtension(path, extensionsAccept) {
+		file, err := getTextFileByPath(path)
+		if err != nil {
+			return nil, err
+		}
+		return &file, nil
+	}
+	return nil, nil
+}
+
+func checkIfEnableExtension(path string, extensionsAccept []string) bool {
+	ext := filepath.Ext(path)
+	for _, extAccept := range extensionsAccept {
+		if ext == extAccept || extAccept == AcceptAllExtensions {
+			return true
+		}
+	}
+	return false
+}
+
+func getTextFileByPath(path string) (TextFile, error) {
+	file, err := ReadAndCreateTextFile(path)
+	if err != nil {
+		return TextFile{}, err
+	}
+	return file, nil
 }
