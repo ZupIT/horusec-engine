@@ -18,23 +18,16 @@ type Finding struct {
 	SourceLocation Location
 }
 
-type Report struct {
-	ID             string   // Comes from Advisory::GetID/0
-	Name           string   // Comes from Advisory::GetName/0
-	Description    string   // Comes from Advisory::GetDescription/0
-	SourceLocation Location // Comes from the Finding
-}
-
-func RunAndBuildReportInFile(document []Unit, rules []Rule, advisories []Advisory, outputFilePath string) error {
-	report := RunAndBuildReport(document, rules, advisories)
+func RunOutputInJSON(document []Unit, rules []Rule, jsonFilePath string) error {
+	report := Run(document, rules)
 	bytesToWrite, err := json.MarshalIndent(report, "", "  ")
 	if err != nil {
 		return err
 	}
-	if _, err := os.Create(outputFilePath); err != nil {
+	if _, err := os.Create(jsonFilePath); err != nil {
 		return err
 	}
-	outputFile, err := os.OpenFile(outputFilePath, os.O_CREATE|os.O_WRONLY, 0644)
+	outputFile, err := os.OpenFile(jsonFilePath, os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		return err
 	}
@@ -53,27 +46,6 @@ func RunAndBuildReportInFile(document []Unit, rules []Rule, advisories []Advisor
 		})
 	}
 	return nil
-}
-
-func RunAndBuildReport(document []Unit, rules []Rule, advisories []Advisory) (programReport []Report) {
-	findings := Run(document, rules)
-	for _, advisory := range advisories {
-		for _, finding := range findings {
-			if finding.ID == advisory.GetID() {
-				report := Report{
-					ID:             advisory.GetID(),
-					Name:           advisory.GetName(),
-					Description:    advisory.GetDescription(),
-					SourceLocation: finding.SourceLocation,
-				}
-				programReport = append(programReport, report)
-			}
-		}
-	}
-	if programReport == nil {
-		return []Report{}
-	}
-	return programReport
 }
 
 func Run(document []Unit, rules []Rule) (documentFindings []Finding) {
