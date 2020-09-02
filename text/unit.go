@@ -85,15 +85,14 @@ func (unit TextUnit) evalAndMatchRule(textRule TextRule, findingsChan chan<- []e
 		localFile := file // Preventing Gorountines of accessing the shared memory bit :/
 		go func() {
 			var findings []engine.Finding
+			var ruleFindings []engine.Finding
 			haveFound := true
 
 			for _, expression := range textRule.Expressions {
 				findingIndexes := expression.FindAllStringIndex(localFile.Content(), -1)
 
 				if findingIndexes != nil {
-					ruleFindings := createFindingsFromIndexes(findingIndexes, localFile, textRule)
-					findings = append(findings, ruleFindings...)
-
+					ruleFindings = append(ruleFindings, createFindingsFromIndexes(findingIndexes, localFile, textRule)...)
 					continue
 				}
 
@@ -102,8 +101,10 @@ func (unit TextUnit) evalAndMatchRule(textRule TextRule, findingsChan chan<- []e
 			}
 
 			if haveFound {
-				findingsChan <- findings
+				findings = append(findings, ruleFindings...)
 			}
+
+			findingsChan <- findings
 		}()
 	}
 }

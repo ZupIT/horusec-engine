@@ -233,6 +233,59 @@ public class App
 
 }
 
+func TestTextunitEvalWithAndMatch(t *testing.T) {
+	javaFileContent := `package com.mycompany.app;
+
+import java.util.Random;
+
+/**
+ * Hello world!
+ *
+ */
+public class App 
+{
+    public static void main( String[] args )
+    {
+        String password = "Ch@ng3m3"
+        Random rand = new Random();
+        System.out.println(rand.nextInt(50));
+        System.out.println( "Hello World!" );
+        System.out.println( "Actual password" + password );
+    }
+}`
+
+	var textUnit TextUnit = TextUnit{}
+
+	javaFile, err := NewTextFile("example/src/main.java", []byte(javaFileContent))
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	textUnit.Files = append(textUnit.Files, javaFile)
+
+	var andMatchRule TextRule = TextRule{}
+	andMatchRule.Description = "Finds java.util.Random imports"
+	andMatchRule.Type = AndMatch
+	andMatchRule.Expressions = append(andMatchRule.Expressions, regexp.MustCompile(`java\.util\.Random`))
+	andMatchRule.Expressions = append(andMatchRule.Expressions, regexp.MustCompile(`rand\.\w+\(`))
+
+	rules := []engine.Rule{andMatchRule}
+	program := []engine.Unit{textUnit}
+
+	findings := engine.Run(program, rules)
+
+	for _, finding := range findings {
+		t.Log(finding.Description)
+		t.Log(finding.SourceLocation)
+	}
+
+	if len(findings) < 2 || len(findings) > 2 {
+		t.Fatalf("Should find only 2 finding, but found %d", len(findings))
+	}
+
+}
+
 /*
  *
  *
