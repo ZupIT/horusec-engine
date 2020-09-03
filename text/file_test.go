@@ -110,6 +110,54 @@ func (v *Version) CreateCobraCmd() *cobra.Command {
 	}
 }
 
+func TestExtractSampleWithAGoFile(t *testing.T) {
+	var exampleGoFile = `package version
+
+import (
+	"github.com/ZupIT/horus/development-kit/pkg/utils/logger"
+	"github.com/spf13/cobra"
+)
+
+type IVersion interface {
+	CreateCobraCmd() *cobra.Command
+}
+
+type Version struct {
+}
+
+func NewVersionCommand() IVersion {
+	return &Version{}
+}
+
+func (v *Version) CreateCobraCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:     "version",
+		Short:   "Actual version installed of the horus",
+		Example: "horus version",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			logger.LogPrint(cmd.Short + " is: ")
+			return nil
+		},
+	}
+}
+`
+	cmdShortExtractor := regexp.MustCompile(`cmd\.Short`)
+
+	findingIndex := cmdShortExtractor.FindStringIndex(exampleGoFile)
+
+	goTextFile, err := NewTextFile("example/cmd/version.go", []byte(exampleGoFile))
+
+	if err != nil {
+		t.Error(err)
+	}
+
+	lineContent := goTextFile.ExtractSample(findingIndex[0])
+
+	if lineContent != `logger.LogPrint(cmd.Short + " is: ")` {
+		t.Fatalf("Failed to find the correct line content. Found: %s", lineContent)
+	}
+}
+
 func TestNameFormattingAndDisplaying(t *testing.T) {
 	expectedName := "version.go"
 
@@ -141,7 +189,7 @@ func TestTextFiles_GetAllFilesUnits(t *testing.T) {
 		path := "./samples"
 		path, err := filepath.Abs(path)
 		assert.NoError(t, err)
-		textUnit, err := LoadDirIntoSingleUnit(path, []string{".go"})
+		textUnit, err := LoadDirIntoSingleUnit(path, []string{".perf"})
 		assert.NoError(t, err)
 		assert.Equal(t, 3, len(textUnit.Files))
 	})
