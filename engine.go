@@ -14,6 +14,9 @@ type Unit interface {
 type Finding struct {
 	ID             string
 	Name           string
+	Severity       string
+	CodeSample     string
+	Confidence     string
 	Description    string
 	SourceLocation Location
 }

@@ -17,5 +17,10 @@ type Rule interface {
 type Metadata struct {
 	ID          string
 	Name        string
+	CodeSample  string
 	Description string
+
+	// Metadata levels
+	Severity   string
+	Confidence string
 }

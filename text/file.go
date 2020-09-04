@@ -5,11 +5,13 @@ import (
 	"path/filepath"
 	"regexp"
 	"sort"
+	"strings"
 )
 
 var (
 	newlineFinder *regexp.Regexp = regexp.MustCompile("\x0a")
 )
+
 const AcceptAllExtensions string = "**"
 
 // binarySearch function uses this search algorithm to find the index of the matching element.
@@ -108,6 +110,21 @@ func (textfile TextFile) FindLineAndColumn(findingIndex int) (line, column int) 
 	}
 
 	return
+}
+
+func (textfile TextFile) ExtractSample(findingIndex int) string {
+	lineIndex := binarySearch(findingIndex, textfile.newlineEndingIndexes)
+
+	if lineIndex < len(textfile.newlineEndingIndexes) {
+		endOfPreviousLine := textfile.newlineEndingIndexes[lineIndex-1]
+		endOfCurrentLine := textfile.newlineEndingIndexes[lineIndex]
+
+		lineContent := textfile.RawString[endOfPreviousLine+1 : endOfCurrentLine]
+
+		return strings.TrimSpace(lineContent)
+	}
+
+	return ""
 }
 
 func ReadAndCreateTextFile(filename string) (TextFile, error) {

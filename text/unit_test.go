@@ -294,7 +294,7 @@ public class App
  */
 
 func BenchmarkHeavyGolangWithSingleTextUnit(b *testing.B) {
-	benchFiles := []string{"benchmark.perf.go", "benchmark1.perf.go", "benchmark2.perf.go"}
+	benchFiles := []string{"benchmark.perf", "benchmark1.perf", "benchmark2.perf"}
 	var textUnit TextUnit = TextUnit{}
 
 	var summaryIdentifier TextRule = TextRule{}
