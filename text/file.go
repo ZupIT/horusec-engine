@@ -115,10 +115,11 @@ func (textfile TextFile) FindLineAndColumn(findingIndex int) (line, column int) 
 func (textfile TextFile) ExtractSample(findingIndex int) string {
 	lineIndex := binarySearch(findingIndex, textfile.newlineEndingIndexes)
 
-	if lineIndex < len(textfile.newlineEndingIndexes) {
-		index := textfile.newlineEndingIndexes[lineIndex]
+	if lineIndex < len(textfile.newlineEndingIndexes) && lineIndex > 0 {
+		endOfPreviousLine := textfile.newlineEndingIndexes[lineIndex-1]
+		endOfCurrentLine := textfile.newlineEndingIndexes[lineIndex]
 
-		lineContent := textfile.RawString[index - 1 : index]
+		lineContent := textfile.RawString[endOfPreviousLine+1 : endOfCurrentLine]
 
 		return strings.TrimSpace(lineContent)
 	}
