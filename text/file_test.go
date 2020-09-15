@@ -185,6 +185,17 @@ func TestTextFiles_GetAllFilesUnits(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, 9, len(textUnit.Files))
 	})
+	t.Run("Should return multi unit with 4 textFiles and max of 3 files per textFile when get any files", func(t *testing.T) {
+		path := "./samples"
+		path, err := filepath.Abs(path)
+		assert.NoError(t, err)
+		textUnit, err := LoadDirIntoMultiUnit(path, 3, []string{"**"})
+		assert.NoError(t, err)
+		assert.Equal(t, 4, len(textUnit))
+		for _, item := range textUnit {
+			assert.LessOrEqual(t, len(item.Files), 3)
+		}
+	})
 	t.Run("Should return unit with tree files when get go files", func(t *testing.T) {
 		path := "./samples"
 		path, err := filepath.Abs(path)

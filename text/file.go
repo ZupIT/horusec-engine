@@ -157,6 +157,33 @@ func LoadDirIntoSingleUnit(path string, extensionsAccept []string) (TextUnit, er
 	return unit, err
 }
 
+// The Param extensionAccept is an filter to check if you need get textUnit for file with this extesion
+//   Example: []string{".java"}
+// If an item of slice contains is equal the "**" it's will accept all extensions
+//   Example: []string{"**"}
+func LoadDirIntoMultiUnit(path string, maxFilesPerTextUnit int, extensionsAccept []string) ([]TextUnit, error) {
+	units := []TextUnit{
+		TextUnit{},
+	}
+	lastIndexToAdd := 0
+	err := filepath.Walk(path, func(path string, info os.FileInfo, err error) error {
+		if err != nil || info.IsDir() {
+			return err
+		}
+		textFile, err := validateAndGetTextFileByPath(path, extensionsAccept)
+		if err != nil || textFile == nil {
+			return err
+		}
+		units[lastIndexToAdd].Files = append(units[lastIndexToAdd].Files, *textFile)
+		if len(units[lastIndexToAdd].Files) >= maxFilesPerTextUnit {
+			units = append(units, TextUnit{})
+			lastIndexToAdd++
+		}
+		return nil
+	})
+	return units, err
+}
+
 func validateAndGetTextFileByPath(path string, extensionsAccept []string) (*TextFile, error) {
 	if checkIfEnableExtension(path, extensionsAccept) {
 		file, err := getTextFileByPath(path)
