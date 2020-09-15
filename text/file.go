@@ -116,10 +116,13 @@ func (textfile TextFile) ExtractSample(findingIndex int) string {
 	lineIndex := binarySearch(findingIndex, textfile.newlineEndingIndexes)
 
 	if lineIndex < len(textfile.newlineEndingIndexes) && lineIndex > 0 {
-		endOfPreviousLine := textfile.newlineEndingIndexes[lineIndex-1]
+		endOfPreviousLine := textfile.newlineEndingIndexes[lineIndex]
+		if lineIndex > 0 {
+			endOfPreviousLine = textfile.newlineEndingIndexes[lineIndex - 1] + 1
+		}
 		endOfCurrentLine := textfile.newlineEndingIndexes[lineIndex]
 
-		lineContent := textfile.RawString[endOfPreviousLine+1 : endOfCurrentLine]
+		lineContent := textfile.RawString[endOfPreviousLine : endOfCurrentLine]
 
 		return strings.TrimSpace(lineContent)
 	}
