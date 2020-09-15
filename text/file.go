@@ -106,7 +106,11 @@ func (textfile TextFile) FindLineAndColumn(findingIndex int) (line, column int) 
 
 		// now we access the textual index in the slice to ge the column
 		endOfCurrentLineInTheFile := textfile.newlineEndingIndexes[endOfCurrentLine]
-		column = (findingIndex - 1) - endOfCurrentLineInTheFile
+		if findingIndex == 0 {
+			column = endOfCurrentLineInTheFile
+		} else {
+			column = (findingIndex - 1) - endOfCurrentLineInTheFile
+		}
 	}
 
 	return
