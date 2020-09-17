@@ -106,7 +106,11 @@ func (textfile TextFile) FindLineAndColumn(findingIndex int) (line, column int) 
 
 		// now we access the textual index in the slice to ge the column
 		endOfCurrentLineInTheFile := textfile.newlineEndingIndexes[endOfCurrentLine]
-		column = (findingIndex - 1) - endOfCurrentLineInTheFile
+		if findingIndex == 0 {
+			column = endOfCurrentLineInTheFile
+		} else {
+			column = (findingIndex - 1) - endOfCurrentLineInTheFile
+		}
 	}
 
 	return
@@ -116,10 +120,13 @@ func (textfile TextFile) ExtractSample(findingIndex int) string {
 	lineIndex := binarySearch(findingIndex, textfile.newlineEndingIndexes)
 
 	if lineIndex < len(textfile.newlineEndingIndexes) {
-		endOfPreviousLine := textfile.newlineEndingIndexes[lineIndex-1]
+		endOfPreviousLine := 0
+		if lineIndex > 0 {
+			endOfPreviousLine = textfile.newlineEndingIndexes[lineIndex - 1] + 1
+		}
 		endOfCurrentLine := textfile.newlineEndingIndexes[lineIndex]
 
-		lineContent := textfile.RawString[endOfPreviousLine+1 : endOfCurrentLine]
+		lineContent := textfile.RawString[endOfPreviousLine : endOfCurrentLine]
 
 		return strings.TrimSpace(lineContent)
 	}
@@ -155,6 +162,33 @@ func LoadDirIntoSingleUnit(path string, extensionsAccept []string) (TextUnit, er
 		return nil
 	})
 	return unit, err
+}
+
+// The Param extensionAccept is an filter to check if you need get textUnit for file with this extesion
+//   Example: []string{".java"}
+// If an item of slice contains is equal the "**" it's will accept all extensions
+//   Example: []string{"**"}
+func LoadDirIntoMultiUnit(path string, maxFilesPerTextUnit int, extensionsAccept []string) ([]TextUnit, error) {
+	units := []TextUnit{
+		TextUnit{},
+	}
+	lastIndexToAdd := 0
+	err := filepath.Walk(path, func(path string, info os.FileInfo, err error) error {
+		if err != nil || info.IsDir() {
+			return err
+		}
+		textFile, err := validateAndGetTextFileByPath(path, extensionsAccept)
+		if err != nil || textFile == nil {
+			return err
+		}
+		units[lastIndexToAdd].Files = append(units[lastIndexToAdd].Files, *textFile)
+		if len(units[lastIndexToAdd].Files) >= maxFilesPerTextUnit {
+			units = append(units, TextUnit{})
+			lastIndexToAdd++
+		}
+		return nil
+	})
+	return units, err
 }
 
 func validateAndGetTextFileByPath(path string, extensionsAccept []string) (*TextFile, error) {
