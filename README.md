@@ -47,3 +47,62 @@ issues manifest in your favorite language syntax, and therefore how to identify 
 ### Finding
 The finding is a key part of your tool, since it's with it that you actually extract useful insight from the source code being analyzed.
 The struct right now is focused on simplicity, but we are working to implement it following the SARIF specification, so you can have complete control of where you import your data.
+
+
+## Examples
+
+A simple analysis of a inmemory string:
+```go
+	var exampleGoFile = `package version
+
+import (
+	"github.com/ZupIT/horus/development-kit/pkg/utils/logger"
+	"github.com/spf13/cobra"
+)
+
+type IVersion interface {
+	CreateCobraCmd() *cobra.Command
+}
+
+type Version struct {
+}
+
+func NewVersionCommand() IVersion {
+	return &Version{}
+}
+
+func (v *Version) CreateCobraCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:     "version",
+		Short:   "Actual version installed of the horus",
+		Example: "horus version",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			logger.LogPrint(cmd.Short + " is: ")
+			return nil
+		},
+	}
+}
+`
+
+	var textUnit TextUnit = TextUnit{}
+	goTextFile, err := NewTextFile("example/cmd/version.go", []byte(exampleGoFile))
+
+	if err != nil {
+		t.Error(err)
+	}
+
+	textUnit.Files = append(textUnit.Files, goTextFile)
+
+	var regularMatchRule TextRule = TextRule{}
+	regularMatchRule.Type = Regular
+	regularMatchRule.Expressions = append(regularMatchRule.Expressions, regexp.MustCompile(`cmd\.Short`))
+
+	rules := []engine.Rule{regularMatchRule}
+	program := []engine.Unit{textUnit}
+
+	findings := engine.Run(program, rules)
+
+	for _, finding := range findings {
+		t.Log(finding.SourceLocation)
+	}
+```
