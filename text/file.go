@@ -122,11 +122,11 @@ func (textfile TextFile) ExtractSample(findingIndex int) string {
 	if lineIndex < len(textfile.newlineEndingIndexes) {
 		endOfPreviousLine := 0
 		if lineIndex > 0 {
-			endOfPreviousLine = textfile.newlineEndingIndexes[lineIndex - 1] + 1
+			endOfPreviousLine = textfile.newlineEndingIndexes[lineIndex-1] + 1
 		}
 		endOfCurrentLine := textfile.newlineEndingIndexes[lineIndex]
 
-		lineContent := textfile.RawString[endOfPreviousLine : endOfCurrentLine]
+		lineContent := textfile.RawString[endOfPreviousLine:endOfCurrentLine]
 
 		return strings.TrimSpace(lineContent)
 	}

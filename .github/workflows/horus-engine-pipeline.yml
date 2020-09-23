@@ -1,0 +1,34 @@
+name: HorusEnginePipeline
+
+on: [push]
+
+jobs:
+  fmt-lint-test-coverage:
+    name: fmt-lint-test-coverage
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Go 1.14
+        uses: actions/setup-go@v1
+        with:
+          go-version: 1.14
+        id: go
+      - name: Check out code
+        uses: actions/checkout@v2
+      - name: fmt
+        run: |
+          echo "==> Checking that code complies with gofmt requirements..."
+          gofmt_files=$(gofmt -l `find . -name '*.go' | grep -v vendor`)
+          echo $gofmt_files
+          if [ ! -z $gofmt_files ]; then
+              echo 'gofmt needs running on the following files:'
+              echo "$gofmt_files"
+              echo "You can use the command: \`gofmt -w \$(gofmt -l \'find . -name \'*.go\' | grep -v vendor)\` to reformat code."
+              exit 1
+          fi
+          echo "=) The project horus-cli it's OK!"
+      - name: lint
+        run: make lint
+      - name: test
+        run: make test
+      - name: coverage
+        run: make coverage
