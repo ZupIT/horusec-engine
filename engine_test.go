@@ -26,16 +26,6 @@ func (unit TestUnit) Eval(rule Rule) []Finding {
 	}
 }
 
-type AdvisoryExample struct {
-	ID string
-	Name string
-	Description string
-}
-
-func (a *AdvisoryExample) GetID() string { return a.ID }
-func (a *AdvisoryExample) GetName() string { return a.Name }
-func (a *AdvisoryExample) GetDescription() string { return a.Description }
-
 func TestRunWithTextUnits(t *testing.T) {
 	testProgram := []Unit{TestUnit{}}
 	rules := []Rule{TestRule{}}

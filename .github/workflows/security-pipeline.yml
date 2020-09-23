@@ -1,0 +1,16 @@
+name: SecurityPipeline
+
+on: [push]
+
+jobs:
+  horus-security:
+    name: horus-security
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v2
+      - name: Running Horus Security
+        shell: bash
+        run: |
+          curl -fsSL https://horus-assets.s3.amazonaws.com/install.sh | bash
+          horus start -p="./"
