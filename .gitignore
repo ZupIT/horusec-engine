@@ -8,4 +8,4 @@ tmp/
 .aws/
 *.pem
 *.srl
-.horus/
+.horusec/

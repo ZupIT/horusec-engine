@@ -3,8 +3,8 @@ name: SecurityPipeline
 on: [push]
 
 jobs:
-  horus-security:
-    name: horus-security
+  horusec-security:
+    name: horusec-security
     runs-on: ubuntu-latest
     steps:
       - name: Check out code into the Go module directory
@@ -12,5 +12,5 @@ jobs:
       - name: Running Horus Security
         shell: bash
         run: |
-          curl -fsSL https://horus-assets.s3.amazonaws.com/install.sh | bash
-          horus start -p="./"
+          curl -fsSL https://horusec-assets.s3.amazonaws.com/install.sh | bash
+          horusec start -p="./"

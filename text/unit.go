@@ -14,9 +14,7 @@
 
 package text
 
-import (
-	"github.com/ZupIT/horus-engine"
-)
+import engine "github.com/ZupIT/horus-engine"
 
 type TextUnit struct {
 	Files []TextFile
