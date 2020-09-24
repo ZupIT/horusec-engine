@@ -1,4 +1,4 @@
-name: HorusEnginePipeline
+name: HorusecEnginePipeline
 
 on: [push]
 
