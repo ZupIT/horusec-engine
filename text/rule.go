@@ -17,7 +17,7 @@ package text
 import (
 	"regexp"
 
-	engine "github.com/ZupIT/horus-engine"
+	engine "github.com/ZupIT/horusec-engine"
 )
 
 type MatchType int

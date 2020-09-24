@@ -19,7 +19,7 @@ import (
 	"regexp"
 	"testing"
 
-	engine "github.com/ZupIT/horus-engine"
+	engine "github.com/ZupIT/horusec-engine"
 )
 
 func TestTextUnitEvalWithRegularMatch(t *testing.T) {
