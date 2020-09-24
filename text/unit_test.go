@@ -19,14 +19,14 @@ import (
 	"regexp"
 	"testing"
 
-	"github.com/ZupIT/horus-engine"
+	engine "github.com/ZupIT/horusec-engine"
 )
 
 func TestTextUnitEvalWithRegularMatch(t *testing.T) {
 	var exampleGoFile = `package version
 
 import (
-	"github.com/ZupIT/horus/development-kit/pkg/utils/logger"
+	"github.com/ZupIT/horusec/development-kit/pkg/utils/logger"
 	"github.com/spf13/cobra"
 )
 
@@ -44,8 +44,8 @@ func NewVersionCommand() IVersion {
 func (v *Version) CreateCobraCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:     "version",
-		Short:   "Actual version installed of the horus",
-		Example: "horus version",
+		Short:   "Actual version installed of the horusec",
+		Example: "horusec version",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			logger.LogPrint(cmd.Short + " is: ")
 			return nil
@@ -121,7 +121,7 @@ func TestTextUnitEvalWithRegularMatchWithMultipleFiles(t *testing.T) {
 	var examplePositiveGoFile = `package version
 
 import (
-	"github.com/ZupIT/horus/development-kit/pkg/utils/logger"
+	"github.com/ZupIT/horusec/development-kit/pkg/utils/logger"
 	"github.com/spf13/cobra"
 )
 
@@ -139,8 +139,8 @@ func NewVersionCommand() IVersion {
 func (v *Version) CreateCobraCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:     "version",
-		Short:   "Actual version installed of the horus",
-		Example: "horus version",
+		Short:   "Actual version installed of the horusec",
+		Example: "horusec version",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			logger.LogPrint(cmd.Short + " is: ")
 			return nil

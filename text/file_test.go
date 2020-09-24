@@ -15,10 +15,11 @@
 package text
 
 import (
-	"github.com/stretchr/testify/assert"
 	"path/filepath"
 	"regexp"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestFindLineAndColumnWithAKotlinController(t *testing.T) {
@@ -73,7 +74,7 @@ func TestFindLineAndColumnWithAGoFile(t *testing.T) {
 	var exampleGoFile = `package version
 
 import (
-	"github.com/ZupIT/horus/development-kit/pkg/utils/logger"
+	"github.com/ZupIT/horusec/development-kit/pkg/utils/logger"
 	"github.com/spf13/cobra"
 )
 
@@ -91,8 +92,8 @@ func NewVersionCommand() IVersion {
 func (v *Version) CreateCobraCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:     "version",
-		Short:   "Actual version installed of the horus",
-		Example: "horus version",
+		Short:   "Actual version installed of the horusec",
+		Example: "horusec version",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			logger.LogPrint(cmd.Short + " is: ")
 			return nil
@@ -128,7 +129,7 @@ func TestExtractSampleWithAGoFile(t *testing.T) {
 	var exampleGoFile = `package version
 
 import (
-	"github.com/ZupIT/horus/development-kit/pkg/utils/logger"
+	"github.com/ZupIT/horusec/development-kit/pkg/utils/logger"
 	"github.com/spf13/cobra"
 )
 
@@ -146,8 +147,8 @@ func NewVersionCommand() IVersion {
 func (v *Version) CreateCobraCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:     "version",
-		Short:   "Actual version installed of the horus",
-		Example: "horus version",
+		Short:   "Actual version installed of the horusec",
+		Example: "horusec version",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			logger.LogPrint(cmd.Short + " is: ")
 			return nil

@@ -1,4 +1,4 @@
-module github.com/ZupIT/horus-engine
+module github.com/ZupIT/horusec-engine
 
 go 1.14
 

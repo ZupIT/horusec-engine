@@ -1,4 +1,4 @@
-name: HorusEnginePipeline
+name: HorusecEnginePipeline
 
 on: [push]
 
@@ -25,7 +25,7 @@ jobs:
               echo "You can use the command: \`gofmt -w \$(gofmt -l \'find . -name \'*.go\' | grep -v vendor)\` to reformat code."
               exit 1
           fi
-          echo "=) The project horus-cli it's OK!"
+          echo "=) The project horusec-cli it's OK!"
       - name: lint
         run: make lint
       - name: test
