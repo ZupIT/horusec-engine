@@ -15,6 +15,7 @@
 package text
 
 import (
+	"bytes"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -24,6 +25,9 @@ import (
 
 var (
 	newlineFinder *regexp.Regexp = regexp.MustCompile("\x0a")
+
+	PEMagicBytes   []byte = []byte{'\x4D', '\x5A'}                 // MZ
+	ELFMagicNumber []byte = []byte{'\x7F', '\x45', '\x4C', '\x46'} // .ELF
 )
 
 const AcceptAllExtensions string = "**"
@@ -153,6 +157,16 @@ func ReadAndCreateTextFile(filename string) (TextFile, error) {
 
 	if err != nil {
 		return TextFile{}, err
+	}
+
+	textFileMagicBytes := textFileContent[:4]
+
+	if bytes.Equal(textFileMagicBytes, ELFMagicNumber) {
+		// Ignore Linux binaries
+		return TextFile{}, nil
+	} else if bytes.Equal(textFileContent[:2], PEMagicBytes) {
+		// Ignore Windows binaries
+		return TextFile{}, nil
 	}
 
 	return NewTextFile(filename, textFileContent)
