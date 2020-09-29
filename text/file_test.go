@@ -191,6 +191,51 @@ func TestNameFormattingAndDisplaying(t *testing.T) {
 	}
 }
 
+func TestReadAndCreateTextFileWithELFFile(t *testing.T) {
+	textFile, err := ReadAndCreateTextFile(filepath.Join("samples", "test.elf"))
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	t.Log(textFile.DisplayName)
+
+	if textFile.DisplayName != "" || textFile.Name != "" || textFile.RawString != "" {
+		t.Fatal("Should not return anything")
+	}
+}
+
+func TestReadAndCreateTextFileWithPEFile(t *testing.T) {
+	textFile, err := ReadAndCreateTextFile(filepath.Join("samples", "test.pe"))
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	t.Log(textFile.DisplayName)
+
+	if textFile.DisplayName != "" || textFile.Name != "" || textFile.RawString != "" {
+		t.Fatal("Should not return anything")
+	}
+}
+
+func TestReadAndCreateTextFileWithMachOFile(t *testing.T) {
+	t.Log("TODO: Skip Mach-O files")
+	t.Skip()
+
+	textFile, err := ReadAndCreateTextFile(filepath.Join("samples", "test.macho"))
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	t.Log(textFile.DisplayName)
+
+	if textFile.DisplayName != "" || textFile.Name != "" || textFile.RawString != "" {
+		t.Fatal("Should not return anything")
+	}
+}
+
 func TestTextFiles_GetAllFilesUnits(t *testing.T) {
 	t.Run("Should return unit with nine files when get any files", func(t *testing.T) {
 		path := "./samples"
@@ -198,7 +243,7 @@ func TestTextFiles_GetAllFilesUnits(t *testing.T) {
 		assert.NoError(t, err)
 		textUnit, err := LoadDirIntoSingleUnit(path, []string{"**"})
 		assert.NoError(t, err)
-		assert.Equal(t, 9, len(textUnit.Files))
+		assert.Equal(t, 11, len(textUnit.Files))
 	})
 	t.Run("Should return multi unit with 4 textFiles and max of 3 files per textFile when get any files", func(t *testing.T) {
 		path := "./samples"
