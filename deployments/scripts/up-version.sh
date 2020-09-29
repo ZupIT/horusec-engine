@@ -110,21 +110,12 @@ pushChangesAndCheckResponse () {
         if [[ $RESULT_PUSH -eq 0 ]]
         then
             echo "New version was updated!"
-            if [ "$BRANCH_NAME" == "master" ]
-            then
-                git checkout develop
-                git pull origin master
-
-                resetAlphaRcToMaster
-
-                ./deployments/scripts/up-version.sh alpha
-            fi
         else
-            echo "Error on push to branch develop: $RESULT_PUSH"
+            echo "Error on push tags: $RESULT_PUSH"
             exit 1
         fi
     else
-        echo "Error on push to branch develop: $RESULT_PUSH"
+        echo "Error on push in branch: $RESULT_PUSH"
         exit 1
     fi
 }

@@ -1,9 +1,9 @@
 #!/bin/bash
 
 checkIfInstallationIsValid () {
-    EXPECTED_RESPONSE="Semantic version tool helper to validate and increase versions semantically"
-    EXISTS_SEMVER=$(semver | grep "$EXPECTED_RESPONSE")
-    if [[ -z "$EXISTS_SEMVER" ]]
+    semver &> /dev/null
+    RESPONSE=$?
+    if [ $RESPONSE != "0" ]
     then
         LOCATION_SEMVER=$(which semver)
         echo "Semver is not installed please remove the binary in location [$LOCATION_SEMVER] and run again"
@@ -19,7 +19,9 @@ installSemver () {
     if [ $RESPONSE != "0" ]
     then
         echo "Installing semver..."
-        go get -u github.com/wiliansilvazup/semver-cli/cmd/semver
+        curl https://horus-assets.s3.amazonaws.com/semver -o ./semver
+        chmod +x ./semver
+        sudo mv ./semver /usr/local/bin/semver
     fi
 }
 
