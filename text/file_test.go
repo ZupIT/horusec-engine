@@ -243,7 +243,7 @@ func TestTextFiles_GetAllFilesUnits(t *testing.T) {
 		assert.NoError(t, err)
 		textUnit, err := LoadDirIntoSingleUnit(path, []string{"**"})
 		assert.NoError(t, err)
-		assert.Equal(t, 11, len(textUnit.Files))
+		assert.Equal(t, 13, len(textUnit.Files))
 	})
 	t.Run("Should return multi unit with 4 textFiles and max of 3 files per textFile when get any files", func(t *testing.T) {
 		path := "./samples"
@@ -251,7 +251,7 @@ func TestTextFiles_GetAllFilesUnits(t *testing.T) {
 		assert.NoError(t, err)
 		textUnit, err := LoadDirIntoMultiUnit(path, 3, []string{"**"})
 		assert.NoError(t, err)
-		assert.Equal(t, 4, len(textUnit))
+		assert.Equal(t, 5, len(textUnit))
 		for _, item := range textUnit {
 			assert.LessOrEqual(t, len(item.Files), 3)
 		}
@@ -262,7 +262,7 @@ func TestTextFiles_GetAllFilesUnits(t *testing.T) {
 		assert.NoError(t, err)
 		textUnit, err := LoadDirIntoSingleUnit(path, []string{".perf"})
 		assert.NoError(t, err)
-		assert.Equal(t, 3, len(textUnit.Files))
+		assert.Equal(t, 5, len(textUnit.Files))
 	})
 	t.Run("Should return error when path not exists", func(t *testing.T) {
 		path := "./not-exist-path.go"
