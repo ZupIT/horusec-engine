@@ -120,12 +120,20 @@ func (unit TextUnit) evalAndMatchRule(textRule TextRule, findingsChan chan<- []e
 			}
 
 			if haveFound {
-				findings = append(findings, ruleFindings...)
+				findings = append(findings, getFirstFinding(ruleFindings))
 			}
 
 			findingsChan <- findings
 		}()
 	}
+}
+
+func getFirstFinding(ruleFindings []engine.Finding) engine.Finding {
+	if ruleFindings != nil {
+		return ruleFindings[0]
+	}
+
+	return engine.Finding{}
 }
 
 func (unit TextUnit) Type() engine.UnitType {
