@@ -294,8 +294,8 @@ public class App
 		t.Log(finding.SourceLocation)
 	}
 
-	if len(findings) < 2 || len(findings) > 2 {
-		t.Fatalf("Should find only 2 finding, but found %d", len(findings))
+	if len(findings) != 1 {
+		t.Fatalf("Should find only 1 finding, but found %d", len(findings))
 	}
 
 }
