@@ -129,7 +129,7 @@ func (unit TextUnit) evalAndMatchRule(textRule TextRule, findingsChan chan<- []e
 }
 
 func getFirstFinding(ruleFindings []engine.Finding) engine.Finding {
-	if ruleFindings != nil && len(ruleFindings) >= 1 {
+	if len(ruleFindings) >= 1 {
 		return ruleFindings[0]
 	}
 
