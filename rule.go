@@ -6,6 +6,7 @@ type UnitType int
 
 const (
 	ProgramTextUnit UnitType = iota
+	StructuredDataUnit
 )
 
 // Rule defines a generic rule for any kind of analysis the engine have to execute
