@@ -1,0 +1,35 @@
+package platforms
+
+import (
+	engine "github.com/ZupIT/horusec-engine"
+	"github.com/antchfx/xpath"
+)
+
+type MatchType int
+
+const (
+	RegularMatch MatchType = iota
+	NotMatch
+)
+
+type StructuredDataRule struct {
+	engine.Metadata
+	Type        MatchType
+	Expressions []*xpath.Expr
+}
+
+func (rule StructuredDataRule) IsFor(unitType engine.UnitType) bool {
+	return engine.StructuredDataUnit == unitType
+}
+
+func NewStructuredDataRule(matchType MatchType, queryStrings []string) StructuredDataRule {
+	var exprs []*xpath.Expr
+	for _, query := range queryStrings {
+		exprs = append(exprs, xpath.MustCompile(query))
+	}
+
+	return StructuredDataRule{
+		Type:        matchType,
+		Expressions: exprs,
+	}
+}
