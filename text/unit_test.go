@@ -308,7 +308,14 @@ public class App
  */
 
 func BenchmarkHeavyGolangWithSingleTextUnit(b *testing.B) {
-	benchFiles := []string{"benchmark.perf", "benchmark1.perf", "benchmark2.perf"}
+	benchFiles := []string{
+		"benchmark.perf",
+		"benchmark1.perf",
+		"benchmark2.perf",
+		"benchmark3.perf",
+		"benchmark4.perf",
+	}
+
 	var textUnit TextUnit = TextUnit{}
 
 	var summaryIdentifier TextRule = TextRule{}
@@ -317,7 +324,10 @@ func BenchmarkHeavyGolangWithSingleTextUnit(b *testing.B) {
 	var instanceIdentifier TextRule = TextRule{}
 	instanceIdentifier.Expressions = append(instanceIdentifier.Expressions, regexp.MustCompile(`Instance`))
 
-	rules := []engine.Rule{summaryIdentifier, instanceIdentifier}
+	var staticMethodsIdentifier TextRule = TextRule{}
+	staticMethodsIdentifier.Expressions = append(staticMethodsIdentifier.Expressions, regexp.MustCompile(`static`))
+
+	rules := []engine.Rule{summaryIdentifier, instanceIdentifier, staticMethodsIdentifier}
 
 	for _, benchFileName := range benchFiles {
 		benchFile, err := ReadAndCreateTextFile(filepath.Join("samples", benchFileName))
@@ -330,6 +340,49 @@ func BenchmarkHeavyGolangWithSingleTextUnit(b *testing.B) {
 	}
 
 	program := []engine.Unit{textUnit}
+
+	b.ResetTimer()
+
+	for i := 0; i < b.N; i++ {
+		engine.Run(program, rules)
+	}
+}
+
+func BenchmarkHeavyGolangWithMultipleUnits(b *testing.B) {
+	benchFiles := []string{
+		"benchmark.perf",
+		"benchmark1.perf",
+		"benchmark2.perf",
+		"benchmark3.perf",
+		"benchmark4.perf",
+	}
+
+	var summaryIdentifier TextRule = TextRule{}
+	summaryIdentifier.Expressions = append(summaryIdentifier.Expressions, regexp.MustCompile(`Summary`))
+
+	var instanceIdentifier TextRule = TextRule{}
+	instanceIdentifier.Expressions = append(instanceIdentifier.Expressions, regexp.MustCompile(`Instance`))
+
+	var staticMethodsIdentifier TextRule = TextRule{}
+	staticMethodsIdentifier.Expressions = append(staticMethodsIdentifier.Expressions, regexp.MustCompile(`static`))
+
+	rules := []engine.Rule{summaryIdentifier, instanceIdentifier, staticMethodsIdentifier}
+
+	program := []engine.Unit{}
+
+	for _, benchFileName := range benchFiles {
+		var textUnit TextUnit = TextUnit{}
+		benchFile, err := ReadAndCreateTextFile(filepath.Join("samples", benchFileName))
+
+		if err != nil {
+			b.Fatal(err)
+		}
+
+		textUnit.Files = append(textUnit.Files, benchFile)
+		for i := 0; i <= 1024; i++ {
+			program = append(program, textUnit)
+		}
+	}
 
 	b.ResetTimer()
 
