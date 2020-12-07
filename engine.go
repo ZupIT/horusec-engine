@@ -55,7 +55,7 @@ func createOutputFile(jsonFilePath string) (*os.File, error) {
 	if _, err := os.Create(jsonFilePath); err != nil {
 		return nil, err
 	}
-	outputFile, err := os.OpenFile(jsonFilePath, os.O_CREATE|os.O_WRONLY, 0644)
+	outputFile, err := os.OpenFile(jsonFilePath, os.O_CREATE|os.O_WRONLY, 0600)
 	if err != nil {
 		return nil, err
 	}
