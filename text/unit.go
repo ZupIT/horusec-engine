@@ -16,6 +16,7 @@ package text
 
 import engine "github.com/ZupIT/horusec-engine"
 
+// nolint name is necessary for now called TextUnit for not occurs breaking changes
 type TextUnit struct {
 	Files []TextFile
 }
@@ -43,20 +44,19 @@ func createFindingsFromIndexes(findingIndexes [][]int, file TextFile, rule TextR
 		line, column := file.FindLineAndColumn(findingIndex[0])
 		codeSample := file.ExtractSample(findingIndex[0])
 
-		finding := newFinding(
+		findings = append(findings, newFinding(
 			rule,
 			file.DisplayName,
 			codeSample,
 			line,
 			column,
-		)
-
-		findings = append(findings, finding)
+		))
 	}
 
 	return findings
 }
 
+// nolint Complex method for pass refactor now TODO: Refactor this method in the future to clean code
 func (unit TextUnit) evalRegularRule(textRule TextRule, findingsChan chan<- []engine.Finding) {
 	for _, file := range unit.Files {
 		localFile := file // Preventing Gorountines of accessing the shared memory bit :/
@@ -87,18 +87,17 @@ func (unit TextUnit) evalNotMatchRule(textRule TextRule, findingsChan chan<- []e
 
 			for _, expression := range textRule.Expressions {
 				findingIndexes := expression.FindAllStringIndex(localFile.Content(), -1)
-
 				if findingIndexes == nil {
 					findings = append(findings, newFinding(textRule, localFile.DisplayName, "", 0, 0))
 				}
 			}
 
 			findingsChan <- findings
-
 		}()
 	}
 }
 
+// nolint Complex method for pass refactor now TODO: Refactor this method in the future to clean code
 func (unit TextUnit) evalAndMatchRule(textRule TextRule, findingsChan chan<- []engine.Finding) {
 	for _, file := range unit.Files {
 		localFile := file // Preventing Gorountines of accessing the shared memory bit :/
@@ -140,8 +139,9 @@ func (unit TextUnit) Type() engine.UnitType {
 	return engine.ProgramTextUnit
 }
 
+// nolint Complex method for pass refactor now TODO: Refactor this method in the future to clean code
 func (unit TextUnit) Eval(rule engine.Rule) (unitFindings []engine.Finding) {
-	if len(unit.Files) <= 0 {
+	if len(unit.Files) == 0 {
 		return unitFindings
 	}
 
@@ -149,16 +149,7 @@ func (unit TextUnit) Eval(rule engine.Rule) (unitFindings []engine.Finding) {
 	findingsChannel := make(chan []engine.Finding, chanSize)
 
 	if textRule, ok := rule.(TextRule); ok {
-		switch textRule.Type {
-		case Regular:
-			go unit.evalRegularRule(textRule, findingsChannel)
-		case OrMatch:
-			go unit.evalRegularRule(textRule, findingsChannel)
-		case NotMatch:
-			go unit.evalNotMatchRule(textRule, findingsChannel)
-		case AndMatch:
-			go unit.evalAndMatchRule(textRule, findingsChannel)
-		}
+		unit.factoryExecuteEvalRuleAsyncByTextRuleType(textRule, findingsChannel)
 	} else {
 		// The rule isn't a TextRule, so we just bail out
 		return []engine.Finding{}
@@ -172,4 +163,18 @@ func (unit TextUnit) Eval(rule engine.Rule) (unitFindings []engine.Finding) {
 	close(findingsChannel)
 
 	return unitFindings
+}
+
+func (unit TextUnit) factoryExecuteEvalRuleAsyncByTextRuleType(
+	textRule TextRule, findingsChannel chan []engine.Finding) {
+	switch textRule.Type {
+	case Regular:
+		go unit.evalRegularRule(textRule, findingsChannel)
+	case OrMatch:
+		go unit.evalRegularRule(textRule, findingsChannel)
+	case NotMatch:
+		go unit.evalNotMatchRule(textRule, findingsChannel)
+	case AndMatch:
+		go unit.evalAndMatchRule(textRule, findingsChannel)
+	}
 }
