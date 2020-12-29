@@ -27,17 +27,17 @@ func RunOutputInJSON(document []Unit, rules []Rule, jsonFilePath string) error {
 	if err != nil {
 		return err
 	}
-	if _, err := os.Create(jsonFilePath); err != nil {
-		return err
-	}
-	outputFile, err := os.OpenFile(jsonFilePath, os.O_CREATE|os.O_WRONLY, 0644)
+	outputFile, err := createOutputFile(jsonFilePath)
+	defer func() {
+		_ = outputFile.Close()
+	}()
 	if err != nil {
 		return err
 	}
-	defer outputFile.Close()
-	if err = outputFile.Truncate(0); err != nil {
-		return err
-	}
+	return writeInOutputFile(outputFile, bytesToWrite)
+}
+
+func writeInOutputFile(outputFile *os.File, bytesToWrite []byte) error {
 	bytesWritten, err := outputFile.Write(bytesToWrite)
 	if err != nil {
 		return err
@@ -51,27 +51,37 @@ func RunOutputInJSON(document []Unit, rules []Rule, jsonFilePath string) error {
 	return nil
 }
 
+func createOutputFile(jsonFilePath string) (*os.File, error) {
+	if _, err := os.Create(jsonFilePath); err != nil {
+		return nil, err
+	}
+	outputFile, err := os.OpenFile(jsonFilePath, os.O_CREATE|os.O_WRONLY, 0600)
+	if err != nil {
+		return nil, err
+	}
+	return outputFile, outputFile.Truncate(0)
+}
+
 func Run(document []Unit, rules []Rule) (documentFindings []Finding) {
-	if len(document) < 1 || len(rules) < 1 {
+	numberOfUnits := (len(document)) * (len(rules))
+	if numberOfUnits == 0 {
 		return []Finding{}
 	}
 
-	numberOfUnits := (len(document)) * (len(rules))
+	return executeRunByNumberOfUnits(numberOfUnits, document, rules)
+}
 
+func executeRunByNumberOfUnits(numberOfUnits int, document []Unit, rules []Rule) (documentFindings []Finding) {
 	documentFindingsChannel := make(chan []Finding, numberOfUnits)
-
 	for _, documentUnit := range document {
 		localDocumentUnit := documentUnit
 		go execRulesInDocumentUnit(rules, localDocumentUnit, documentFindingsChannel)
 	}
-
 	for i := 1; i <= numberOfUnits; i++ {
 		unitFindings := <-documentFindingsChannel
 		documentFindings = append(documentFindings, unitFindings...)
 	}
-
 	close(documentFindingsChannel)
-
 	return documentFindings
 }
 

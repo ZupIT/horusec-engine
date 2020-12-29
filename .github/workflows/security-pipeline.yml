@@ -7,10 +7,9 @@ jobs:
     name: horusec-security
     runs-on: ubuntu-latest
     steps:
-      - name: Check out code into the Go module directory
+      - name: Check out code
         uses: actions/checkout@v2
       - name: Running Horusec Security
-        shell: bash
         run: |
-          curl -fsSL https://horusec-cli.s3.amazonaws.com/install.sh | bash
-          horusec start -p="./"
+          curl -fsSL https://horusec.io/bin/install.sh | bash
+          horusec start -p="./" -e="true"

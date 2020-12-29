@@ -29,6 +29,7 @@ const (
 	AndMatch
 )
 
+// nolint name is necessary for now called TextRule for not occurs breaking changes
 type TextRule struct {
 	engine.Metadata
 	Type        MatchType

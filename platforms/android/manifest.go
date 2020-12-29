@@ -68,7 +68,7 @@ type ApplicationInfo struct {
 	Services           []Service           `xml:"service"`
 }
 
-// Manifest is a marshalled version of all the data in the AndroidManifest.xml file
+// Manifest is a marshaled version of all the data in the AndroidManifest.xml file
 type Manifest struct {
 	PackageName string          `xml:"package,attr"`
 	SDKInfo     SDKInfo         `xml:"uses-sdk"`
@@ -84,6 +84,7 @@ func (unit ManifestUnit) Type() engine.UnitType {
 	return engine.StructuredDataUnit
 }
 
+// nolint Complex method for pass refactor now TODO: Refactor this method in the future to clean code
 func (unit ManifestUnit) Eval(rule engine.Rule) (unitFindings []engine.Finding) {
 	if structuredDataRule, ok := rule.(platforms.StructuredDataRule); ok {
 		switch structuredDataRule.Type {
@@ -91,7 +92,7 @@ func (unit ManifestUnit) Eval(rule engine.Rule) (unitFindings []engine.Finding) 
 			for _, expression := range structuredDataRule.Expressions {
 				exprResult := xmlquery.QuerySelectorAll(unit.Document, expression)
 
-				if len(exprResult) <= 0 {
+				if len(exprResult) < 1 {
 					return
 				}
 

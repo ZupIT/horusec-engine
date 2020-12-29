@@ -9,17 +9,15 @@ fmt:
 
 # Run converage with threshold
 coverage:
-	deployments/scripts/coverage.sh 75
+	curl -fsSL https://raw.githubusercontent.com/ZupIT/horusec/master/deployments/scripts/coverage.sh | bash -s 75 .
 
 # Check lint of project setup on file .golangci.yml
 lint:
     ifeq ($(wildcard $(GOCILINT)), $(GOCILINT))
-#		$(GOCILINT) run -v --timeout=2m -c .golangci.yml ./... # not implemented lint equals of the horusec
-		$(GOCILINT) run -v --timeout=2m ./...
+		$(GOCILINT) run -v --timeout=2m -c .golangci.yml ./...
     else
 		curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s v1.25.0
-#		$(GOCILINT) run -v --timeout=2m -c .golangci.yml ./...  # not implemented lint equals of the horusec
-		$(GOCILINT) run -v --timeout=2m ./...  # not implemented lint equals of the horusec
+		$(GOCILINT) run -v --timeout=2m -c .golangci.yml ./...
     endif
 
 # Run all tests of project but stop the execution on the first test fail

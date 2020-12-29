@@ -36,17 +36,15 @@ func newUnicodeReader(defaultReader io.Reader) io.Reader {
 // the encoding to UTF-8.
 func ReadTextFile(filename string) ([]byte, error) {
 	fileDescriptor, err := os.Open(filename)
-
 	if err != nil {
 		return []byte{}, err
 	}
-
-	defer fileDescriptor.Close()
+	defer func() {
+		_ = fileDescriptor.Close()
+	}()
 
 	reader := newUnicodeReader(fileDescriptor)
-
 	utf8FormattedString, err := ioutil.ReadAll(reader)
-
 	if err != nil {
 		return []byte{}, err
 	}

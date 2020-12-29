@@ -42,12 +42,13 @@ func binarySearch(searchIndex int, collection []int) (foundIndex int) {
 }
 
 // TextFile represents a file to be analyzed
+// nolint name is necessary for now called TextFile for not occurs breaking changes
 type TextFile struct {
 	DisplayName string // Holds the raw path relative to the root folder of the project
 	Name        string // Holds only the single name of the file (e.g. handler.js)
 	RawString   string // Holds all the file content
 
-	// Holds the complete path to the file, could be absolute or not (e.g. /home/user/Documents/myProject/router/handler.js)
+	// Holds the complete path to the file, could be absolute or not (e.g. /home/user/myProject/router/handler.js)
 	PhysicalPath string
 
 	// Indexes for internal file reference
@@ -58,21 +59,16 @@ type TextFile struct {
 }
 
 func NewTextFile(relativeFilePath string, content []byte) (TextFile, error) {
-	var err error
-	var formattedPhysicalPath string
-
-	if !filepath.IsAbs(relativeFilePath) {
-		formattedPhysicalPath, err = filepath.Abs(relativeFilePath)
-
-		if err != nil {
-			return TextFile{}, err
-		}
-	} else {
-		formattedPhysicalPath = relativeFilePath
+	formattedPhysicalPath, err := validateRelativeFilePath(relativeFilePath)
+	if err != nil {
+		return TextFile{}, err
 	}
 
-	_, formattedFilename := filepath.Split(formattedPhysicalPath)
+	return createTextFileByPath(formattedPhysicalPath, relativeFilePath, content), nil
+}
 
+func createTextFileByPath(formattedPhysicalPath, relativeFilePath string, content []byte) TextFile {
+	_, formattedFilename := filepath.Split(formattedPhysicalPath)
 	textfile := TextFile{
 		PhysicalPath: formattedPhysicalPath,
 		RawString:    string(content),
@@ -81,20 +77,27 @@ func NewTextFile(relativeFilePath string, content []byte) (TextFile, error) {
 		Name:        formattedFilename,
 		DisplayName: relativeFilePath,
 	}
-
 	textfile.newlineIndexes = newlineFinder.FindAllIndex(content, -1)
 
 	for _, newlineIndex := range textfile.newlineIndexes {
 		textfile.newlineEndingIndexes = append(textfile.newlineEndingIndexes, newlineIndex[0])
 	}
+	return textfile
+}
 
-	return textfile, nil
+func validateRelativeFilePath(relativeFilePath string) (string, error) {
+	if !filepath.IsAbs(relativeFilePath) {
+		return filepath.Abs(relativeFilePath)
+	}
+
+	return relativeFilePath, nil
 }
 
 func (textfile TextFile) Content() string {
 	return textfile.RawString
 }
 
+// nolint TODO: Remove commentaries and refactor method to clean code
 func (textfile TextFile) FindLineAndColumn(findingIndex int) (line, column int) {
 	// findingIndex is the index of the beginning of the text we want to
 	// locate inside the file
@@ -130,8 +133,7 @@ func (textfile TextFile) FindLineAndColumn(findingIndex int) (line, column int) 
 			column = (findingIndex - 1) - endOfCurrentLineInTheFile
 		}
 	}
-
-	return
+	return line, column
 }
 
 func (textfile TextFile) ExtractSample(findingIndex int) string {
@@ -154,13 +156,11 @@ func (textfile TextFile) ExtractSample(findingIndex int) string {
 
 func ReadAndCreateTextFile(filename string) (TextFile, error) {
 	textFileContent, err := ReadTextFile(filename)
-
 	if err != nil {
 		return TextFile{}, err
 	}
 
 	textFileMagicBytes := textFileContent[:4]
-
 	if bytes.Equal(textFileMagicBytes, ELFMagicNumber) {
 		// Ignore Linux binaries
 		return TextFile{}, nil
@@ -196,10 +196,9 @@ func LoadDirIntoSingleUnit(path string, extensionsAccept []string) (TextUnit, er
 //   Example: []string{".java"}
 // If an item of slice contains is equal the "**" it's will accept all extensions
 //   Example: []string{"**"}
+// nolint Complex method for pass refactor now TODO: Refactor this method in the future to clean code
 func LoadDirIntoMultiUnit(path string, maxFilesPerTextUnit int, extensionsAccept []string) ([]TextUnit, error) {
-	units := []TextUnit{
-		TextUnit{},
-	}
+	units := []TextUnit{{}}
 	lastIndexToAdd := 0
 	err := filepath.Walk(path, func(path string, info os.FileInfo, err error) error {
 		if err != nil || info.IsDir() {
