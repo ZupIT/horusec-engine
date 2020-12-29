@@ -16,11 +16,13 @@ package text
 
 import (
 	"bytes"
+	"fmt"
 	"os"
 	"path/filepath"
 	"regexp"
 	"sort"
 	"strings"
+	"time"
 )
 
 var (
@@ -200,11 +202,16 @@ func LoadDirIntoSingleUnit(path string, extensionsAccept []string) (TextUnit, er
 func LoadDirIntoMultiUnit(path string, maxFilesPerTextUnit int, extensionsAccept []string) ([]TextUnit, error) {
 	units := []TextUnit{{}}
 	lastIndexToAdd := 0
+	totalFilesRead := 0
 	err := filepath.Walk(path, func(path string, info os.FileInfo, err error) error {
+		time.Sleep(20 * time.Millisecond)
+		currentTime := time.Now()
 		if err != nil || info.IsDir() {
 			return err
 		}
 		textFile, err := validateAndGetTextFileByPath(path, extensionsAccept)
+		print(fmt.Sprintf("Read file in %v Microseconds. Total: %v [%s]", time.Now().Sub(currentTime).Microseconds(), totalFilesRead, path))
+		totalFilesRead++
 		if err != nil || textFile == nil {
 			return err
 		}
