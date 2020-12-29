@@ -210,7 +210,7 @@ func LoadDirIntoMultiUnit(path string, maxFilesPerTextUnit int, extensionsAccept
 			return err
 		}
 		textFile, err := validateAndGetTextFileByPath(path, extensionsAccept)
-		print(fmt.Sprintf("Read file in %v Microseconds. Total: %v [%s]", time.Now().Sub(currentTime).Microseconds(), totalFilesRead, path))
+		fmt.Println(fmt.Sprintf("Read file in %v Microseconds. Total: %v [%s]", time.Now().Sub(currentTime).Microseconds(), totalFilesRead, path))
 		totalFilesRead++
 		if err != nil || textFile == nil {
 			return err
