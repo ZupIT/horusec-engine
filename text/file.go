@@ -16,11 +16,14 @@ package text
 
 import (
 	"bytes"
+	"fmt"
+	"github.com/ZupIT/horusec/development-kit/pkg/utils/logger"
 	"os"
 	"path/filepath"
 	"regexp"
 	"sort"
 	"strings"
+	"time"
 )
 
 var (
@@ -177,19 +180,14 @@ func ReadAndCreateTextFile(filename string) (TextFile, error) {
 // If an item of slice contains is equal the "**" it's will accept all extensions
 //   Example: []string{"**"}
 func LoadDirIntoSingleUnit(path string, extensionsAccept []string) (TextUnit, error) {
-	unit := TextUnit{}
-	err := filepath.Walk(path, func(path string, info os.FileInfo, err error) error {
-		if err != nil || info.IsDir() {
-			return err
-		}
-		textFile, err := validateAndGetTextFileByPath(path, extensionsAccept)
-		if err != nil || textFile == nil {
-			return err
-		}
-		unit.Files = append(unit.Files, *textFile)
-		return nil
-	})
-	return unit, err
+	listTextUnit, err := loadDirIntoUnit(path, 0, extensionsAccept)
+	if err != nil {
+		return TextUnit{}, err
+	}
+	if len(listTextUnit) < 1 {
+		return TextUnit{}, nil
+	}
+	return listTextUnit[0], nil
 }
 
 // The Param extensionAccept is an filter to check if you need get textUnit for file with this extesion
@@ -198,35 +196,61 @@ func LoadDirIntoSingleUnit(path string, extensionsAccept []string) (TextUnit, er
 //   Example: []string{"**"}
 // nolint Complex method for pass refactor now TODO: Refactor this method in the future to clean code
 func LoadDirIntoMultiUnit(path string, maxFilesPerTextUnit int, extensionsAccept []string) ([]TextUnit, error) {
-	units := []TextUnit{{}}
-	lastIndexToAdd := 0
-	err := filepath.Walk(path, func(path string, info os.FileInfo, err error) error {
-		if err != nil || info.IsDir() {
+	return loadDirIntoUnit(path, maxFilesPerTextUnit, extensionsAccept)
+}
+
+func loadDirIntoUnit(path string, maxFilesPerTextUnit int, extensionsAccept []string) ([]TextUnit, error) {
+	filesToRun, err := getFilesPathIntoProjectPath(path, extensionsAccept)
+	if err != nil {
+		return []TextUnit{}, err
+	}
+	return getTextUnitsFromFilesPath(filesToRun, maxFilesPerTextUnit)
+}
+
+func getFilesPathIntoProjectPath(projectPath string, extensionsAccept []string) (filesToRun []string, err error) {
+	return filesToRun, filepath.Walk(projectPath, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
 			return err
 		}
-		textFile, err := validateAndGetTextFileByPath(path, extensionsAccept)
-		if err != nil || textFile == nil {
-			return err
-		}
-		units[lastIndexToAdd].Files = append(units[lastIndexToAdd].Files, *textFile)
-		if len(units[lastIndexToAdd].Files) >= maxFilesPerTextUnit {
-			units = append(units, TextUnit{})
-			lastIndexToAdd++
+		if !info.IsDir() {
+			if checkIfEnableExtension(path, extensionsAccept) {
+				filesToRun = append(filesToRun, path)
+			}
 		}
 		return nil
 	})
-	return units, err
 }
 
-func validateAndGetTextFileByPath(path string, extensionsAccept []string) (*TextFile, error) {
-	if checkIfEnableExtension(path, extensionsAccept) {
-		file, err := getTextFileByPath(path)
+func getTextUnitsFromFilesPath(filesToRun []string, maxFilesPerTextUnit int) (textUnits []TextUnit, err error) {
+	textUnits = []TextUnit{{}}
+	lastIndexToAdd := 0
+	for k, currentFile := range filesToRun {
+		time.Sleep(15 * time.Millisecond)
+		currentTime := time.Now()
+		textUnits, lastIndexToAdd, err = readFileAndExtractTextUnit(
+			textUnits, lastIndexToAdd, maxFilesPerTextUnit, currentFile)
+		logger.LogTraceWithLevel(fmt.Sprintf(
+			"Read file in %v Microseconds. Total files read: %v/%v ",
+			time.Since(currentTime).Microseconds(), k, len(filesToRun)), logger.TraceLevel, currentFile)
 		if err != nil {
-			return nil, err
+			return []TextUnit{}, err
 		}
-		return &file, nil
 	}
-	return nil, nil
+	return textUnits, nil
+}
+
+func readFileAndExtractTextUnit(
+	textUnits []TextUnit, lastIndexToAdd, maxFilesPerTextUnit int, currentFile string) ([]TextUnit, int, error) {
+	textFile, err := ReadAndCreateTextFile(currentFile)
+	if err != nil {
+		return []TextUnit{}, lastIndexToAdd, err
+	}
+	textUnits[lastIndexToAdd].Files = append(textUnits[lastIndexToAdd].Files, textFile)
+	if maxFilesPerTextUnit > 0 && len(textUnits[lastIndexToAdd].Files) >= maxFilesPerTextUnit {
+		textUnits = append(textUnits, TextUnit{})
+		return textUnits, lastIndexToAdd + 1, nil
+	}
+	return textUnits, lastIndexToAdd, nil
 }
 
 func checkIfEnableExtension(path string, extensionsAccept []string) bool {
@@ -237,12 +261,4 @@ func checkIfEnableExtension(path string, extensionsAccept []string) bool {
 		}
 	}
 	return false
-}
-
-func getTextFileByPath(path string) (TextFile, error) {
-	file, err := ReadAndCreateTextFile(path)
-	if err != nil {
-		return TextFile{}, err
-	}
-	return file, nil
 }

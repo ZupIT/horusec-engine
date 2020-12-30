@@ -3,6 +3,8 @@ package engine
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/ZupIT/horusec/development-kit/pkg/utils/logger"
+	"math"
 	"os"
 )
 
@@ -21,6 +23,15 @@ type Finding struct {
 	SourceLocation Location
 }
 
+func Run(document []Unit, rules []Rule) (documentFindings []Finding) {
+	numberOfUnits := (len(document)) * (len(rules))
+	if numberOfUnits == 0 {
+		return []Finding{}
+	}
+
+	return executeRunByNumberOfUnits(numberOfUnits, document, rules)
+}
+
 func RunOutputInJSON(document []Unit, rules []Rule, jsonFilePath string) error {
 	report := Run(document, rules)
 	bytesToWrite, err := json.MarshalIndent(report, "", "  ")
@@ -35,6 +46,52 @@ func RunOutputInJSON(document []Unit, rules []Rule, jsonFilePath string) error {
 		return err
 	}
 	return writeInOutputFile(outputFile, bytesToWrite)
+}
+
+func RunMaxUnitsByAnalysis(document []Unit, rules []Rule, maxUnitPerAnalysis int) (documentFindings []Finding) {
+	listDocuments := breakTextUnitsIntoLimitOfUnit(document, maxUnitPerAnalysis)
+	for key, units := range listDocuments {
+		logger.LogDebugWithLevel(fmt.Sprintf("Start run analysis %v/%v", key, len(listDocuments)), logger.DebugLevel)
+		documentFindings = append(documentFindings, Run(units, rules)...)
+	}
+	return documentFindings
+}
+
+func breakTextUnitsIntoLimitOfUnit(allUnits []Unit, maxUnitsPerAnalysis int) (units [][]Unit) {
+	units = [][]Unit{}
+	startIndex := 0
+	endIndex := maxUnitsPerAnalysis
+	for i := 0; i < getTotalTextUnitsToRunByAnalysis(allUnits, maxUnitsPerAnalysis); i++ {
+		units = append(units, []Unit{})
+		units = toBreakUnitsAddUnitAndUpdateStartEndIndex(allUnits, units, startIndex, endIndex, i)
+		startIndex = endIndex + 1
+		endIndex += maxUnitsPerAnalysis
+	}
+	return units
+}
+
+func getTotalTextUnitsToRunByAnalysis(textUnits []Unit, maxUnitsPerAnalysis int) int {
+	totalTextUnits := len(textUnits)
+	if totalTextUnits <= maxUnitsPerAnalysis {
+		return 1
+	}
+	totalUnitsToRun := float64(totalTextUnits / maxUnitsPerAnalysis)
+	// nolint:staticcheck is necessary usage pointless in math.ceil
+	return int(math.Ceil(totalUnitsToRun))
+}
+
+func toBreakUnitsAddUnitAndUpdateStartEndIndex(
+	allUnits []Unit, unitsToAppend [][]Unit, startIndex, endIndex, i int) [][]Unit {
+	if len(allUnits[startIndex:]) <= endIndex {
+		for k := range allUnits[startIndex:] {
+			unitsToAppend[i] = append(unitsToAppend[i], allUnits[k])
+		}
+	} else {
+		for k := range allUnits[startIndex:endIndex] {
+			unitsToAppend[i] = append(unitsToAppend[i], allUnits[k])
+		}
+	}
+	return unitsToAppend
 }
 
 func writeInOutputFile(outputFile *os.File, bytesToWrite []byte) error {
@@ -60,15 +117,6 @@ func createOutputFile(jsonFilePath string) (*os.File, error) {
 		return nil, err
 	}
 	return outputFile, outputFile.Truncate(0)
-}
-
-func Run(document []Unit, rules []Rule) (documentFindings []Finding) {
-	numberOfUnits := (len(document)) * (len(rules))
-	if numberOfUnits == 0 {
-		return []Finding{}
-	}
-
-	return executeRunByNumberOfUnits(numberOfUnits, document, rules)
 }
 
 func executeRunByNumberOfUnits(numberOfUnits int, document []Unit, rules []Rule) (documentFindings []Finding) {

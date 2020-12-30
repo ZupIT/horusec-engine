@@ -9,7 +9,7 @@ fmt:
 
 # Run converage with threshold
 coverage:
-	curl -fsSL https://raw.githubusercontent.com/ZupIT/horusec/master/deployments/scripts/coverage.sh | bash -s 75 .
+	curl -fsSL https://raw.githubusercontent.com/ZupIT/horusec/master/deployments/scripts/coverage.sh | bash -s 67 .
 
 # Check lint of project setup on file .golangci.yml
 lint:
