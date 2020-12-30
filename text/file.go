@@ -158,6 +158,7 @@ func (textfile TextFile) ExtractSample(findingIndex int) string {
 	return ""
 }
 
+// nolint:funlen method is necessary more 15 lines
 func ReadAndCreateTextFile(filename string) (TextFile, error) {
 	var textFileContent []byte
 	var err error
