@@ -227,11 +227,11 @@ func getTextUnitsFromFilesPath(filesToRun []string, maxFilesPerTextUnit int) (te
 	for k, currentFile := range filesToRun {
 		time.Sleep(15 * time.Millisecond)
 		currentTime := time.Now()
-		textUnits, lastIndexToAdd, err = readFileAndExtractTextUnit(textUnits, lastIndexToAdd, maxFilesPerTextUnit, currentFile)
-		logger.LogTraceWithLevel(
-			fmt.Sprintf("Read file in %v Microseconds. Total files read: %v/%v ",
-				time.Since(currentTime).Microseconds(), k, len(filesToRun),
-			), logger.TraceLevel, currentFile)
+		textUnits, lastIndexToAdd, err = readFileAndExtractTextUnit(
+			textUnits, lastIndexToAdd, maxFilesPerTextUnit, currentFile)
+		logger.LogTraceWithLevel(fmt.Sprintf(
+			"Read file in %v Microseconds. Total files read: %v/%v ",
+			time.Since(currentTime).Microseconds(), k, len(filesToRun)), logger.TraceLevel, currentFile)
 		if err != nil {
 			return []TextUnit{}, err
 		}

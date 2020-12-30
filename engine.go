@@ -83,12 +83,12 @@ func getTotalTextUnitsToRunByAnalysis(textUnits []Unit, maxUnitsPerAnalysis int)
 func toBreakUnitsAddUnitAndUpdateStartEndIndex(
 	allUnits []Unit, unitsToAppend [][]Unit, startIndex, endIndex, i int) [][]Unit {
 	if len(allUnits[startIndex:]) <= endIndex {
-		for _, f := range allUnits[startIndex:] {
-			unitsToAppend[i] = append(unitsToAppend[i], f)
+		for k := range allUnits[startIndex:] {
+			unitsToAppend[i] = append(unitsToAppend[i], allUnits[k])
 		}
 	} else {
-		for _, f := range allUnits[startIndex:endIndex] {
-			unitsToAppend[i] = append(unitsToAppend[i], f)
+		for k := range allUnits[startIndex:endIndex] {
+			unitsToAppend[i] = append(unitsToAppend[i], allUnits[k])
 		}
 	}
 	return unitsToAppend
