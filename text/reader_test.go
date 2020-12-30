@@ -28,7 +28,7 @@ func TestReadTextFileControlWithUTF8(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	bytesReadFromUTF8File, err := ReadTextFile(filepath.Join("samples", "PetsController.utf8.cs"))
+	bytesReadFromUTF8File, err := ReadTextFileUnix(filepath.Join("samples", "PetsController.utf8.cs"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -44,7 +44,7 @@ func TestReadTextFileControlWithUTF8WithBOM(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	bytesReadFromUTF8File, err := ReadTextFile(filepath.Join("samples", "PetsController.utf8bom.cs"))
+	bytesReadFromUTF8File, err := ReadTextFileUnix(filepath.Join("samples", "PetsController.utf8bom.cs"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -60,7 +60,7 @@ func TestReadTextFileWithUTF16LEWithBOM(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	bytesReadFromUTF16File, err := ReadTextFile(filepath.Join("samples", "PetsController.utf16lebom.cs"))
+	bytesReadFromUTF16File, err := ReadTextFileUnix(filepath.Join("samples", "PetsController.utf16lebom.cs"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -76,7 +76,7 @@ func TestReadTextFileWithUTF16BEWithBOM(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	bytesReadFromUTF16File, err := ReadTextFile(filepath.Join("samples", "PetsController.utf16bebom.cs"))
+	bytesReadFromUTF16File, err := ReadTextFileUnix(filepath.Join("samples", "PetsController.utf16bebom.cs"))
 	if err != nil {
 		t.Fatal(err)
 	}
