@@ -12,20 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// +build windows
-
 package text
 
 import (
 	"bytes"
 	"errors"
+	"golang.org/x/text/encoding/unicode"
+	"golang.org/x/text/transform"
 	"io"
 	"io/ioutil"
 	"os"
-	"runtime"
-
-	"golang.org/x/text/encoding/unicode"
-	"golang.org/x/text/transform"
 )
 
 var (
@@ -38,14 +34,14 @@ var (
 
 // newUnicodeReader creates a transformer to read UTF16 LE or BE MS-Windows files
 // essentially transforming everything to UTF-8, if and only if the file have the BOM
-func newUnicodeReader(defaultReader io.Reader) io.Reader {
+func newUnicodeReaderWin(defaultReader io.Reader) io.Reader {
 	decoder := unicode.UTF8.NewDecoder()
 	return transform.NewReader(defaultReader, unicode.BOMOverride(decoder))
 }
 
 // ReadTextFile reads the content of a file, converting when possible
 // the encoding to UTF-8.
-func ReadTextFile(filename string) ([]byte, error) {
+func ReadTextFileWin(filename string) ([]byte, error) {
 	fileDescriptor, err := os.Open(filename)
 
 	if err != nil {
@@ -67,7 +63,7 @@ func ReadTextFile(filename string) ([]byte, error) {
 		return []byte{}, ErrWinFileWithoutBOM
 	}
 
-	reader := newUnicodeReader(fileDescriptor)
+	reader := newUnicodeReaderWin(fileDescriptor)
 
 	utf8FormattedString, err := ioutil.ReadAll(reader)
 

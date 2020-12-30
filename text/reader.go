@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// +build !windows
-
 package text
 
 import (
@@ -27,14 +25,14 @@ import (
 
 // newUnicodeReader creates a transformer to read UTF16 LE or BE MS-Windows files
 // essentially transforming everything to UTF-8, if and only if the file have the BOM
-func newUnicodeReader(defaultReader io.Reader) io.Reader {
+func newUnicodeReaderUnix(defaultReader io.Reader) io.Reader {
 	decoder := unicode.UTF8.NewDecoder()
 	return transform.NewReader(defaultReader, unicode.BOMOverride(decoder))
 }
 
 // ReadTextFile reads the content of a file, converting when possible
 // the encoding to UTF-8.
-func ReadTextFile(filename string) ([]byte, error) {
+func ReadTextFileUnix(filename string) ([]byte, error) {
 	fileDescriptor, err := os.Open(filename)
 	if err != nil {
 		return []byte{}, err
@@ -43,7 +41,7 @@ func ReadTextFile(filename string) ([]byte, error) {
 		_ = fileDescriptor.Close()
 	}()
 
-	reader := newUnicodeReader(fileDescriptor)
+	reader := newUnicodeReaderUnix(fileDescriptor)
 	utf8FormattedString, err := ioutil.ReadAll(reader)
 	if err != nil {
 		return []byte{}, err
