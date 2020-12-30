@@ -21,7 +21,6 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
-	"runtime"
 	"sort"
 	"strings"
 	"time"
@@ -160,13 +159,7 @@ func (textfile TextFile) ExtractSample(findingIndex int) string {
 
 // nolint:funlen method is necessary more 15 lines
 func ReadAndCreateTextFile(filename string) (TextFile, error) {
-	var textFileContent []byte
-	var err error
-	if runtime.GOOS == "windows" {
-		textFileContent, err = ReadTextFileWin(filename)
-	} else {
-		textFileContent, err = ReadTextFileUnix(filename)
-	}
+	textFileContent, err := ReadTextFileUnix(filename)
 	if err != nil {
 		return TextFile{}, err
 	}
