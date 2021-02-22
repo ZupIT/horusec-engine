@@ -35,7 +35,7 @@ and allows you to expand the functionality of the engine with new techniques, wh
 
 ### Unit
 The most important of them, an unit is a piece of your code that makes sense to be analyzed as one. So every Unit is
-a lexical scope, you can imagine for example, a C++ namespace of a Java Class. The engine will threat all the files and code inside
+a lexical scope, you can imagine for example, a C++ namespace of a Java Class. The engine will treat all the files and code inside
 an unit as one thing, and will only be able to cross reference anything inside a single unit.
 We are working on a more profound and complex lexical analysis between units and even a more deeper one inside units, [so any help is welcome!](https://github.com/ZupIT/horusec-engine/issues)
 
