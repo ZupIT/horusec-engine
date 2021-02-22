@@ -3,11 +3,11 @@
 This repository contains the standalone SAST engine used by the Horusec project.
 
 The goal of this project is to provide a baseline functionality and the basic building blocks
-for anyone to build their own SAST tool.
+for you to build your own SAST tool.
 
 ## But what is a SAST tool anyway?
 A Static Application Security Testing tool is an automated scanner for security issues in your source code or binary artifact
-The main goal of it is to identify, as soon as possible in your development lifecycle any possible threat to your infrastructure
+The main goal of it is to identify, as soon as possible in your development lifecycle, any possible threat to your infrastructure
 and your user's data. One important thing to remember is that no SAST tool found actual vulnerabilities, because the tool never
 actually executes the program being analyzed, therefore, you still have to keep testing your applications with more traditional
 pentesting and any other tests that you can execute.
@@ -35,7 +35,7 @@ and allows you to expand the functionality of the engine with new techniques, wh
 
 ### Unit
 The most important of them, an unit is a piece of your code that makes sense to be analyzed as one. So every Unit is
-a lexical scope, you can imagine for example, a C++ namespace of a Java Class. The engine will treat all the files and code inside
+a lexical scope, you can imagine for example, a C++ namespace or a Java Class. The engine will treat all the files and code inside
 an unit as one thing, and will only be able to cross reference anything inside a single unit.
 We are working on a more profound and complex lexical analysis between units and even a more deeper one inside units, [so any help is welcome!](https://github.com/ZupIT/horusec-engine/issues)
 
@@ -46,12 +46,12 @@ issues manifest in your favorite language syntax, and therefore how to identify 
 
 ### Finding
 The finding is a key part of your tool, since it's with it that you actually extract useful insight from the source code being analyzed.
-The struct right now is focused on simplicity, but we are working to implement it following the SARIF specification, so you can have complete control of where you import your data.
+The struct right now is focused on simplicity, but we are working to implement it following the [SARIF](https://github.com/oasis-tcs/sarif-spec) specification, so you can have complete control of where you import your data.
 
 
 ## Examples
 
-A simple analysis of a inmemory string:
+A simple analysis of an inmemory string:
 ```go
 	var exampleGoFile = `package version
 
