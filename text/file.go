@@ -17,13 +17,14 @@ package text
 import (
 	"bytes"
 	"fmt"
-	"github.com/ZupIT/horusec/development-kit/pkg/utils/logger"
 	"os"
 	"path/filepath"
 	"regexp"
 	"sort"
 	"strings"
 	"time"
+
+	"github.com/ZupIT/horusec/development-kit/pkg/utils/logger"
 )
 
 var (
@@ -130,8 +131,8 @@ func (textfile TextFile) FindLineAndColumn(findingIndex int) (line, column int) 
 
 		// now we access the textual index in the slice to ge the column
 		endOfCurrentLineInTheFile := textfile.newlineEndingIndexes[endOfCurrentLine]
-		if findingIndex == 0 {
-			column = endOfCurrentLineInTheFile
+		if lineIndex == 0 {
+			column = findingIndex
 		} else {
 			column = (findingIndex - 1) - endOfCurrentLineInTheFile
 		}
