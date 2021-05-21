@@ -17,11 +17,12 @@ package text
 import (
 	"bytes"
 	"errors"
-	"golang.org/x/text/encoding/unicode"
-	"golang.org/x/text/transform"
 	"io"
 	"io/ioutil"
 	"os"
+
+	"golang.org/x/text/encoding/unicode"
+	"golang.org/x/text/transform"
 )
 
 var (

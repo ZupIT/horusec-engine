@@ -3,9 +3,10 @@ package engine
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/ZupIT/horusec/development-kit/pkg/utils/logger"
 	"math"
 	"os"
+
+	"github.com/ZupIT/horusec/development-kit/pkg/utils/logger"
 )
 
 type Unit interface {
