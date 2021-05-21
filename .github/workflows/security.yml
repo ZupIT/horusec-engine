@@ -1,0 +1,9 @@
+name: Security
+on: [ "push" ]
+jobs:
+  security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: security
+        run: make security

@@ -1,8 +1,9 @@
 package platforms
 
 import (
-	engine "github.com/ZupIT/horusec-engine"
 	"github.com/antchfx/xpath"
+
+	engine "github.com/ZupIT/horusec-engine"
 )
 
 type MatchType int
@@ -18,6 +19,7 @@ type StructuredDataRule struct {
 	Expressions []*xpath.Expr
 }
 
+//nolint // change to pointer
 func (rule StructuredDataRule) IsFor(unitType engine.UnitType) bool {
 	return engine.StructuredDataUnit == unitType
 }

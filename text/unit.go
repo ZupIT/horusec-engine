@@ -16,11 +16,12 @@ package text
 
 import engine "github.com/ZupIT/horusec-engine"
 
-// nolint name is necessary for now called TextUnit for not occurs breaking changes
+// nolint // name is necessary for now called TextUnit for not occurs breaking changes
 type TextUnit struct {
 	Files []TextFile
 }
 
+//nolint // change to pointer
 func newFinding(ruleData TextRule, filename, codeSample string, line, column int) engine.Finding {
 	return engine.Finding{
 		ID:          ruleData.ID,
@@ -39,6 +40,7 @@ func newFinding(ruleData TextRule, filename, codeSample string, line, column int
 	}
 }
 
+//nolint // change to pointer
 func createFindingsFromIndexes(findingIndexes [][]int, file TextFile, rule TextRule) (findings []engine.Finding) {
 	for _, findingIndex := range findingIndexes {
 		line, column := file.FindLineAndColumn(findingIndex[0])
@@ -56,7 +58,7 @@ func createFindingsFromIndexes(findingIndexes [][]int, file TextFile, rule TextR
 	return findings
 }
 
-// nolint Complex method for pass refactor now TODO: Refactor this method in the future to clean code
+// nolint // Complex method for pass refactor now TODO: Refactor this method in the future to clean code
 func (unit TextUnit) evalRegularRule(textRule TextRule, findingsChan chan<- []engine.Finding) {
 	for _, file := range unit.Files {
 		localFile := file // Preventing Gorountines of accessing the shared memory bit :/
@@ -79,6 +81,7 @@ func (unit TextUnit) evalRegularRule(textRule TextRule, findingsChan chan<- []en
 	}
 }
 
+//nolint // change to pointer
 func (unit TextUnit) evalNotMatchRule(textRule TextRule, findingsChan chan<- []engine.Finding) {
 	for _, file := range unit.Files {
 		localFile := file // Preventing Gorountines of accessing the shared memory bit :/
@@ -97,7 +100,7 @@ func (unit TextUnit) evalNotMatchRule(textRule TextRule, findingsChan chan<- []e
 	}
 }
 
-// nolint Complex method for pass refactor now TODO: Refactor this method in the future to clean code
+// nolint // Complex method for pass refactor now TODO: Refactor this method in the future to clean code
 func (unit TextUnit) evalAndMatchRule(textRule TextRule, findingsChan chan<- []engine.Finding) {
 	for _, file := range unit.Files {
 		localFile := file // Preventing Gorountines of accessing the shared memory bit :/
@@ -139,7 +142,7 @@ func (unit TextUnit) Type() engine.UnitType {
 	return engine.ProgramTextUnit
 }
 
-// nolint Complex method for pass refactor now TODO: Refactor this method in the future to clean code
+// nolint // Complex method for pass refactor now TODO: Refactor this method in the future to clean code
 func (unit TextUnit) Eval(rule engine.Rule) (unitFindings []engine.Finding) {
 	if len(unit.Files) == 0 {
 		return unitFindings
@@ -165,6 +168,7 @@ func (unit TextUnit) Eval(rule engine.Rule) (unitFindings []engine.Finding) {
 	return unitFindings
 }
 
+//nolint // change to pointer
 func (unit TextUnit) factoryExecuteEvalRuleAsyncByTextRuleType(
 	textRule TextRule, findingsChannel chan []engine.Finding) {
 	switch textRule.Type {

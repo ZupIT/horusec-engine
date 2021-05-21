@@ -6,6 +6,7 @@ import (
 
 // PopulateFindingWithRuleMetadata converts the engine.Metadata field inside the StructuredDataRule to a engine.Finding
 // struct
+//nolint // change to pointer
 func PopulateFindingWithRuleMetadata(
 	ruleData StructuredDataRule, filename, codeSample string, line, column int) engine.Finding {
 	return engine.Finding{

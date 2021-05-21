@@ -46,7 +46,7 @@ func binarySearch(searchIndex int, collection []int) (foundIndex int) {
 }
 
 // TextFile represents a file to be analyzed
-// nolint name is necessary for now called TextFile for not occurs breaking changes
+// nolint//  name is necessary for now called TextFile for not occurs breaking changes
 type TextFile struct {
 	DisplayName string // Holds the raw path relative to the root folder of the project
 	Name        string // Holds only the single name of the file (e.g. handler.js)
@@ -97,11 +97,12 @@ func validateRelativeFilePath(relativeFilePath string) (string, error) {
 	return relativeFilePath, nil
 }
 
+//nolint // change to pointer
 func (textfile TextFile) Content() string {
 	return textfile.RawString
 }
 
-// nolint TODO: Remove commentaries and refactor method to clean code
+// nolint // refact to have a clean code
 func (textfile TextFile) FindLineAndColumn(findingIndex int) (line, column int) {
 	// findingIndex is the index of the beginning of the text we want to
 	// locate inside the file
@@ -140,6 +141,7 @@ func (textfile TextFile) FindLineAndColumn(findingIndex int) (line, column int) 
 	return line, column
 }
 
+//nolint // change to pointer
 func (textfile TextFile) ExtractSample(findingIndex int) string {
 	lineIndex := binarySearch(findingIndex, textfile.newlineEndingIndexes)
 
@@ -158,7 +160,6 @@ func (textfile TextFile) ExtractSample(findingIndex int) string {
 	return ""
 }
 
-// nolint:funlen method is necessary more 15 lines
 func ReadAndCreateTextFile(filename string) (TextFile, error) {
 	textFileContent, err := ReadTextFileUnix(filename)
 	if err != nil {
@@ -196,7 +197,6 @@ func LoadDirIntoSingleUnit(path string, extensionsAccept []string) (TextUnit, er
 //   Example: []string{".java"}
 // If an item of slice contains is equal the "**" it's will accept all extensions
 //   Example: []string{"**"}
-// nolint Complex method for pass refactor now TODO: Refactor this method in the future to clean code
 func LoadDirIntoMultiUnit(path string, maxFilesPerTextUnit int, extensionsAccept []string) ([]TextUnit, error) {
 	return loadDirIntoUnit(path, maxFilesPerTextUnit, extensionsAccept)
 }
@@ -223,6 +223,7 @@ func getFilesPathIntoProjectPath(projectPath string, extensionsAccept []string) 
 	})
 }
 
+//nolint // refactor to constant
 func getTextUnitsFromFilesPath(filesToRun []string, maxFilesPerTextUnit int) (textUnits []TextUnit, err error) {
 	textUnits = []TextUnit{{}}
 	lastIndexToAdd := 0
