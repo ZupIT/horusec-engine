@@ -29,13 +29,14 @@ const (
 	AndMatch
 )
 
-// nolint name is necessary for now called TextRule for not occurs breaking changes
+// nolint // name is necessary for now called TextRule for not occurs breaking changes
 type TextRule struct {
 	engine.Metadata
 	Type        MatchType
 	Expressions []*regexp.Regexp
 }
 
+//nolint // change to pointer
 func (rule TextRule) IsFor(unitType engine.UnitType) bool {
 	return engine.ProgramTextUnit == unitType
 }

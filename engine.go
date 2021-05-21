@@ -77,7 +77,7 @@ func getTotalTextUnitsToRunByAnalysis(textUnits []Unit, maxUnitsPerAnalysis int)
 		return 1
 	}
 	totalUnitsToRun := float64(totalTextUnits / maxUnitsPerAnalysis)
-	// nolint:staticcheck is necessary usage pointless in math.ceil
+	// nolint:staticcheck // is necessary usage pointless in math.ceil
 	return int(math.Ceil(totalUnitsToRun))
 }
 

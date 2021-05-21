@@ -84,7 +84,7 @@ func (unit ManifestUnit) Type() engine.UnitType {
 	return engine.StructuredDataUnit
 }
 
-// nolint Complex method for pass refactor now TODO: Refactor this method in the future to clean code
+// nolint // Complex method for pass refactor now TODO: Refactor this method in the future to clean code
 func (unit ManifestUnit) Eval(rule engine.Rule) (unitFindings []engine.Finding) {
 	if structuredDataRule, ok := rule.(platforms.StructuredDataRule); ok {
 		switch structuredDataRule.Type {

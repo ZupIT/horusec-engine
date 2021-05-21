@@ -42,7 +42,7 @@ func newUnicodeReaderWin(defaultReader io.Reader) io.Reader {
 
 // ReadTextFile reads the content of a file, converting when possible
 // the encoding to UTF-8.
-// nolint:funlen method is necessary more 10 lines
+// nolint // method is necessary more 10 lines
 func ReadTextFileWin(filename string) ([]byte, error) {
 	fileDescriptor, err := os.Open(filename)
 

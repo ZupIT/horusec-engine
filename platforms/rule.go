@@ -19,6 +19,7 @@ type StructuredDataRule struct {
 	Expressions []*xpath.Expr
 }
 
+//nolint // change to pointer
 func (rule StructuredDataRule) IsFor(unitType engine.UnitType) bool {
 	return engine.StructuredDataUnit == unitType
 }
