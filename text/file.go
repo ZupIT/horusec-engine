@@ -46,7 +46,7 @@ func binarySearch(searchIndex int, collection []int) (foundIndex int) {
 }
 
 // TextFile represents a file to be analyzed
-// nolint//  name is necessary for now called TextFile for not occurs breaking changes
+// nolint:golint //  name is necessary for now called TextFile for not occurs breaking changes
 type TextFile struct {
 	DisplayName string // Holds the raw path relative to the root folder of the project
 	Name        string // Holds only the single name of the file (e.g. handler.js)

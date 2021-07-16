@@ -109,6 +109,7 @@ func writeInOutputFile(outputFile *os.File, bytesToWrite []byte) error {
 	return nil
 }
 
+//nolint:gomnd // improving in the feature
 func createOutputFile(jsonFilePath string) (*os.File, error) {
 	if _, err := os.Create(jsonFilePath); err != nil {
 		return nil, err
