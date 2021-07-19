@@ -126,3 +126,10 @@ func (v *Version) CreateCobraCmd() *cobra.Command {
 		t.Log(finding.SourceLocation)
 	}
 ```
+
+## Communication
+
+We have a few channels for contact, feel free to reach out to us at:
+
+- [GitHub Issues](https://github.com/ZupIT/horusec-engine/issues)
+- [Zup Open Source Forum](https://forum.zup.com.br)
