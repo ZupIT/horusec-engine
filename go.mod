@@ -6,7 +6,7 @@ require (
 	github.com/ZupIT/horusec v1.4.2
 	github.com/antchfx/xmlquery v1.3.3
 	github.com/antchfx/xpath v1.1.11
-	github.com/google/addlicense v0.0.0-20210428195630-6d92264d7170 // indirect
+	github.com/google/addlicense v1.0.0 // indirect
 	github.com/google/uuid v1.1.2
 	github.com/stretchr/testify v1.6.1
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect
