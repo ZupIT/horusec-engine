@@ -4,7 +4,7 @@ go 1.14
 
 require (
 	github.com/ZupIT/horusec v1.4.2
-	github.com/antchfx/xmlquery v1.3.3
+	github.com/antchfx/xmlquery v1.3.6
 	github.com/antchfx/xpath v1.2.0
 	github.com/google/addlicense v1.0.0 // indirect
 	github.com/google/uuid v1.1.2
