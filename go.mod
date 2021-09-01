@@ -3,7 +3,7 @@ module github.com/ZupIT/horusec-engine
 go 1.14
 
 require (
-	github.com/ZupIT/horusec v1.4.2
+	github.com/ZupIT/horusec/v2 v2.4.3
 	github.com/antchfx/xmlquery v1.3.6
 	github.com/antchfx/xpath v1.2.0
 	github.com/google/addlicense v1.0.0 // indirect
