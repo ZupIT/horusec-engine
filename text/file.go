@@ -24,7 +24,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ZupIT/horusec/development-kit/pkg/utils/logger"
+	"github.com/ZupIT/horusec-devkit/pkg/utils/logger"
+	loggerEnums "github.com/ZupIT/horusec-devkit/pkg/utils/logger/enums"
 )
 
 var (
@@ -234,7 +235,7 @@ func getTextUnitsFromFilesPath(filesToRun []string, maxFilesPerTextUnit int) (te
 			textUnits, lastIndexToAdd, maxFilesPerTextUnit, currentFile)
 		logger.LogTraceWithLevel(fmt.Sprintf(
 			"Read file in %v Microseconds. Total files read: %v/%v ",
-			time.Since(currentTime).Microseconds(), k, len(filesToRun)), logger.TraceLevel, currentFile)
+			time.Since(currentTime).Microseconds(), k, len(filesToRun)), loggerEnums.TraceLevel, currentFile)
 		if err != nil {
 			return []TextUnit{}, err
 		}
