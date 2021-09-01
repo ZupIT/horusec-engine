@@ -20,7 +20,8 @@ import (
 	"math"
 	"os"
 
-	"github.com/ZupIT/horusec/development-kit/pkg/utils/logger"
+	"github.com/ZupIT/horusec-devkit/pkg/utils/logger"
+	loggerEnums "github.com/ZupIT/horusec-devkit/pkg/utils/logger/enums"
 )
 
 type Unit interface {
@@ -66,7 +67,7 @@ func RunOutputInJSON(document []Unit, rules []Rule, jsonFilePath string) error {
 func RunMaxUnitsByAnalysis(document []Unit, rules []Rule, maxUnitPerAnalysis int) (documentFindings []Finding) {
 	listDocuments := breakTextUnitsIntoLimitOfUnit(document, maxUnitPerAnalysis)
 	for key, units := range listDocuments {
-		logger.LogDebugWithLevel(fmt.Sprintf("Start run analysis %v/%v", key, len(listDocuments)), logger.DebugLevel)
+		logger.LogDebugWithLevel(fmt.Sprintf("Start run analysis %v/%v", key, len(listDocuments)), loggerEnums.DebugLevel)
 		documentFindings = append(documentFindings, Run(units, rules)...)
 	}
 	return documentFindings
