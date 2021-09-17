@@ -22,6 +22,8 @@ import (
 	engine "github.com/ZupIT/horusec-engine"
 )
 
+var samples = filepath.Join("examples", "samples")
+
 func TestTextUnitEvalWithRegularMatch(t *testing.T) {
 	var exampleGoFile = `package version
 
@@ -330,7 +332,7 @@ func BenchmarkHeavyGolangWithSingleTextUnit(b *testing.B) {
 	rules := []engine.Rule{summaryIdentifier, instanceIdentifier, staticMethodsIdentifier}
 
 	for _, benchFileName := range benchFiles {
-		benchFile, err := ReadAndCreateTextFile(filepath.Join("samples", benchFileName))
+		benchFile, err := ReadAndCreateTextFile(filepath.Join(samples, benchFileName))
 
 		if err != nil {
 			b.Fatal(err)
@@ -372,7 +374,7 @@ func BenchmarkHeavyGolangWithMultipleUnits(b *testing.B) {
 
 	for _, benchFileName := range benchFiles {
 		var textUnit TextUnit = TextUnit{}
-		benchFile, err := ReadAndCreateTextFile(filepath.Join("samples", benchFileName))
+		benchFile, err := ReadAndCreateTextFile(filepath.Join(samples, benchFileName))
 
 		if err != nil {
 			b.Fatal(err)
