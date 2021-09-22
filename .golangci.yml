@@ -142,7 +142,7 @@ exclude-rules:
 run:
   skip-dirs:
     - vendor/
-    - examples/
+    - text/examples/
     - tmp
     - e2e/
   skip-files:
