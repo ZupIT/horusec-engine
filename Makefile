@@ -6,6 +6,7 @@ GO_IMPORTS ?= goimports
 GO_IMPORTS_LOCAL ?= github.com/ZupIT/horusec-engine
 HORUSEC ?= horusec
 ADDLICENSE ?= addlicense
+GO_LIST_TO_TEST ?= $$(go list ./... | grep -v /text/examples/)
 
 fmt:
 	$(GOFMT) -w $(GO_FILES)
@@ -22,7 +23,8 @@ coverage:
 	curl -fsSL https://raw.githubusercontent.com/ZupIT/horusec-devkit/main/scripts/coverage.sh | bash -s 66.3 .
 
 test:
-	$(GO) clean -testcache && $(GO) test -v ./... -timeout=2m -parallel=1 -failfast -short
+	$(GO) clean -testcache
+	$(GO) test -v $(GO_LIST_TO_TEST) -race -timeout=5m -parallel=1 -failfast -short
 
 fix-imports:
     ifeq (, $(shell which $(GO_IMPORTS)))

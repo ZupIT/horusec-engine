@@ -22,7 +22,7 @@ import (
 )
 
 func TestWinReadTextFileShouldFailWithUTF16LEWithoutBOM(t *testing.T) {
-	_, err := ReadTextFileWin(filepath.Join("samples", "PetsController.utf16le.cs"))
+	_, err := ReadTextFileWin(filepath.Join("examples", "csharp", "example2", "PetsController.utf16le.cs"))
 
 	if err == nil {
 		t.Fatalf("Should have returned error for files encoded with UTF16 LE without BOM")
@@ -30,7 +30,7 @@ func TestWinReadTextFileShouldFailWithUTF16LEWithoutBOM(t *testing.T) {
 }
 
 func TestWinReadTextFileShouldFailWithUTF16BEWithoutBOM(t *testing.T) {
-	_, err := ReadTextFileWin(filepath.Join("samples", "PetsController.utf16be.cs"))
+	_, err := ReadTextFileWin(filepath.Join("examples", "csharp", "example2", "PetsController.utf16be.cs"))
 
 	if err == nil {
 		t.Fatalf("Should have returned error for files encoded with UTF16 BE without BOM")

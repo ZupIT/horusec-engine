@@ -309,7 +309,7 @@ func TestNameFormattingAndDisplaying(t *testing.T) {
 }
 
 func TestReadAndCreateTextFileWithELFFile(t *testing.T) {
-	textFile, err := ReadAndCreateTextFile(filepath.Join("samples", "test.elf"))
+	textFile, err := ReadAndCreateTextFile(filepath.Join("examples", "elf", "example1", "test.elf"))
 
 	if err != nil {
 		t.Fatal(err)
@@ -323,7 +323,7 @@ func TestReadAndCreateTextFileWithELFFile(t *testing.T) {
 }
 
 func TestReadAndCreateTextFileWithPEFile(t *testing.T) {
-	textFile, err := ReadAndCreateTextFile(filepath.Join("samples", "test.pe"))
+	textFile, err := ReadAndCreateTextFile(filepath.Join("examples", "pe", "example1", "test.pe"))
 
 	if err != nil {
 		t.Fatal(err)
@@ -340,7 +340,7 @@ func TestReadAndCreateTextFileWithMachOFile(t *testing.T) {
 	t.Log("TODO: Skip Mach-O files")
 	t.Skip()
 
-	textFile, err := ReadAndCreateTextFile(filepath.Join("samples", "test.macho"))
+	textFile, err := ReadAndCreateTextFile(filepath.Join("examples", "pe", "example1", "test.macho"))
 
 	if err != nil {
 		t.Fatal(err)
@@ -355,27 +355,24 @@ func TestReadAndCreateTextFileWithMachOFile(t *testing.T) {
 
 func TestTextFiles_GetAllFilesUnits(t *testing.T) {
 	t.Run("Should return unit with nine files when get any files", func(t *testing.T) {
-		path := "./samples"
-		path, err := filepath.Abs(path)
+		path, err := filepath.Abs("examples")
 		assert.NoError(t, err)
 		textUnit, err := LoadDirIntoSingleUnit(path, []string{"**"})
 		assert.NoError(t, err)
-		assert.Equal(t, 13, len(textUnit.Files))
+		assert.Equal(t, 237, len(textUnit.Files))
 	})
 	t.Run("Should return multi unit with 4 textFiles and max of 3 files per textFile when get any files", func(t *testing.T) {
-		path := "./samples"
-		path, err := filepath.Abs(path)
+		path, err := filepath.Abs("examples")
 		assert.NoError(t, err)
 		textUnit, err := LoadDirIntoMultiUnit(path, 3, []string{"**"})
 		assert.NoError(t, err)
-		assert.Equal(t, 5, len(textUnit))
+		assert.Equal(t, 80, len(textUnit))
 		for _, item := range textUnit {
 			assert.LessOrEqual(t, len(item.Files), 3)
 		}
 	})
 	t.Run("Should return unit with tree files when get go files", func(t *testing.T) {
-		path := "./samples"
-		path, err := filepath.Abs(path)
+		path, err := filepath.Abs("examples")
 		assert.NoError(t, err)
 		textUnit, err := LoadDirIntoSingleUnit(path, []string{".perf"})
 		assert.NoError(t, err)

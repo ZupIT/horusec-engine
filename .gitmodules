@@ -1,0 +1,3 @@
+[submodule "text/examples"]
+	path = text/examples
+	url = https://github.com/ZupIT/horusec-examples-vulnerabilities
