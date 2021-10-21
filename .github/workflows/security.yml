@@ -26,6 +26,7 @@ jobs:
           HORUSEC_CLI_REPOSITORY_AUTHORIZATION: ${{ secrets.HORUSEC_CLI_REPOSITORY_AUTHORIZATION }}
           HORUSEC_CLI_HORUSEC_API_URI: ${{ secrets.HORUSEC_CLI_HORUSEC_API_URI }}
           HORUSEC_CLI_REPOSITORY_NAME: ${{ secrets.HORUSEC_CLI_REPOSITORY_NAME }}
+          REPOSITORY_OWNER: ${{ github.event.pull_request.head.repo.full_name }}
         run: |
-          curl -fsSL https://raw.githubusercontent.com/ZupIT/horusec/master/deployments/scripts/install.sh | bash -s latest
-          horusec start -p . -e true -G true
+          curl -fsSL https://raw.githubusercontent.com/ZupIT/horusec/main/deployments/scripts/install.sh | bash -s latest
+          horusec start -p . -e=$(if [ "$REPOSITORY_OWNER" == "ZupIT/horusec" ]; then echo "true"; else echo "false"; fi) -G --show-vulnerabilities-types="Vulnerability, Risk Accepted"
