@@ -20,11 +20,23 @@
 
 # **Horusec Engine**
 
+## **Table of contents**
+### 1. [**About**](#about)
+### 2. [**Usage**](#usage)
+>#### 2.1. [**Why does this engine help me?**](#why-does-this-engine-help-me)
+>#### 2.2. [**Examples**](#examples)
+### 3. [**Documentation**](#documentation)
+### 4. [**Contributing**](#contributing)
+### 5. [**License**](#license)
+### 6. [**Community**](#community)
+
+## **About** 
+
 This repository contains the standalone SAST engine used by Horusec.
 
 Horusec-Engine provides baseline functionality and the basic building blocks for you to build your own SAST tool.
 
-## **What is a SAST tool?**
+### **What is a SAST tool?**
 A Static Application Security Testing tool is an automated scanner for security issues in your source code or binary artifact. The main goal is to identify, as soon as possible in your development lifecycle, any possible threat to your infrastructure and your user's data.
 SAST tools don't actually find vulnerabilities because the tool never executes the program being analyzed, therefore, you still have to keep testing your applications with more traditional pen testing and any other tests that you can execute.
 
@@ -32,26 +44,27 @@ SAST tools don't actually find vulnerabilities because the tool never executes t
 ### **There are many SAST tools out there, why write my own?**
 The main benefit you can get for writing your own is the amount of knowledge about your application you can add to your tool. In the beginning, the off-the-shelf tool will have more rules and more corner cases covered than yours, but with the right amount of dedication to improve and expand the techniques your tool uses, you can easily overcome the regular market tools.
 
+## **Usage**
+
 ### **Why does this engine help me?**
 The only built-in technique our engine uses is the syntax pattern matching technique, a powerful yet simple technique to uncover the most common mistakes you can leave in your codebase. But, the extensibility of the engine is the main advantage it presents. All the design around our solution was focused on the extensibility and interoperability of techniques in one single analysis.
 
-To achieve that, Horusec-Engine uses three simple and expressive components that can be easily extended to suit your needs and it allows you to expand the functionality of the engine with new techniques, while still having a common ground for all of them. 
-See it below: 
+To achieve that, Horusec-Engine uses three components that allow you to expand the functionality of the engine with new techniques and still with common ground for all of them. They can be extended to suit your needs. Check them out below: 
 
 
-### **1. Unit**
+#### **1. Unit**
 A unit is a piece of your code that makes sense to be analyzed as one. So every Unit is a lexical scope, for example, a C++ namespace or a Java Class. The engine will treat all the files and code inside a unit as one thing, and it will only be able to cross-reference anything inside a single unit.
 We are working on a complex lexical analysis between units and even a more deeper one inside units, [**if you want to help us, check out our GitHub issues**](https://github.com/ZupIT/horusec-engine/issues).
 
-### **2. Rule**
+#### **2. Rule**
 The engine won't help you here because you have to provide your own rules. The FOSS version of Horusec's tool has a lot of rules you can use, but this interface is here to encourage you to learn more about how security issues manifest in your favorite language syntax, and therefore how to identify them with your tool.
 
-### **3. Finding**
-The finding is a key part of your tool. You can actually extract useful insights from the source code analysis.
-The struct is focused on simplicity, but we are working to implement it following the[**SARIF**](https://github.com/oasis-tcs/sarif-spec) specification, so you can have complete control of where you import your data.
+#### **3. Finding**
+The finding is a key part of your tool. You can extract useful insights from the source code analysis.
+The structure is focused on simplicity, but we are working to implement it following the [**SARIF**](https://github.com/oasis-tcs/sarif-spec) specification, so you can have complete control of where you import your data.
 
 
-## **Examples**
+### **Examples**
 
 A simple analysis of an inmemory string:
 
@@ -111,30 +124,50 @@ func (v *Version) CreateCobraCmd() *cobra.Command {
 ```
 ## **Documentation**
 
-For more information about Horusec, please check out the [**documentation**](https://horusec.io/docs/).
+For more information about Horusec, please check out the [**documentation**](https://horusec.io/docs/). 
 
 
 ## **Contributing**
 
-If you want to contribute to this repository, access our [**Contributing Guide**](https://github.com/ZupIT/charlescd/blob/main/CONTRIBUTING.md). 
-And if you want to know more about Horusec, check out some of our other projects:
+If you want to contribute to this repository, access our [**Contributing Guide**](https://github.com/ZupIT/horusec-engine/blob/main/CONTRIBUTING.md). 
 
 
-- [**Admin**](https://github.com/ZupIT/horusec-admin)
-- [**Charts**](https://github.com/ZupIT/charlescd/tree/main/circle-matcher)
-- [**Devkit**](https://github.com/ZupIT/horusec-devkit)
-- [**Jenkins**](https://github.com/ZupIT/horusec-jenkins-sharedlib)
-- [**Operator**](https://github.com/ZupIT/horusec-operator)
-- [**Platform**](https://github.com/ZupIT/horusec-platform)
-- [**VSCode plugin**](https://github.com/ZupIT/horusec-vscode-plugin)
-- [**Kotlin**](https://github.com/ZupIT/horusec-tree-sitter-kotlin)
-- [**Vulnerabilities**](https://github.com/ZupIT/horusec-examples-vulnerabilities)
+### **Developer Certificate of Origin - DCO**
+
+ This is a security layer for the project and for the developers. It is mandatory.
+ 
+ Follow one of these two methods to add DCO to your commits:
+ 
+**1. Command line**
+ Follow the steps: 
+ **Step 1:** Configure your local git environment adding the same name and e-mail configured at your GitHub account. It helps to sign commits manually during reviews and suggestions.
+
+ ```
+git config --global user.name “Name”
+git config --global user.email “email@domain.com.br”
+```
+**Step 2:** Add the Signed-off-by line with the `'-s'` flag in the git commit command:
+
+```
+$ git commit -s -m "This is my commit message"
+```
+
+**2. GitHub website**
+You can also manually sign your commits during GitHub reviews and suggestions, follow the steps below: 
+
+**Step 1:** When the commit changes box opens, manually type or paste your signature in the comment box, see the example:
+
+```
+Signed-off-by: Name < e-mail address >
+```
+
+For this method, your name and e-mail must be the same registered on your GitHub account.
+
+## **License**
+[**Apache License 2.0**](https://github.com/ZupIT/horusec-engine/blob/main/LICENSE).
 
 ## **Community**
-Feel free to reach out to us at:
-
-- [**GitHub Issues**](https://github.com/ZupIT/horusec-devkit/issues)
-- [**Zup Open Source Forum**](https://forum.zup.com.br)
+Do you have any question about Horusec? Let's chat in our [**forum**](https://forum.zup.com.br/).
 
 
 This project exists thanks to all the contributors. You rock! ❤️🚀
