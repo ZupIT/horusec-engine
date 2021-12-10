@@ -15,7 +15,7 @@
 package android
 
 import (
-	"io/ioutil"
+	"os"
 	"testing"
 
 	engine "github.com/ZupIT/horusec-engine"
@@ -23,7 +23,7 @@ import (
 )
 
 func TestLoadingAManifestUnitWithValidManifestShouldWork(t *testing.T) {
-	androidManifest, err := ioutil.ReadFile("AndroidManifest.xml")
+	androidManifest, err := os.ReadFile("AndroidManifest.xml")
 
 	if err != nil {
 		t.Fatal(err)
@@ -37,7 +37,7 @@ func TestLoadingAManifestUnitWithValidManifestShouldWork(t *testing.T) {
 }
 
 func TestMatchRegularRuleWithValidManifestShouldWork(t *testing.T) {
-	androidManifest, err := ioutil.ReadFile("AndroidManifest.xml")
+	androidManifest, err := os.ReadFile("AndroidManifest.xml")
 
 	if err != nil {
 		t.Fatal(err)
@@ -59,7 +59,7 @@ func TestMatchRegularRuleWithValidManifestShouldWork(t *testing.T) {
 }
 
 func TestMatchNotRuleWithValidManifestShouldWork(t *testing.T) {
-	androidManifest, err := ioutil.ReadFile("AndroidManifest.xml")
+	androidManifest, err := os.ReadFile("AndroidManifest.xml")
 
 	if err != nil {
 		t.Fatal(err)
@@ -82,7 +82,7 @@ func TestMatchNotRuleWithValidManifestShouldWork(t *testing.T) {
 }
 
 func TestMatchNotRuleWithValidManifestShouldWorkFindingAnIssue(t *testing.T) {
-	androidManifest, err := ioutil.ReadFile("AndroidManifest.2.xml")
+	androidManifest, err := os.ReadFile("AndroidManifest.2.xml")
 
 	if err != nil {
 		t.Fatal(err)
@@ -105,7 +105,7 @@ func TestMatchNotRuleWithValidManifestShouldWorkFindingAnIssue(t *testing.T) {
 }
 
 func TestCustomXPathExpressionsHandlingWithValidManifestShouldWork(t *testing.T) {
-	androidManifest, err := ioutil.ReadFile("AndroidManifest.xml")
+	androidManifest, err := os.ReadFile("AndroidManifest.xml")
 
 	if err != nil {
 		t.Fatal(err)

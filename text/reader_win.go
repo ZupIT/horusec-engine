@@ -18,7 +18,6 @@ import (
 	"bytes"
 	"errors"
 	"io"
-	"io/ioutil"
 	"os"
 
 	"golang.org/x/text/encoding/unicode"
@@ -67,7 +66,7 @@ func ReadTextFileWin(filename string) ([]byte, error) {
 
 	reader := newUnicodeReaderWin(fileDescriptor)
 
-	utf8FormattedString, err := ioutil.ReadAll(reader)
+	utf8FormattedString, err := io.ReadAll(reader)
 
 	if err != nil {
 		return []byte{}, err

@@ -12,18 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+//go:build !windows
 // +build !windows
 
 package text
 
 import (
-	"io/ioutil"
+	"os"
 	"path/filepath"
 	"testing"
 )
 
 func TestReadTextFileControlWithUTF8(t *testing.T) {
-	expectedBytes, err := ioutil.ReadFile(filepath.Join("examples", "csharp", "example2", "PetsController.utf8.cs"))
+	expectedBytes, err := os.ReadFile(filepath.Join("examples", "csharp", "example2", "PetsController.utf8.cs"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -39,7 +40,7 @@ func TestReadTextFileControlWithUTF8(t *testing.T) {
 }
 
 func TestReadTextFileControlWithUTF8WithBOM(t *testing.T) {
-	expectedBytes, err := ioutil.ReadFile(filepath.Join("examples", "csharp", "example2", "PetsController.utf8.cs"))
+	expectedBytes, err := os.ReadFile(filepath.Join("examples", "csharp", "example2", "PetsController.utf8.cs"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -55,7 +56,7 @@ func TestReadTextFileControlWithUTF8WithBOM(t *testing.T) {
 }
 
 func TestReadTextFileWithUTF16LEWithBOM(t *testing.T) {
-	expectedBytes, err := ioutil.ReadFile(filepath.Join("examples", "csharp", "example2", "PetsController.utf8.cs"))
+	expectedBytes, err := os.ReadFile(filepath.Join("examples", "csharp", "example2", "PetsController.utf8.cs"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -71,7 +72,7 @@ func TestReadTextFileWithUTF16LEWithBOM(t *testing.T) {
 }
 
 func TestReadTextFileWithUTF16BEWithBOM(t *testing.T) {
-	expectedBytes, err := ioutil.ReadFile(filepath.Join("examples", "csharp", "example2", "PetsController.utf8.cs"))
+	expectedBytes, err := os.ReadFile(filepath.Join("examples", "csharp", "example2", "PetsController.utf8.cs"))
 	if err != nil {
 		t.Fatal(err)
 	}
