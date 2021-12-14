@@ -1,9 +1,12 @@
 {
+  "baseBranches": ["main"],
   "extends": [
     "config:base"
   ],
   "schedule": [
     "every weekend"
   ],
-  "commitBody": "Signed-off-by: Renovate Bot <bot@renovateapp.com>"
+  "commitBody": "Signed-off-by: Renovate Bot <bot@renovateapp.com>",
+  "commitMessagePrefix": "deps:chore -",
+  "commitMessageAction": "update"
 }
