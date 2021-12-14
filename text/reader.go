@@ -16,7 +16,6 @@ package text
 
 import (
 	"io"
-	"io/ioutil"
 	"os"
 
 	"golang.org/x/text/encoding/unicode"
@@ -42,7 +41,7 @@ func ReadTextFileUnix(filename string) ([]byte, error) {
 	}()
 
 	reader := newUnicodeReaderUnix(fileDescriptor)
-	utf8FormattedString, err := ioutil.ReadAll(reader)
+	utf8FormattedString, err := io.ReadAll(reader)
 	if err != nil {
 		return []byte{}, err
 	}
