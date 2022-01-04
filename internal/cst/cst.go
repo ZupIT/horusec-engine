@@ -16,7 +16,9 @@ package cst
 
 import (
 	"bytes"
+	"context"
 	"errors"
+	"fmt"
 	"math"
 
 	"github.com/ZupIT/horusec-devkit/pkg/enums/languages"
@@ -70,7 +72,7 @@ func (f inspector) Visit(node *Node) Visitor {
 	return nil
 }
 
-func (_ inspector) Accept(_ *Node) bool { return true }
+func (inspector) Accept(*Node) bool { return true }
 
 // Inspect traverses an CST in depth-first order: It starts by calling
 // f(node); node must not be nil. If f returns true, Inspect invokes f
@@ -95,7 +97,12 @@ func Parse(src []byte, language languages.Language) (*Node, error) {
 		return nil, errors.New("invalid language")
 	}
 
-	return newNode(parser.Parse(nil, src).RootNode(), src), nil
+	node, err := parser.ParseCtx(context.Background(), nil, src)
+	if err != nil {
+		return nil, fmt.Errorf("parse node: %w", err)
+	}
+
+	return newNode(node.RootNode(), src), nil
 }
 
 type Node struct {
