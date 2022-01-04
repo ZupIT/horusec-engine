@@ -45,7 +45,6 @@ func Walk(v Visitor, node Node) {
 	// (the order of the cases matches the order
 	// of the corresponding node types in ast.go)
 	switch n := node.(type) {
-
 	// Expressions
 	case *Ident, *BasicLit:
 		// Nothing to do.
@@ -96,8 +95,8 @@ func Walk(v Visitor, node Node) {
 
 	// Statements
 	case *AssignStmt:
-		walkExprList(v, n.Lhs)
-		walkExprList(v, n.Rhs)
+		walkExprList(v, n.LHS)
+		walkExprList(v, n.RHS)
 	case *BlockStmt:
 		walkStmtList(v, n.List)
 	case *ExprStmt:

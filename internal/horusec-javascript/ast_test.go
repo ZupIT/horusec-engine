@@ -110,7 +110,7 @@ class Foo{
 									Body: &ast.BlockStmt{
 										List: []ast.Stmt{
 											&ast.AssignStmt{
-												Lhs: []ast.Expr{
+												LHS: []ast.Expr{
 													&ast.SelectorExpr{
 														Expr: &ast.Ident{
 															Name: "this",
@@ -120,14 +120,14 @@ class Foo{
 														},
 													},
 												},
-												Rhs: []ast.Expr{
+												RHS: []ast.Expr{
 													&ast.Ident{
 														Name: "a",
 													},
 												},
 											},
 											&ast.AssignStmt{
-												Lhs: []ast.Expr{
+												LHS: []ast.Expr{
 													&ast.SelectorExpr{
 														Expr: &ast.Ident{
 															Name: "this",
@@ -137,7 +137,7 @@ class Foo{
 														},
 													},
 												},
-												Rhs: []ast.Expr{
+												RHS: []ast.Expr{
 													&ast.Ident{
 														Name: "b",
 													},
@@ -293,12 +293,12 @@ function f(a, b) {
 						Body: &ast.BlockStmt{
 							List: []ast.Stmt{
 								&ast.AssignStmt{
-									Lhs: []ast.Expr{
+									LHS: []ast.Expr{
 										&ast.Ident{
 											Name: "c",
 										},
 									},
-									Rhs: []ast.Expr{
+									RHS: []ast.Expr{
 										&ast.BinaryExpr{
 											Left: &ast.Ident{
 												Name: "a",
@@ -328,12 +328,12 @@ function f(a, b) {
 									},
 								},
 								&ast.AssignStmt{
-									Lhs: []ast.Expr{
+									LHS: []ast.Expr{
 										&ast.Ident{
 											Name: "foo",
 										},
 									},
-									Rhs: []ast.Expr{
+									RHS: []ast.Expr{
 										&ast.CallExpr{
 											Fun: &ast.Ident{
 												Name: "doFoo",
@@ -387,12 +387,12 @@ function f() {
 						Body: &ast.BlockStmt{
 							List: []ast.Stmt{
 								&ast.AssignStmt{
-									Lhs: []ast.Expr{
+									LHS: []ast.Expr{
 										&ast.Ident{
 											Name: "sum",
 										},
 									},
-									Rhs: []ast.Expr{
+									RHS: []ast.Expr{
 										&ast.FuncLit{
 											Type: &ast.FuncType{
 												Results: nil,
@@ -432,12 +432,12 @@ function f() {
 									},
 								},
 								&ast.AssignStmt{
-									Lhs: []ast.Expr{
+									LHS: []ast.Expr{
 										&ast.Ident{
 											Name: "sub",
 										},
 									},
-									Rhs: []ast.Expr{
+									RHS: []ast.Expr{
 										&ast.FuncLit{
 											Type: &ast.FuncType{
 												Results: nil,
@@ -477,12 +477,12 @@ function f() {
 									},
 								},
 								&ast.AssignStmt{
-									Lhs: []ast.Expr{
+									LHS: []ast.Expr{
 										&ast.Ident{
 											Name: "result",
 										},
 									},
-									Rhs: []ast.Expr{
+									RHS: []ast.Expr{
 										&ast.CallExpr{
 											Fun: &ast.Ident{
 												Name: "doSomething",
