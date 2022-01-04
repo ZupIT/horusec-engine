@@ -223,8 +223,8 @@ func (p *parser) parseStmt(node *cst.Node) ast.Stmt {
 		})
 
 		return &ast.AssignStmt{
-			Lhs: lhs,
-			Rhs: rhs,
+			LHS: lhs,
+			RHS: rhs,
 		}
 	case ExpressionStatement:
 		// We need to check the child of expression_statement and check
@@ -234,8 +234,8 @@ func (p *parser) parseStmt(node *cst.Node) ast.Stmt {
 			left := child.ChildByFieldName("left")
 			right := child.ChildByFieldName("right")
 			return &ast.AssignStmt{
-				Lhs: []ast.Expr{p.parseExpr(left)},
-				Rhs: []ast.Expr{p.parseExpr(right)},
+				LHS: []ast.Expr{p.parseExpr(left)},
+				RHS: []ast.Expr{p.parseExpr(right)},
 			}
 		default:
 			return &ast.ExprStmt{
@@ -434,7 +434,6 @@ func (p *parser) parseRequireCallExpr(node *cst.Node) ast.Decl {
 					Name: ast.NewIdent(decl.ChildByFieldName("name")),
 				}
 			}
-
 		}
 	}
 	return nil

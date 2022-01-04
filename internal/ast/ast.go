@@ -159,8 +159,8 @@ func (*TemplateExpr) node() {}
 type (
 	// AssignStmt node represents an assignment or a variable declaration.
 	AssignStmt struct {
-		Lhs []Expr
-		Rhs []Expr
+		LHS []Expr
+		RHS []Expr
 	}
 
 	// BlockStmt node represents a statement list.
