@@ -12,9 +12,7 @@ require (
 	github.com/panjf2000/ants/v2 v2.4.7
 	github.com/panjf2000/ants/v2 v2.4.8
 	github.com/smacker/go-tree-sitter v0.0.0-20210519070246-0ba5d9f5237b
+	github.com/smacker/go-tree-sitter v0.0.0-20211116060328-db7fde9b5e82
 	github.com/stretchr/testify v1.7.0
 	golang.org/x/text v0.3.7
-	golang.org/x/tools v0.1.4
 )
-
-replace github.com/smacker/go-tree-sitter => github.com/matheusalcantarazup/go-tree-sitter v0.0.0-20210715121837-0e7947091588
