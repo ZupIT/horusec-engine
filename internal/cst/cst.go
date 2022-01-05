@@ -72,8 +72,6 @@ func (f inspector) Visit(node *Node) Visitor {
 	return nil
 }
 
-func (inspector) Accept(*Node) bool { return true }
-
 // Inspect traverses an CST in depth-first order: It starts by calling
 // f(node); node must not be nil. If f returns true, Inspect invokes f
 // recursively for each of the non-nil children of node, followed by a
@@ -105,6 +103,11 @@ func Parse(src []byte, language languages.Language) (*Node, error) {
 	return newNode(node.RootNode(), src), nil
 }
 
+// Node is a wrapper around treesitter.Node that holds the source
+// code used to create the initial CST.
+//
+// This source code is used to get the source code reprensentation
+// of some node inside CST.
 type Node struct {
 	node *treesitter.Node
 	src  []byte
