@@ -23,6 +23,8 @@ import (
 	"github.com/ZupIT/horusec-engine/internal/cst"
 )
 
+// ParseFile parses the source code of a single JavaScript source file
+// and returns the corresponding ast.File node.
 func ParseFile(name string, src []byte) (*ast.File, error) {
 	root, err := cst.Parse(src, languages.Javascript)
 	if err != nil {
@@ -36,6 +38,7 @@ func ParseFile(name string, src []byte) (*ast.File, error) {
 type parser struct {
 }
 
+// parseCST parse a tree-sitter CST to a generic AST.
 func (p *parser) parseCST(name string, root *cst.Node) *ast.File {
 	file := &ast.File{
 		Name: &ast.Ident{
