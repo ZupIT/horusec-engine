@@ -190,6 +190,9 @@ func (p *parser) parseVarDecl(node *cst.Node) []ast.Decl {
 				if decl := p.parseRequireCallExpr(value); decl != nil {
 					decls = append(decls, decl)
 				}
+				// TODO: Parse correclty lexical declaration to a call expression
+				// when call_expression is outside an expression
+				// e.g: let foo = bar();
 				return
 			default:
 				// Otherwise we just parse value as an expression.
