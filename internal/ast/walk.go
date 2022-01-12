@@ -127,6 +127,9 @@ func Walk(v Visitor, node Node) {
 		if n.Body != nil {
 			Walk(v, n.Body)
 		}
+	case *ClassDecl:
+		Walk(v, n.Name)
+		walkDeclList(v, n.Body.List)
 
 	// Files
 	case *File:
@@ -134,6 +137,7 @@ func Walk(v Visitor, node Node) {
 			Walk(v, n.Name)
 		}
 		walkDeclList(v, n.Decls)
+		walkExprList(v, n.Exprs)
 	default:
 		panic(fmt.Sprintf("ast.Walk: unexpected node type %T", n))
 	}
