@@ -15,53 +15,111 @@
 package engine
 
 import (
+	"context"
+	"errors"
+	"path/filepath"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
-var TestUnitType UnitType = 999
-
-type TestRule struct{}
-
-func (rule TestRule) IsFor(unitType UnitType) bool {
-	return TestUnitType == unitType
+type ruleMock struct {
+	findings []Finding
+	err      error
 }
 
-type TestUnit struct{}
-
-func (unit TestUnit) Type() UnitType {
-	return TestUnitType
+func newRuleMock(findings []Finding, err error) *ruleMock {
+	return &ruleMock{
+		findings: findings,
+		err:      err,
+	}
 }
 
-func (unit TestUnit) Eval(rule Rule) []Finding {
-	return []Finding{
-		Finding{
-			ID: "1",
+// Run will return a total of findings depending on total of file paths found in informed project path and total of
+// findings passed to the mock (ruleMock.findings * file paths)
+func (r *ruleMock) Run(_ string) ([]Finding, error) {
+	return r.findings, r.err
+}
+
+func TestEngineRun(t *testing.T) {
+	testcases := []struct {
+		name             string
+		projectPath      string
+		extensions       []string
+		rules            Rule
+		err              bool
+		expectedFindings int
+	}{
+		{
+			name:             "Should run without errors and return 225 findings",
+			projectPath:      filepath.Join("text", "examples"),
+			extensions:       []string{AcceptAnyExtension},
+			rules:            newRuleMock([]Finding{{}}, nil),
+			expectedFindings: 225,
+			err:              false,
+		},
+		{
+			name:             "Should run without errors and return 24 findings",
+			projectPath:      filepath.Join("text", "examples"),
+			extensions:       []string{".ex"},
+			rules:            newRuleMock([]Finding{{}}, nil),
+			expectedFindings: 24,
+			err:              false,
+		},
+		{
+			name:             "Should run without errors and return 3 findings",
+			projectPath:      filepath.Join("text", "examples"),
+			extensions:       []string{".py"},
+			rules:            newRuleMock([]Finding{{}}, nil),
+			expectedFindings: 3,
+			err:              false,
+		},
+		{
+			name:             "Should run without errors and return 4 findings",
+			projectPath:      filepath.Join("text", "examples"),
+			extensions:       []string{".go"},
+			rules:            newRuleMock([]Finding{{}}, nil),
+			expectedFindings: 4,
+			err:              false,
+		},
+		{
+			name:             "Should run without errors and return 0 findings",
+			projectPath:      filepath.Join("text", "examples"),
+			extensions:       []string{".invalidExt"},
+			rules:            newRuleMock([]Finding{{}}, nil),
+			expectedFindings: 0,
+			err:              false,
+		},
+		{
+			name:             "Should return error when invalid project path",
+			projectPath:      "invalidPath",
+			extensions:       []string{AcceptAnyExtension},
+			rules:            newRuleMock(nil, nil),
+			expectedFindings: 0,
+			err:              true,
+		},
+		{
+			name:             "Should return error when failed to run rule",
+			extensions:       []string{AcceptAnyExtension},
+			expectedFindings: 0,
+			rules:            newRuleMock(nil, errors.New("test error")),
+			projectPath:      filepath.Join("text", "examples"),
+			err:              true,
 		},
 	}
-}
 
-func TestRunWithTextUnits(t *testing.T) {
-	testProgram := []Unit{TestUnit{}}
-	rules := []Rule{TestRule{}}
+	for _, testcase := range testcases {
+		t.Run(testcase.name, func(t *testing.T) {
+			engine := NewEngine(0, testcase.extensions...)
 
-	findings := Run(testProgram, rules)
+			findings, err := engine.Run(context.Background(), testcase.projectPath, testcase.rules)
+			if testcase.err {
+				assert.Error(t, err)
+			} else {
+				assert.NoError(t, err)
+			}
 
-	if len(findings) < 1 || len(findings) > 1 {
-		t.Fatal("Should find only 1 finding")
-	}
-}
-
-func TestRunWith1000Units(t *testing.T) {
-	rules := []Rule{TestRule{}, TestRule{}, TestRule{}}
-	testProgram := []Unit{}
-
-	for i := 0; i < 1000; i++ {
-		testProgram = append(testProgram, TestUnit{})
-	}
-
-	findings := Run(testProgram, rules)
-
-	if len(findings) != 3000 {
-		t.Fatal("Should find only 3000 finding")
+			assert.Len(t, findings, testcase.expectedFindings)
+		})
 	}
 }
