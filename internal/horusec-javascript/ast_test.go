@@ -34,6 +34,39 @@ type testcase struct {
 	file ast.File
 }
 
+func TestJavaScriptParseFileFillAllPositions(t *testing.T) {
+	src := []byte(`
+class Foo { f(a, b) { return a + b }}
+
+function f1(s) { console.log(s) } 
+
+const f2 (a, b) => { return a / b }
+	`)
+
+	f, err := javascript.ParseFile("", src)
+	require.NoError(t, err, "Expected no error to parse source file: %v", err)
+
+	notExpectedPos := ast.Pos{
+		Byte:   0,
+		Row:    0,
+		Column: 0,
+	}
+
+	ast.Inspect(f, func(n ast.Node) bool {
+		if n == nil {
+			return false
+		}
+
+		start := f.Start()
+		end := f.End()
+
+		assert.NotEqual(t, notExpectedPos, start, "Expected not empty start position from node %T: %s", n, start)
+		assert.NotEqual(t, notExpectedPos, end, "Expected not empty end position from node %T: %s", n, end)
+
+		return true
+	})
+}
+
 func TestJavaScriptParseFile(t *testing.T) {
 	wd, err := os.Getwd()
 	require.NoError(t, err, "Expected no error to get current working directory: %v", err)
