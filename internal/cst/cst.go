@@ -170,6 +170,16 @@ func (n *Node) IsError() bool {
 	return n.node.Symbol() == math.MaxUint16
 }
 
+// StartByte returns the node's start byte.
+func (n *Node) StartByte() uint32 {
+	return n.node.StartByte()
+}
+
+// EndByte returns the node's end byte.
+func (n *Node) EndByte() uint32 {
+	return n.node.EndByte()
+}
+
 // StartPoint returns the node's start position in terms of rows and columns.
 func (n *Node) StartPoint() treesitter.Point {
 	return n.node.StartPoint()

@@ -41,6 +41,7 @@ type parser struct {
 // parseCST parse a tree-sitter CST to a generic AST.
 func (p *parser) parseCST(name string, root *cst.Node) *ast.File {
 	file := &ast.File{
+		Position: ast.NewPosition(root),
 		Name: &ast.Ident{
 			Name: name,
 		},
@@ -73,7 +74,8 @@ func (p *parser) parseCST(name string, root *cst.Node) *ast.File {
 
 func (p *parser) parseClassDecl(node *cst.Node) ast.Decl {
 	classDecl := &ast.ClassDecl{
-		Name: ast.NewIdent(node.ChildByFieldName("name")),
+		Name:     ast.NewIdent(node.ChildByFieldName("name")),
+		Position: ast.NewPosition(node),
 	}
 
 	if body := node.ChildByFieldName("body"); body != nil {
@@ -84,13 +86,16 @@ func (p *parser) parseClassDecl(node *cst.Node) ast.Decl {
 }
 
 func (p *parser) parseClassBody(body *cst.Node) *ast.BodyDecl {
-	var bodyDecl ast.BodyDecl
+	bodyDecl := ast.BodyDecl{
+		Position: ast.NewPosition(body),
+	}
 
 	cst.IterNamedChilds(body, func(node *cst.Node) {
 		switch node.Type() {
 		case PublicFieldDefinition:
 			valueDecl := ast.ValueDecl{
-				Names: []*ast.Ident{ast.NewIdent(node.ChildByFieldName("property"))},
+				Names:    []*ast.Ident{ast.NewIdent(node.ChildByFieldName("property"))},
+				Position: ast.NewPosition(node),
 			}
 			if value := node.ChildByFieldName("value"); value != nil {
 				valueDecl.Values = append(valueDecl.Values, p.parseExpr(value))
@@ -112,8 +117,9 @@ func (p *parser) parseFuncDecl(node *cst.Node) ast.Decl {
 
 func (p *parser) parseArrowFunc(ident *ast.Ident, node *cst.Node) ast.Decl {
 	decl := &ast.FuncDecl{
-		Name: ident,
-		Type: new(ast.FuncType),
+		Name:     ident,
+		Type:     new(ast.FuncType),
+		Position: ast.NewPosition(node),
 	}
 
 	if parameters := node.ChildByFieldName("parameters"); parameters != nil {
@@ -144,11 +150,13 @@ func (p *parser) parseParameters(node *cst.Node) *ast.FieldList {
 
 	cst.IterNamedChilds(node, func(node *cst.Node) {
 		parameters = append(parameters, &ast.Field{
-			Name: p.parseExpr(node),
+			Name:     p.parseExpr(node),
+			Position: ast.NewPosition(node),
 		})
 	})
 	return &ast.FieldList{
-		List: parameters,
+		List:     parameters,
+		Position: ast.NewPosition(node),
 	}
 }
 
@@ -170,7 +178,9 @@ func (p *parser) parseVarDecl(node *cst.Node) []ast.Decl {
 	// const a, b = foo(); Should generate one ast.ValueDecl with two Names and one Value.
 
 	var decls []ast.Decl
-	var varDecl ast.ValueDecl
+	varDecl := ast.ValueDecl{
+		Position: ast.NewPosition(node),
+	}
 
 	cst.IterNamedChilds(node, func(node *cst.Node) {
 		assertNodeType(node, VariableDeclarator)
@@ -229,8 +239,9 @@ func (p *parser) parseStmt(node *cst.Node) ast.Stmt {
 		})
 
 		return &ast.AssignStmt{
-			LHS: lhs,
-			RHS: rhs,
+			LHS:      lhs,
+			RHS:      rhs,
+			Position: ast.NewPosition(node),
 		}
 	case ExpressionStatement:
 		// We need to check the child of expression_statement and check
@@ -240,19 +251,22 @@ func (p *parser) parseStmt(node *cst.Node) ast.Stmt {
 			left := child.ChildByFieldName("left")
 			right := child.ChildByFieldName("right")
 			return &ast.AssignStmt{
-				LHS: []ast.Expr{p.parseExpr(left)},
-				RHS: []ast.Expr{p.parseExpr(right)},
+				LHS:      []ast.Expr{p.parseExpr(left)},
+				RHS:      []ast.Expr{p.parseExpr(right)},
+				Position: ast.NewPosition(node),
 			}
 		default:
 			return &ast.ExprStmt{
-				Expr: p.parseExpr(child),
+				Expr:     p.parseExpr(child),
+				Position: ast.NewPosition(node),
 			}
 		}
 	case ReturnStatement:
 		expr := node.NamedChild(0)
 		if expr.Type() == SequenceExpression {
 			return &ast.ReturnStmt{
-				Results: p.parseSequenceExpr(expr),
+				Results:  p.parseSequenceExpr(expr),
+				Position: ast.NewPosition(node),
 			}
 		}
 		return &ast.ReturnStmt{
@@ -262,8 +276,9 @@ func (p *parser) parseStmt(node *cst.Node) ast.Stmt {
 		}
 	case IfStatement:
 		stmt := &ast.IfStmt{
-			Cond: p.parseExpr(node.ChildByFieldName("condition")),
-			Body: p.parseFuncBody(node.ChildByFieldName("consequence")),
+			Cond:     p.parseExpr(node.ChildByFieldName("condition")),
+			Body:     p.parseFuncBody(node.ChildByFieldName("consequence")),
+			Position: ast.NewPosition(node),
 		}
 
 		if alt := node.ChildByFieldName("alternative"); alt != nil {
@@ -311,13 +326,15 @@ func (p *parser) parseExpr(node *cst.Node) ast.Expr {
 		return ast.NewIdent(node)
 	case String, Number:
 		return &ast.BasicLit{
-			Kind:  node.Type(),
-			Value: string(cst.SanitizeNodeValue(node.Value())),
+			Kind:     node.Type(),
+			Value:    string(cst.SanitizeNodeValue(node.Value())),
+			Position: ast.NewPosition(node),
 		}
 	case True, False:
 		return &ast.BasicLit{
-			Kind:  "boolean",
-			Value: string(node.Value()),
+			Kind:     "boolean",
+			Value:    string(node.Value()),
+			Position: ast.NewPosition(node),
 		}
 	case NewExpression:
 		parent := node.Parent()
@@ -332,9 +349,10 @@ func (p *parser) parseExpr(node *cst.Node) ast.Expr {
 		assertNodeType(name, Identifier)
 
 		return &ast.ObjectExpr{
-			Name: ast.NewIdent(name),
-			Type: p.parseExpr(node.ChildByFieldName("constructor")),
-			Elts: args,
+			Name:     ast.NewIdent(name),
+			Type:     p.parseExpr(node.ChildByFieldName("constructor")),
+			Elts:     args,
+			Position: ast.NewPosition(node),
 		}
 	case Object:
 		var obj ast.ObjectExpr
@@ -344,8 +362,9 @@ func (p *parser) parseExpr(node *cst.Node) ast.Expr {
 		return &obj
 	case Pair:
 		return &ast.KeyValueExpr{
-			Key:   p.parseExpr(node.ChildByFieldName("key")),
-			Value: p.parseExpr(node.ChildByFieldName("value")),
+			Key:      p.parseExpr(node.ChildByFieldName("key")),
+			Value:    p.parseExpr(node.ChildByFieldName("value")),
+			Position: ast.NewPosition(node),
 		}
 	case Array:
 		var obj ast.ObjectExpr
@@ -357,8 +376,9 @@ func (p *parser) parseExpr(node *cst.Node) ast.Expr {
 		// TODO: tree-sitter doesn't expose a operator node
 		// we need to find a way to get this operator.
 		return &ast.BinaryExpr{
-			Left:  p.parseExpr(node.ChildByFieldName("left")),
-			Right: p.parseExpr(node.ChildByFieldName("right")),
+			Left:     p.parseExpr(node.ChildByFieldName("left")),
+			Right:    p.parseExpr(node.ChildByFieldName("right")),
+			Position: ast.NewPosition(node),
 		}
 	case ParenthesizedExpression:
 		return p.parseExpr(node.NamedChild(0))
@@ -367,9 +387,10 @@ func (p *parser) parseExpr(node *cst.Node) ast.Expr {
 		assertNodeType(left, Identifier)
 
 		return &ast.ObjectExpr{
-			Name: ast.NewIdent(left),
-			Type: nil,
-			Elts: []ast.Expr{p.parseExpr(node.ChildByFieldName("right"))},
+			Name:     ast.NewIdent(left),
+			Type:     nil,
+			Elts:     []ast.Expr{p.parseExpr(node.ChildByFieldName("right"))},
+			Position: ast.NewPosition(node),
 		}
 	case CallExpression:
 		fn := node.ChildByFieldName("function")
@@ -381,13 +402,15 @@ func (p *parser) parseExpr(node *cst.Node) ast.Expr {
 		})
 
 		return &ast.CallExpr{
-			Fun:  p.parseExpr(fn),
-			Args: argsExpr,
+			Fun:      p.parseExpr(fn),
+			Args:     argsExpr,
+			Position: ast.NewPosition(node),
 		}
 	case MemberExpression:
 		return &ast.SelectorExpr{
-			Expr: p.parseExpr(node.ChildByFieldName("object")),
-			Sel:  ast.NewIdent(node.ChildByFieldName("property")),
+			Expr:     p.parseExpr(node.ChildByFieldName("object")),
+			Sel:      ast.NewIdent(node.ChildByFieldName("property")),
+			Position: ast.NewPosition(node),
 		}
 	case ArrowFunction, Function:
 		var params *ast.FieldList
@@ -401,7 +424,8 @@ func (p *parser) parseExpr(node *cst.Node) ast.Expr {
 				Params:  params,
 				Results: nil,
 			},
-			Body: p.parseFuncBody(node.ChildByFieldName("body")),
+			Body:     p.parseFuncBody(node.ChildByFieldName("body")),
+			Position: ast.NewPosition(node),
 		}
 	case TemplateString:
 		var exprs []ast.Expr
@@ -409,8 +433,9 @@ func (p *parser) parseExpr(node *cst.Node) ast.Expr {
 			exprs = append(exprs, p.parseExpr(node.NamedChild(0)))
 		})
 		return &ast.TemplateExpr{
-			Value: string(cst.SanitizeNodeValue(node.Value())),
-			Subs:  exprs,
+			Value:    string(cst.SanitizeNodeValue(node.Value())),
+			Subs:     exprs,
+			Position: ast.NewPosition(node),
 		}
 	case ExpressionStatement:
 		// ExpressionStatement is composed only by an expression and semicolon
@@ -436,8 +461,9 @@ func (p *parser) parseRequireCallExpr(node *cst.Node) ast.Decl {
 		if args := node.ChildByFieldName("arguments"); args != nil {
 			if args.NamedChildCount() > 0 {
 				return &ast.ImportDecl{
-					Path: ast.NewIdent(args.NamedChild(0)),
-					Name: ast.NewIdent(decl.ChildByFieldName("name")),
+					Path:     ast.NewIdent(args.NamedChild(0)),
+					Name:     ast.NewIdent(decl.ChildByFieldName("name")),
+					Position: ast.NewPosition(node),
 				}
 			}
 		}
@@ -465,7 +491,8 @@ func (p *parser) parseImportStmt(node *cst.Node) []ast.Decl {
 	if importClause.Type() == String {
 		return []ast.Decl{
 			&ast.ImportDecl{
-				Path: ast.NewIdent(source),
+				Path:     ast.NewIdent(source),
+				Position: ast.NewPosition(node),
 			},
 		}
 	}
@@ -475,8 +502,9 @@ func (p *parser) parseImportStmt(node *cst.Node) []ast.Decl {
 		// Handle `import name from 'module-name'`
 		return []ast.Decl{
 			&ast.ImportDecl{
-				Name: ast.NewIdent(imported),
-				Path: ast.NewIdent(source),
+				Name:     ast.NewIdent(imported),
+				Path:     ast.NewIdent(source),
+				Position: ast.NewPosition(node),
 			},
 		}
 	case NamedImports:
@@ -486,8 +514,9 @@ func (p *parser) parseImportStmt(node *cst.Node) []ast.Decl {
 		cst.IterNamedChilds(imported, func(importIdentifier *cst.Node) {
 			if name := importIdentifier.ChildByFieldName("name"); name != nil {
 				imports = append(imports, &ast.ImportDecl{
-					Name: ast.NewIdent(name),
-					Path: ast.NewIdent(source),
+					Name:     ast.NewIdent(name),
+					Path:     ast.NewIdent(source),
+					Position: ast.NewPosition(node),
 				})
 			}
 		})
@@ -496,8 +525,9 @@ func (p *parser) parseImportStmt(node *cst.Node) []ast.Decl {
 		// Handle `import * as name from 'module-name'`
 		return []ast.Decl{
 			&ast.ImportDecl{
-				Name: ast.NewIdent(imported.NamedChild(0)),
-				Path: ast.NewIdent(source),
+				Name:     ast.NewIdent(imported.NamedChild(0)),
+				Path:     ast.NewIdent(source),
+				Position: ast.NewPosition(node),
 			},
 		}
 	}
