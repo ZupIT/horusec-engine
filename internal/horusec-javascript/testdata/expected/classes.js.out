@@ -1,0 +1,134 @@
+     0  *ast.File {
+     1  .  Position: ast.Position {}
+     2  .  Name: *ast.Ident {
+     3  .  .  Name: "classes.js"
+     4  .  .  Position: ast.Position {}
+     5  .  }
+     6  .  Decls: []ast.Decl (len = 2) {
+     7  .  .  0: *ast.ClassDecl {
+     8  .  .  .  Position: ast.Position {}
+     9  .  .  .  Name: *ast.Ident {
+    10  .  .  .  .  Name: "C1"
+    11  .  .  .  .  Position: ast.Position {}
+    12  .  .  .  }
+    13  .  .  .  Body: *ast.BodyDecl {
+    14  .  .  .  .  Position: ast.Position {}
+    15  .  .  .  }
+    16  .  .  }
+    17  .  .  1: *ast.ClassDecl {
+    18  .  .  .  Position: ast.Position {}
+    19  .  .  .  Name: *ast.Ident {
+    20  .  .  .  .  Name: "C2"
+    21  .  .  .  .  Position: ast.Position {}
+    22  .  .  .  }
+    23  .  .  .  Body: *ast.BodyDecl {
+    24  .  .  .  .  Position: ast.Position {}
+    25  .  .  .  .  List: []ast.Decl (len = 3) {
+    26  .  .  .  .  .  0: *ast.ValueDecl {
+    27  .  .  .  .  .  .  Position: ast.Position {}
+    28  .  .  .  .  .  .  Names: []*ast.Ident (len = 1) {
+    29  .  .  .  .  .  .  .  0: *ast.Ident {
+    30  .  .  .  .  .  .  .  .  Name: "a"
+    31  .  .  .  .  .  .  .  .  Position: ast.Position {}
+    32  .  .  .  .  .  .  .  }
+    33  .  .  .  .  .  .  }
+    34  .  .  .  .  .  }
+    35  .  .  .  .  .  1: *ast.ValueDecl {
+    36  .  .  .  .  .  .  Position: ast.Position {}
+    37  .  .  .  .  .  .  Names: []*ast.Ident (len = 1) {
+    38  .  .  .  .  .  .  .  0: *ast.Ident {
+    39  .  .  .  .  .  .  .  .  Name: "b"
+    40  .  .  .  .  .  .  .  .  Position: ast.Position {}
+    41  .  .  .  .  .  .  .  }
+    42  .  .  .  .  .  .  }
+    43  .  .  .  .  .  .  Values: []ast.Expr (len = 1) {
+    44  .  .  .  .  .  .  .  0: *ast.BasicLit {
+    45  .  .  .  .  .  .  .  .  Position: ast.Position {}
+    46  .  .  .  .  .  .  .  .  Kind: "number"
+    47  .  .  .  .  .  .  .  .  Value: "10"
+    48  .  .  .  .  .  .  .  }
+    49  .  .  .  .  .  .  }
+    50  .  .  .  .  .  }
+    51  .  .  .  .  .  2: *ast.FuncDecl {
+    52  .  .  .  .  .  .  Position: ast.Position {}
+    53  .  .  .  .  .  .  Name: *ast.Ident {
+    54  .  .  .  .  .  .  .  Name: "constructor"
+    55  .  .  .  .  .  .  .  Position: ast.Position {}
+    56  .  .  .  .  .  .  }
+    57  .  .  .  .  .  .  Type: *ast.FuncType {
+    58  .  .  .  .  .  .  .  Position: ast.Position {}
+    59  .  .  .  .  .  .  .  Params: *ast.FieldList {
+    60  .  .  .  .  .  .  .  .  Position: ast.Position {}
+    61  .  .  .  .  .  .  .  .  List: []*ast.Field (len = 2) {
+    62  .  .  .  .  .  .  .  .  .  0: *ast.Field {
+    63  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+    64  .  .  .  .  .  .  .  .  .  .  Name: *ast.Ident {
+    65  .  .  .  .  .  .  .  .  .  .  .  Name: "a"
+    66  .  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+    67  .  .  .  .  .  .  .  .  .  .  }
+    68  .  .  .  .  .  .  .  .  .  }
+    69  .  .  .  .  .  .  .  .  .  1: *ast.Field {
+    70  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+    71  .  .  .  .  .  .  .  .  .  .  Name: *ast.Ident {
+    72  .  .  .  .  .  .  .  .  .  .  .  Name: "b"
+    73  .  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+    74  .  .  .  .  .  .  .  .  .  .  }
+    75  .  .  .  .  .  .  .  .  .  }
+    76  .  .  .  .  .  .  .  .  }
+    77  .  .  .  .  .  .  .  }
+    78  .  .  .  .  .  .  }
+    79  .  .  .  .  .  .  Body: *ast.BlockStmt {
+    80  .  .  .  .  .  .  .  Position: ast.Position {}
+    81  .  .  .  .  .  .  .  List: []ast.Stmt (len = 2) {
+    82  .  .  .  .  .  .  .  .  0: *ast.AssignStmt {
+    83  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+    84  .  .  .  .  .  .  .  .  .  LHS: []ast.Expr (len = 1) {
+    85  .  .  .  .  .  .  .  .  .  .  0: *ast.SelectorExpr {
+    86  .  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+    87  .  .  .  .  .  .  .  .  .  .  .  Expr: *ast.Ident {
+    88  .  .  .  .  .  .  .  .  .  .  .  .  Name: "this"
+    89  .  .  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+    90  .  .  .  .  .  .  .  .  .  .  .  }
+    91  .  .  .  .  .  .  .  .  .  .  .  Sel: *ast.Ident {
+    92  .  .  .  .  .  .  .  .  .  .  .  .  Name: "a"
+    93  .  .  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+    94  .  .  .  .  .  .  .  .  .  .  .  }
+    95  .  .  .  .  .  .  .  .  .  .  }
+    96  .  .  .  .  .  .  .  .  .  }
+    97  .  .  .  .  .  .  .  .  .  RHS: []ast.Expr (len = 1) {
+    98  .  .  .  .  .  .  .  .  .  .  0: *ast.Ident {
+    99  .  .  .  .  .  .  .  .  .  .  .  Name: "a"
+   100  .  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+   101  .  .  .  .  .  .  .  .  .  .  }
+   102  .  .  .  .  .  .  .  .  .  }
+   103  .  .  .  .  .  .  .  .  }
+   104  .  .  .  .  .  .  .  .  1: *ast.AssignStmt {
+   105  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+   106  .  .  .  .  .  .  .  .  .  LHS: []ast.Expr (len = 1) {
+   107  .  .  .  .  .  .  .  .  .  .  0: *ast.SelectorExpr {
+   108  .  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+   109  .  .  .  .  .  .  .  .  .  .  .  Expr: *ast.Ident {
+   110  .  .  .  .  .  .  .  .  .  .  .  .  Name: "this"
+   111  .  .  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+   112  .  .  .  .  .  .  .  .  .  .  .  }
+   113  .  .  .  .  .  .  .  .  .  .  .  Sel: *ast.Ident {
+   114  .  .  .  .  .  .  .  .  .  .  .  .  Name: "b"
+   115  .  .  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+   116  .  .  .  .  .  .  .  .  .  .  .  }
+   117  .  .  .  .  .  .  .  .  .  .  }
+   118  .  .  .  .  .  .  .  .  .  }
+   119  .  .  .  .  .  .  .  .  .  RHS: []ast.Expr (len = 1) {
+   120  .  .  .  .  .  .  .  .  .  .  0: *ast.Ident {
+   121  .  .  .  .  .  .  .  .  .  .  .  Name: "b"
+   122  .  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+   123  .  .  .  .  .  .  .  .  .  .  }
+   124  .  .  .  .  .  .  .  .  .  }
+   125  .  .  .  .  .  .  .  .  }
+   126  .  .  .  .  .  .  .  }
+   127  .  .  .  .  .  .  }
+   128  .  .  .  .  .  }
+   129  .  .  .  .  }
+   130  .  .  .  }
+   131  .  .  }
+   132  .  }
+   133  }
