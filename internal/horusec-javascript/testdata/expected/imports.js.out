@@ -1,0 +1,104 @@
+     0  *ast.File {
+     1  .  Position: ast.Position {}
+     2  .  Name: *ast.Ident {
+     3  .  .  Name: "imports.js"
+     4  .  .  Position: ast.Position {}
+     5  .  }
+     6  .  Decls: []ast.Decl (len = 9) {
+     7  .  .  0: *ast.ImportDecl {
+     8  .  .  .  Position: ast.Position {}
+     9  .  .  .  Name: *ast.Ident {
+    10  .  .  .  .  Name: "foo"
+    11  .  .  .  .  Position: ast.Position {}
+    12  .  .  .  }
+    13  .  .  .  Path: *ast.Ident {
+    14  .  .  .  .  Name: "bar"
+    15  .  .  .  .  Position: ast.Position {}
+    16  .  .  .  }
+    17  .  .  }
+    18  .  .  1: *ast.ImportDecl {
+    19  .  .  .  Position: ast.Position {}
+    20  .  .  .  Name: *ast.Ident {
+    21  .  .  .  .  Name: "foo"
+    22  .  .  .  .  Position: ast.Position {}
+    23  .  .  .  }
+    24  .  .  .  Path: *ast.Ident {
+    25  .  .  .  .  Name: "bar"
+    26  .  .  .  .  Position: ast.Position {}
+    27  .  .  .  }
+    28  .  .  }
+    29  .  .  2: *ast.ImportDecl {
+    30  .  .  .  Position: ast.Position {}
+    31  .  .  .  Name: *ast.Ident {
+    32  .  .  .  .  Name: "foo"
+    33  .  .  .  .  Position: ast.Position {}
+    34  .  .  .  }
+    35  .  .  .  Path: *ast.Ident {
+    36  .  .  .  .  Name: "bar"
+    37  .  .  .  .  Position: ast.Position {}
+    38  .  .  .  }
+    39  .  .  }
+    40  .  .  3: *ast.ImportDecl {
+    41  .  .  .  Position: ast.Position {}
+    42  .  .  .  Name: *ast.Ident {
+    43  .  .  .  .  Name: "foo"
+    44  .  .  .  .  Position: ast.Position {}
+    45  .  .  .  }
+    46  .  .  .  Path: *ast.Ident {
+    47  .  .  .  .  Name: "baz"
+    48  .  .  .  .  Position: ast.Position {}
+    49  .  .  .  }
+    50  .  .  }
+    51  .  .  4: *ast.ImportDecl {
+    52  .  .  .  Position: ast.Position {}
+    53  .  .  .  Name: *ast.Ident {
+    54  .  .  .  .  Name: "bar"
+    55  .  .  .  .  Position: ast.Position {}
+    56  .  .  .  }
+    57  .  .  .  Path: *ast.Ident {
+    58  .  .  .  .  Name: "baz"
+    59  .  .  .  .  Position: ast.Position {}
+    60  .  .  .  }
+    61  .  .  }
+    62  .  .  5: *ast.ImportDecl {
+    63  .  .  .  Position: ast.Position {}
+    64  .  .  .  Path: *ast.Ident {
+    65  .  .  .  .  Name: "foo"
+    66  .  .  .  .  Position: ast.Position {}
+    67  .  .  .  }
+    68  .  .  }
+    69  .  .  6: *ast.ImportDecl {
+    70  .  .  .  Position: ast.Position {}
+    71  .  .  .  Name: *ast.Ident {
+    72  .  .  .  .  Name: "foo"
+    73  .  .  .  .  Position: ast.Position {}
+    74  .  .  .  }
+    75  .  .  .  Path: *ast.Ident {
+    76  .  .  .  .  Name: "bar"
+    77  .  .  .  .  Position: ast.Position {}
+    78  .  .  .  }
+    79  .  .  }
+    80  .  .  7: *ast.ImportDecl {
+    81  .  .  .  Position: ast.Position {}
+    82  .  .  .  Name: *ast.Ident {
+    83  .  .  .  .  Name: "foo"
+    84  .  .  .  .  Position: ast.Position {}
+    85  .  .  .  }
+    86  .  .  .  Path: *ast.Ident {
+    87  .  .  .  .  Name: "foo"
+    88  .  .  .  .  Position: ast.Position {}
+    89  .  .  .  }
+    90  .  .  }
+    91  .  .  8: *ast.ImportDecl {
+    92  .  .  .  Position: ast.Position {}
+    93  .  .  .  Name: *ast.Ident {
+    94  .  .  .  .  Name: "foo"
+    95  .  .  .  .  Position: ast.Position {}
+    96  .  .  .  }
+    97  .  .  .  Path: *ast.Ident {
+    98  .  .  .  .  Name: "bar"
+    99  .  .  .  .  Position: ast.Position {}
+   100  .  .  .  }
+   101  .  .  }
+   102  .  }
+   103  }
