@@ -1,0 +1,30 @@
+     0  *ast.File {
+     1  .  Position: ast.Position {}
+     2  .  Name: *ast.Ident {
+     3  .  .  Name: "expressions.js"
+     4  .  .  Position: ast.Position {}
+     5  .  }
+     6  .  Exprs: []ast.Expr (len = 1) {
+     7  .  .  0: *ast.CallExpr {
+     8  .  .  .  Position: ast.Position {}
+     9  .  .  .  Fun: *ast.SelectorExpr {
+    10  .  .  .  .  Position: ast.Position {}
+    11  .  .  .  .  Expr: *ast.Ident {
+    12  .  .  .  .  .  Name: "console"
+    13  .  .  .  .  .  Position: ast.Position {}
+    14  .  .  .  .  }
+    15  .  .  .  .  Sel: *ast.Ident {
+    16  .  .  .  .  .  Name: "log"
+    17  .  .  .  .  .  Position: ast.Position {}
+    18  .  .  .  .  }
+    19  .  .  .  }
+    20  .  .  .  Args: []ast.Expr (len = 1) {
+    21  .  .  .  .  0: *ast.BasicLit {
+    22  .  .  .  .  .  Position: ast.Position {}
+    23  .  .  .  .  .  Kind: "string"
+    24  .  .  .  .  .  Value: "testing"
+    25  .  .  .  .  }
+    26  .  .  .  }
+    27  .  .  }
+    28  .  }
+    29  }
