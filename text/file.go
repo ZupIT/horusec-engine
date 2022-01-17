@@ -15,96 +15,68 @@
 package text
 
 import (
-	"bytes"
-	"fmt"
-	"os"
 	"path/filepath"
 	"regexp"
 	"sort"
 	"strings"
-	"time"
-
-	"github.com/ZupIT/horusec-devkit/pkg/utils/logger"
-	loggerEnums "github.com/ZupIT/horusec-devkit/pkg/utils/logger/enums"
 )
 
-var (
-	newlineFinder *regexp.Regexp = regexp.MustCompile("\x0a")
+// regexNewLine regex representing the new line hexadecimal, equivalent of \n.
+var regexNewLine = regexp.MustCompile("\x0a")
 
-	PEMagicBytes   []byte = []byte{'\x4D', '\x5A'}                 // MZ
-	ELFMagicNumber []byte = []byte{'\x7F', '\x45', '\x4C', '\x46'} // .ELF
-)
-
-const AcceptAllExtensions string = "**"
-
-// binarySearch function uses this search algorithm to find the index of the matching element.
-func binarySearch(searchIndex int, collection []int) (foundIndex int) {
-	foundIndex = sort.Search(
-		len(collection),
-		func(index int) bool { return collection[index] >= searchIndex },
-	)
-	return
+// File represents a file to be analyzed
+type File struct {
+	// AbsolutePath holds the complete path to the file (e.g. /home/user/myProject/router/handler.js)
+	AbsolutePath         string
+	RelativePath         string  // RelativePath holds the raw path relative to the root folder of the project
+	Content              []byte  // Content holds all the file content
+	Name                 string  // Name holds only the single name of the file (e.g. handler.js)
+	newlineIndexes       [][]int // newlineIndexes holds information about where is the beginning and ending of each line
+	newlineEndingIndexes []int   // newlineEndingIndexes represents the *start* index of each '\n' rune in the file
 }
 
-// TextFile represents a file to be analyzed
-// nolint:golint //  name is necessary for now called TextFile for not occurs breaking changes
-type TextFile struct {
-	DisplayName string // Holds the raw path relative to the root folder of the project
-	Name        string // Holds only the single name of the file (e.g. handler.js)
-	RawString   string // Holds all the file content
-
-	// Holds the complete path to the file, could be absolute or not (e.g. /home/user/myProject/router/handler.js)
-	PhysicalPath string
-
-	// Indexes for internal file reference
-	// newlineIndexes holds information about where is the beginning and ending of each line in the file
-	newlineIndexes [][]int
-	// newlineEndingIndexes represents the *start* index of each '\n' rune in the file
-	newlineEndingIndexes []int
-}
-
-func NewTextFile(relativeFilePath string, content []byte) (TextFile, error) {
-	formattedPhysicalPath, err := validateRelativeFilePath(relativeFilePath)
-	if err != nil {
-		return TextFile{}, err
+// NewTextFile create a new text file with all necessary info filled
+func NewTextFile(relativeFilePath string, content []byte) (*File, error) {
+	file := &File{
+		RelativePath:   relativeFilePath,
+		Content:        content,
+		Name:           filepath.Base(relativeFilePath),
+		newlineIndexes: regexNewLine.FindAllIndex(content, -1),
 	}
 
-	return createTextFileByPath(formattedPhysicalPath, relativeFilePath, content), nil
-}
-
-func createTextFileByPath(formattedPhysicalPath, relativeFilePath string, content []byte) TextFile {
-	_, formattedFilename := filepath.Split(formattedPhysicalPath)
-	textfile := TextFile{
-		PhysicalPath: formattedPhysicalPath,
-		RawString:    string(content),
-
-		// Display info
-		Name:        formattedFilename,
-		DisplayName: relativeFilePath,
-	}
-	textfile.newlineIndexes = newlineFinder.FindAllIndex(content, -1)
-
-	for _, newlineIndex := range textfile.newlineIndexes {
-		textfile.newlineEndingIndexes = append(textfile.newlineEndingIndexes, newlineIndex[0])
-	}
-	return textfile
-}
-
-func validateRelativeFilePath(relativeFilePath string) (string, error) {
-	if !filepath.IsAbs(relativeFilePath) {
-		return filepath.Abs(relativeFilePath)
+	if err := file.setAbsFilePath(); err != nil {
+		return nil, err
 	}
 
-	return relativeFilePath, nil
+	file.setNewlineEndingIndexes()
+
+	return file, nil
 }
 
-//nolint // change to pointer
-func (textfile TextFile) Content() string {
-	return textfile.RawString
+// setAbsFilePath verifies if the filepath is absolute and set, otherwise it will parse and then set
+func (f *File) setAbsFilePath() error {
+	if filepath.IsAbs(f.RelativePath) {
+		f.AbsolutePath = f.RelativePath
+
+		return nil
+	}
+
+	absolutePath, err := filepath.Abs(f.RelativePath)
+	f.AbsolutePath = absolutePath
+
+	return err
 }
 
-// nolint // refact to have a clean code
-func (textfile TextFile) FindLineAndColumn(findingIndex int) (line, column int) {
+// setNewlineEndingIndexes for each new line index set the ending index
+func (f *File) setNewlineEndingIndexes() {
+	for _, newlineIndex := range f.newlineIndexes {
+		f.newlineEndingIndexes = append(f.newlineEndingIndexes, newlineIndex[0])
+	}
+}
+
+// nolint:funlen,wsl // todo complex function need to be improved
+// FindLineAndColumn get line and column using the beginning index of the example code
+func (f *File) FindLineAndColumn(findingIndex int) (line, column int) {
 	// findingIndex is the index of the beginning of the text we want to
 	// locate inside the file
 
@@ -114,15 +86,14 @@ func (textfile TextFile) FindLineAndColumn(findingIndex int) (line, column int) 
 	// so we search for where we would put the findingIndex in the array
 	// using a binary search algorithm, because this will give us the exact
 	// lines that the index is between.
-	lineIndex := binarySearch(findingIndex, textfile.newlineEndingIndexes)
+	lineIndex := f.binarySearch(findingIndex, f.newlineEndingIndexes)
 
 	// Now with the right index found we have to get the previous \n
 	// from the findingIndex, so it gets the right line
-	if lineIndex < len(textfile.newlineEndingIndexes) {
+	if lineIndex < len(f.newlineEndingIndexes) {
 		// we add +1 here because we want the line to
 		// reflect the "human" line count, not the indexed one in the slice
 		line = lineIndex + 1
-
 		endOfCurrentLine := lineIndex - 1
 
 		// If there is no previous line the finding is in the beginning
@@ -132,137 +103,45 @@ func (textfile TextFile) FindLineAndColumn(findingIndex int) (line, column int) 
 		}
 
 		// now we access the textual index in the slice to ge the column
-		endOfCurrentLineInTheFile := textfile.newlineEndingIndexes[endOfCurrentLine]
+		endOfCurrentLineInTheFile := f.newlineEndingIndexes[endOfCurrentLine]
+
 		if lineIndex == 0 {
 			column = findingIndex
 		} else {
 			column = (findingIndex - 1) - endOfCurrentLineInTheFile
 		}
 	}
+
 	return line, column
 }
 
-//nolint // change to pointer
-func (textfile TextFile) ExtractSample(findingIndex int) string {
-	lineIndex := binarySearch(findingIndex, textfile.newlineEndingIndexes)
+// binarySearch function uses this search algorithm to find the index of the matching element.
+func (f *File) binarySearch(searchIndex int, collection []int) (foundIndex int) {
+	foundIndex = sort.Search(
+		len(collection),
+		func(index int) bool { return collection[index] >= searchIndex },
+	)
 
-	if lineIndex < len(textfile.newlineEndingIndexes) {
+	return
+}
+
+// nolint:funlen // todo complex function, needs to be improved
+// ExtractSample search for the vulnerable code using the finding indexes
+func (f *File) ExtractSample(findingIndex int) string {
+	lineIndex := f.binarySearch(findingIndex, f.newlineEndingIndexes)
+
+	if lineIndex < len(f.newlineEndingIndexes) {
 		endOfPreviousLine := 0
+
 		if lineIndex > 0 {
-			endOfPreviousLine = textfile.newlineEndingIndexes[lineIndex-1] + 1
+			endOfPreviousLine = f.newlineEndingIndexes[lineIndex-1] + 1
 		}
-		endOfCurrentLine := textfile.newlineEndingIndexes[lineIndex]
 
-		lineContent := textfile.RawString[endOfPreviousLine:endOfCurrentLine]
+		endOfCurrentLine := f.newlineEndingIndexes[lineIndex]
+		lineContent := f.Content[endOfPreviousLine:endOfCurrentLine]
 
-		return strings.TrimSpace(lineContent)
+		return strings.TrimSpace(string(lineContent))
 	}
 
 	return ""
-}
-
-func ReadAndCreateTextFile(filename string) (TextFile, error) {
-	textFileContent, err := ReadTextFileUnix(filename)
-	if err != nil {
-		return TextFile{}, err
-	}
-
-	textFileMagicBytes := textFileContent[:4]
-	if bytes.Equal(textFileMagicBytes, ELFMagicNumber) {
-		// Ignore Linux binaries
-		return TextFile{}, nil
-	} else if bytes.Equal(textFileContent[:2], PEMagicBytes) {
-		// Ignore Windows binaries
-		return TextFile{}, nil
-	}
-
-	return NewTextFile(filename, textFileContent)
-}
-
-// The Param extensionAccept is an filter to check if you need get textUnit for file with this extesion
-//   Example: []string{".java"}
-// If an item of slice contains is equal the "**" it's will accept all extensions
-//   Example: []string{"**"}
-func LoadDirIntoSingleUnit(path string, extensionsAccept []string) (TextUnit, error) {
-	listTextUnit, err := loadDirIntoUnit(path, 0, extensionsAccept)
-	if err != nil {
-		return TextUnit{}, err
-	}
-	if len(listTextUnit) < 1 {
-		return TextUnit{}, nil
-	}
-	return listTextUnit[0], nil
-}
-
-// The Param extensionAccept is an filter to check if you need get textUnit for file with this extesion
-//   Example: []string{".java"}
-// If an item of slice contains is equal the "**" it's will accept all extensions
-//   Example: []string{"**"}
-func LoadDirIntoMultiUnit(path string, maxFilesPerTextUnit int, extensionsAccept []string) ([]TextUnit, error) {
-	return loadDirIntoUnit(path, maxFilesPerTextUnit, extensionsAccept)
-}
-
-func loadDirIntoUnit(path string, maxFilesPerTextUnit int, extensionsAccept []string) ([]TextUnit, error) {
-	filesToRun, err := getFilesPathIntoProjectPath(path, extensionsAccept)
-	if err != nil {
-		return []TextUnit{}, err
-	}
-	return getTextUnitsFromFilesPath(filesToRun, maxFilesPerTextUnit)
-}
-
-func getFilesPathIntoProjectPath(projectPath string, extensionsAccept []string) (filesToRun []string, err error) {
-	return filesToRun, filepath.Walk(projectPath, func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-		if !info.IsDir() {
-			if checkIfEnableExtension(path, extensionsAccept) {
-				filesToRun = append(filesToRun, path)
-			}
-		}
-		return nil
-	})
-}
-
-//nolint // refactor to constant
-func getTextUnitsFromFilesPath(filesToRun []string, maxFilesPerTextUnit int) (textUnits []TextUnit, err error) {
-	textUnits = []TextUnit{{}}
-	lastIndexToAdd := 0
-	for k, currentFile := range filesToRun {
-		time.Sleep(15 * time.Millisecond)
-		currentTime := time.Now()
-		textUnits, lastIndexToAdd, err = readFileAndExtractTextUnit(
-			textUnits, lastIndexToAdd, maxFilesPerTextUnit, currentFile)
-		logger.LogTraceWithLevel(fmt.Sprintf(
-			"Read file in %v Microseconds. Total files read: %v/%v ",
-			time.Since(currentTime).Microseconds(), k, len(filesToRun)), loggerEnums.TraceLevel, currentFile)
-		if err != nil {
-			return []TextUnit{}, err
-		}
-	}
-	return textUnits, nil
-}
-
-func readFileAndExtractTextUnit(
-	textUnits []TextUnit, lastIndexToAdd, maxFilesPerTextUnit int, currentFile string) ([]TextUnit, int, error) {
-	textFile, err := ReadAndCreateTextFile(currentFile)
-	if err != nil {
-		return []TextUnit{}, lastIndexToAdd, err
-	}
-	textUnits[lastIndexToAdd].Files = append(textUnits[lastIndexToAdd].Files, textFile)
-	if maxFilesPerTextUnit > 0 && len(textUnits[lastIndexToAdd].Files) >= maxFilesPerTextUnit {
-		textUnits = append(textUnits, TextUnit{})
-		return textUnits, lastIndexToAdd + 1, nil
-	}
-	return textUnits, lastIndexToAdd, nil
-}
-
-func checkIfEnableExtension(path string, extensionsAccept []string) bool {
-	ext := filepath.Ext(path)
-	for _, extAccept := range extensionsAccept {
-		if ext == extAccept || extAccept == AcceptAllExtensions {
-			return true
-		}
-	}
-	return false
 }

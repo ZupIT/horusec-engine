@@ -15,20 +15,22 @@
 package engine
 
 import (
-	"encoding/json"
-	"fmt"
-	"math"
-	"os"
+	"context"
+	"io/fs"
+	"path/filepath"
+	"strings"
+	"sync"
 
-	"github.com/ZupIT/horusec-devkit/pkg/utils/logger"
-	loggerEnums "github.com/ZupIT/horusec-devkit/pkg/utils/logger/enums"
+	"golang.org/x/sync/errgroup"
+
+	"github.com/ZupIT/horusec-engine/pool"
 )
 
-type Unit interface {
-	Type() UnitType
-	Eval(Rule) []Finding
-}
+// AcceptAnyExtension can be passed as extensions argument in NewEngine to accept any extension
+const AcceptAnyExtension string = "*"
 
+// Finding represents a possible vulnerability found by the engine, it contains all information necessary to detect and
+// correct the vulnerability
 type Finding struct {
 	ID             string
 	Name           string
@@ -39,125 +41,141 @@ type Finding struct {
 	SourceLocation Location
 }
 
-func Run(document []Unit, rules []Rule) (documentFindings []Finding) {
-	numberOfUnits := (len(document)) * (len(rules))
-	if numberOfUnits == 0 {
-		return []Finding{}
-	}
-
-	return executeRunByNumberOfUnits(numberOfUnits, document, rules)
+// Location represents the location of the vulnerability in a file
+type Location struct {
+	Filename string
+	Line     int
+	Column   int
 }
 
-func RunOutputInJSON(document []Unit, rules []Rule, jsonFilePath string) error {
-	report := Run(document, rules)
-	bytesToWrite, err := json.MarshalIndent(report, "", "  ")
+// Engine contains all the engine necessary data
+type Engine struct {
+	poolSize   int
+	extensions []string
+}
+
+// NewEngine creates a new engine instance with all necessary data.
+// extensions argument represents which extension the engine should apply the rules
+// poolSize represents the number of go routines to open (Default is 10)
+func NewEngine(poolSize int, extensions ...string) *Engine {
+	return &Engine{
+		poolSize:   poolSize,
+		extensions: extensions,
+	}
+}
+
+// Run walks through projectPath and runs the method Rule.Run in a pool of goroutines
+// if an error is found when executes Rule.Run method it cancels current running go routines and return
+// valid findings and the error
+// nolint:funlen,gocyclo // necessary complexity, breaking this function will lead to an even more complex code
+func (e *Engine) Run(ctx context.Context, projectPath string, rules ...Rule) ([]Finding, error) {
+	var findings []Finding
+
+	paths, err := e.getValidFilePaths(projectPath)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	outputFile, err := createOutputFile(jsonFilePath)
-	defer func() {
-		_ = outputFile.Close()
-	}()
+
+	mutex := new(sync.Mutex)
+	wg := sync.WaitGroup{}
+
+	workerPool, err := pool.NewPool(e.poolSize)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return writeInOutputFile(outputFile, bytesToWrite)
-}
 
-func RunMaxUnitsByAnalysis(document []Unit, rules []Rule, maxUnitPerAnalysis int) (documentFindings []Finding) {
-	listDocuments := breakTextUnitsIntoLimitOfUnit(document, maxUnitPerAnalysis)
-	for key, units := range listDocuments {
-		logger.LogDebugWithLevel(fmt.Sprintf("Start run analysis %v/%v", key, len(listDocuments)), loggerEnums.DebugLevel)
-		documentFindings = append(documentFindings, Run(units, rules)...)
-	}
-	return documentFindings
-}
+	defer workerPool.Release()
 
-func breakTextUnitsIntoLimitOfUnit(allUnits []Unit, maxUnitsPerAnalysis int) (units [][]Unit) {
-	units = [][]Unit{}
-	startIndex := 0
-	endIndex := maxUnitsPerAnalysis
-	for i := 0; i < getTotalTextUnitsToRunByAnalysis(allUnits, maxUnitsPerAnalysis); i++ {
-		units = append(units, []Unit{})
-		units = toBreakUnitsAddUnitAndUpdateStartEndIndex(allUnits, units, startIndex, endIndex, i)
-		startIndex = endIndex + 1
-		endIndex += maxUnitsPerAnalysis
-	}
-	return units
-}
+	group, _ := errgroup.WithContext(ctx)
 
-func getTotalTextUnitsToRunByAnalysis(textUnits []Unit, maxUnitsPerAnalysis int) int {
-	totalTextUnits := len(textUnits)
-	if totalTextUnits <= maxUnitsPerAnalysis {
-		return 1
-	}
-	totalUnitsToRun := float64(totalTextUnits / maxUnitsPerAnalysis)
-	// nolint:staticcheck // is necessary usage pointless in math.ceil
-	return int(math.Ceil(totalUnitsToRun))
-}
+	wg.Add(len(paths))
 
-func toBreakUnitsAddUnitAndUpdateStartEndIndex(
-	allUnits []Unit, unitsToAppend [][]Unit, startIndex, endIndex, i int) [][]Unit {
-	if len(allUnits[startIndex:]) <= endIndex {
-		for k := range allUnits[startIndex:] {
-			unitsToAppend[i] = append(unitsToAppend[i], allUnits[k])
-		}
-	} else {
-		for k := range allUnits[startIndex:endIndex] {
-			unitsToAppend[i] = append(unitsToAppend[i], allUnits[k])
-		}
-	}
-	return unitsToAppend
-}
+	for _, path := range paths {
+		pathCopy := path
 
-func writeInOutputFile(outputFile *os.File, bytesToWrite []byte) error {
-	bytesWritten, err := outputFile.Write(bytesToWrite)
-	if err != nil {
-		return err
-	}
-	if bytesWritten != len(bytesToWrite) {
-		return fmt.Errorf("bytes written and length of bytes to write is not equal: %v", map[string]interface{}{
-			"bytesWritten": bytesWritten,
-			"bytesToWrite": string(bytesToWrite),
+		errSubmit := workerPool.Submit(func() {
+			group.Go(func() error {
+				defer wg.Done()
+
+				newFindings, errRunRule := e.runRule(rules, pathCopy)
+				if errRunRule != nil {
+					return errRunRule
+				}
+
+				mutex.Lock()
+				findings = append(findings, newFindings...)
+				mutex.Unlock()
+
+				return errRunRule
+			})
 		})
-	}
-	return nil
-}
-
-//nolint:gomnd // improving in the feature
-func createOutputFile(jsonFilePath string) (*os.File, error) {
-	if _, err := os.Create(jsonFilePath); err != nil {
-		return nil, err
-	}
-	outputFile, err := os.OpenFile(jsonFilePath, os.O_CREATE|os.O_WRONLY, 0600)
-	if err != nil {
-		return nil, err
-	}
-	return outputFile, outputFile.Truncate(0)
-}
-
-func executeRunByNumberOfUnits(numberOfUnits int, document []Unit, rules []Rule) (documentFindings []Finding) {
-	documentFindingsChannel := make(chan []Finding, numberOfUnits)
-	for _, documentUnit := range document {
-		localDocumentUnit := documentUnit
-		go execRulesInDocumentUnit(rules, localDocumentUnit, documentFindingsChannel)
-	}
-	for i := 1; i <= numberOfUnits; i++ {
-		unitFindings := <-documentFindingsChannel
-		documentFindings = append(documentFindings, unitFindings...)
-	}
-	close(documentFindingsChannel)
-	return documentFindings
-}
-
-func execRulesInDocumentUnit(rules []Rule, documentUnit Unit, findings chan<- []Finding) {
-	for _, rule := range rules {
-		localRule := rule
-		if localRule.IsFor(documentUnit.Type()) {
-			go func() {
-				ruleFindings := documentUnit.Eval(localRule)
-				findings <- ruleFindings
-			}()
+		if errSubmit != nil {
+			return nil, errSubmit
 		}
 	}
+
+	wg.Wait()
+	err = group.Wait()
+
+	return findings, err
+}
+
+func (e *Engine) runRule(rules []Rule, pathCopy string) ([]Finding, error) {
+	var findings []Finding
+
+	for _, rule := range rules {
+		f, err := rule.Run(pathCopy)
+		if err != nil {
+			return nil, err
+		}
+
+		findings = append(findings, f...)
+	}
+
+	return findings, nil
+}
+
+// getValidFilePaths this function will walk the project directory and will look for files that match the extensions
+// informed during the initialization of the engine and return a slice with it.
+// Directories, sys links and files with extensions that are not in Engine.extensions struct wil be ignored
+func (e *Engine) getValidFilePaths(projectPath string) ([]string, error) {
+	var validPaths []string
+
+	err := filepath.WalkDir(projectPath, func(path string, entry fs.DirEntry, err error) error {
+		if err != nil || e.isInvalidFilePath(path, entry) {
+			return err
+		}
+
+		validPaths = append(validPaths, path)
+
+		return nil
+	})
+
+	return validPaths, err
+}
+
+// isInvalidFilePath contains a list of validations to check if a path needs to be analyzed. It will ignore directories,
+// sysLinks, extensions that don't match the necessary ones, and .git files
+func (e *Engine) isInvalidFilePath(path string, entry fs.DirEntry) bool {
+	return entry.IsDir() ||
+		entry.Type() == fs.ModeSymlink ||
+		e.isInvalidExtension(path) ||
+		e.isFileFromGitFolder(path)
+}
+
+// isInvalidExtension verify if the filepath contains a valid file extension.
+// The valid extensions are the ones that should be analyzed, and are passed during the initialization of the engine
+func (e *Engine) isInvalidExtension(path string) bool {
+	for _, ext := range e.extensions {
+		if ext == filepath.Ext(path) || ext == AcceptAnyExtension {
+			return false
+		}
+	}
+
+	return true
+}
+
+// isFileFromGitFolder check if a file is in a .git folder
+func (e *Engine) isFileFromGitFolder(path string) bool {
+	return strings.Contains(path, ".git")
 }

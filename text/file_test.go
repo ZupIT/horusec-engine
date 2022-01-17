@@ -15,6 +15,7 @@
 package text
 
 import (
+	"errors"
 	"path/filepath"
 	"regexp"
 	"testing"
@@ -22,366 +23,185 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestFindLineAndColumnWithAKotlinController(t *testing.T) {
-	var exampleKotlinController = `package org.jetbrains.kotlin.demo
+const (
+	sampleKotlin = `
+		package org.jetbrains.kotlin.demo
 
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.RestController
-import java.util.concurrent.atomic.AtomicLong
+		import org.springframework.web.bind.annotation.GetMapping
+		import org.springframework.web.bind.annotation.RequestParam
+		import org.springframework.web.bind.annotation.RestController
+		import java.util.concurrent.atomic.AtomicLong
+		
+		@RestController
+		class GreetingController {
+		
+			val counter = AtomicLong()
+		
+			@GetMapping("/greeting")
+			fun greeting(@RequestParam(value = "name", defaultValue = "World") name: String) =
+					Greeting(counter.incrementAndGet(), "Hello, $name")
+		
+		}
+	`
 
-@RestController
-class GreetingController {
-
-    val counter = AtomicLong()
-
-    @GetMapping("/greeting")
-    fun greeting(@RequestParam(value = "name", defaultValue = "World") name: String) =
-            Greeting(counter.incrementAndGet(), "Hello, $name")
-
-}
-`
-
-	nameVariableLine := 14
-	nameVariableColumn := 71
-
-	// So we lookup for something in the file
-	// in this case the 'name: String' variable
-	// and the method should return the correct line and column
-	// for where it is, in a human readable form.
-	nameStringExtractor := regexp.MustCompile(`name\:`)
-
-	findingIndex := nameStringExtractor.FindStringIndex(exampleKotlinController)
-
-	controllerTextFile, err := NewTextFile("example/controller.kt", []byte(exampleKotlinController))
-
-	if err != nil {
-		t.Error(err)
-	}
-
-	line, column := controllerTextFile.FindLineAndColumn(findingIndex[0])
-
-	if line != nameVariableLine || column != nameVariableColumn {
-		t.Errorf(
-			"Failed to find the right line and column. Wanted: %d:%d. Found: %d:%d",
-			nameVariableLine, nameVariableColumn,
-			line, column,
+	sampleGo = `
+		package version
+		
+		import (
+			"github.com/ZupIT/horusec/development-kit/pkg/utils/logger"
+			"github.com/spf13/cobra"
 		)
-	}
-}
-
-func TestFindLineAndColumnWithAGoFile(t *testing.T) {
-	var exampleGoFile = `package version
-
-import (
-	"github.com/ZupIT/horusec/development-kit/pkg/utils/logger"
-	"github.com/spf13/cobra"
-)
-
-type IVersion interface {
-	CreateCobraCmd() *cobra.Command
-}
-
-type Version struct {
-}
-
-func NewVersionCommand() IVersion {
-	return &Version{}
-}
-
-func (v *Version) CreateCobraCmd() *cobra.Command {
-	return &cobra.Command{
-		Use:     "version",
-		Short:   "Actual version installed of the horusec",
-		Example: "horusec version",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			logger.LogPrint(cmd.Short + " is: ")
-			return nil
-		},
-	}
-}
-`
-	cmdShortVariableLine := 25
-	cmdShortVariableColumn := 19
-
-	cmdShortExtractor := regexp.MustCompile(`cmd\.Short`)
-
-	findingIndex := cmdShortExtractor.FindStringIndex(exampleGoFile)
-
-	goTextFile, err := NewTextFile("example/cmd/version.go", []byte(exampleGoFile))
-
-	if err != nil {
-		t.Error(err)
-	}
-
-	line, column := goTextFile.FindLineAndColumn(findingIndex[0])
-
-	if line != cmdShortVariableLine || column != cmdShortVariableColumn {
-		t.Errorf(
-			"Failed to find the right line and column. Wanted: %d:%d. Found: %d:%d",
-			cmdShortVariableLine, cmdShortVariableColumn,
-			line, column,
-		)
-	}
-}
-
-func TestExtractSampleWithAGoFile(t *testing.T) {
-	var exampleGoFile = `package version
-
-import (
-	"github.com/ZupIT/horusec/development-kit/pkg/utils/logger"
-	"github.com/spf13/cobra"
-)
-
-type IVersion interface {
-	CreateCobraCmd() *cobra.Command
-}
-
-type Version struct {
-}
-
-func NewVersionCommand() IVersion {
-	return &Version{}
-}
-
-func (v *Version) CreateCobraCmd() *cobra.Command {
-	return &cobra.Command{
-		Use:     "version",
-		Short:   "Actual version installed of the horusec",
-		Example: "horusec version",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			logger.LogPrint(cmd.Short + " is: ")
-			return nil
-		},
-	}
-}
-`
-	cmdShortExtractor := regexp.MustCompile(`cmd\.Short`)
-
-	findingIndex := cmdShortExtractor.FindStringIndex(exampleGoFile)
-
-	goTextFile, err := NewTextFile("example/cmd/version.go", []byte(exampleGoFile))
-
-	if err != nil {
-		t.Error(err)
-	}
-
-	lineContent := goTextFile.ExtractSample(findingIndex[0])
-
-	if lineContent != `logger.LogPrint(cmd.Short + " is: ")` {
-		t.Fatalf("Failed to find the correct line content. Found: %s", lineContent)
-	}
-}
-
-func TestFindLineAndColumnWithAJavascriptFile(t *testing.T) {
-	var exampleJsFile = `function die(msg) { alert(msg); return false; }
-
-function checkValue($form, selector, name, expected_value) {
-	var input = $form.find(selector)[0];
-	if (!input) { return die('You seem to be missing a required input.'); }
-	if ($(input).attr('value').toLowerCase() !== expected_value.toLowerCase()) {
-		return die('You seem to be using the wrong value for ' + name + '.');
-	}
-	return true;
-}
-
-var allowed_actions = ['http://localhost:8000/csrf/gift-card', 'http://127.0.0.1:8000/csrf/gift-card'];
-$(document).on('submit', 'form', function(e) {
-	var $form = $(this);
-	if (!$form.attr('action') || allowed_actions.indexOf($form.attr('action')) === -1) {
-		return die("Check your form action. It appears to be incorrect. You want the full URL to the giftcard form!");
-	}
-	if (!$form.attr('method') || $form.attr('method').toUpperCase() != 'POST') {
-		return die("Check your form method. You should be POSTing.");
-	}
-
-	// inputs should be either hidden or submit
-	var inputs = $form.find('input').toArray();
-	for (var i in inputs) {
-		var type = $(inputs[i]).attr('type') || '';
-		switch (type.toLowerCase()) {
-			case 'hidden':
-			case 'submit':
-				break; // all good
-			default:
-				return die("You appear to have inputs that are not hidden.");
+		
+		type IVersion interface {
+			CreateCobraCmd() *cobra.Command
 		}
-	}
-
-	if (!checkValue($form, 'input[type="submit"]', 'submit', 'View Photos')) {
-		return false;
-	}
-	if (!checkValue($form, 'input[name="email"]', 'email', 'evil@evil.com')) {
-		return false;
-	}
-	if (!checkValue($form, 'input[name="amount"]', 'amount', '100')) {function checkValue($form, selector, name, expected_value) {
-		var input = $form.find(selector)[0];
-		if (!input) { return die('You seem to be missing a required input.'); }
-		if ($(input).attr('value').toLowerCase() !== expected_value.toLowerCase()) {
-			return die('You seem to be using the wrong value for ' + name + '.');
+		
+		type Version struct {
 		}
-		return true;
-	}
-	
-	var allowed_actions = ['http://localhost:8000/csrf/gift-card', 'http://127.0.0.1:8000/csrf/gift-card'];
-	$(document).on('submit', 'form', function(e) {
-		var $form = $(this);
-		if (!$form.attr('action') || allowed_actions.indexOf($form.attr('action')) === -1) {
-			return die("Check your form action. It appears to be incorrect. You want the full URL to the giftcard form!");
+		
+		func NewVersionCommand() IVersion {
+			return &Version{}
 		}
-		if (!$form.attr('method') || $form.attr('method').toUpperCase() != 'POST') {
-			return die("Check your form method. You should be POSTing.");
-		}
-	
-		// inputs should be either hidden or submit
-		var inputs = $form.find('input').toArray();
-		for (var i in inputs) {
-			var type = $(inputs[i]).attr('type') || '';
-			switch (type.toLowerCase()) {
-				case 'hidden':
-				case 'submit':
-					break; // all good
-				default:
-					return die("You appear to have inputs that are not hidden.");
+		
+		func (v *Version) CreateCobraCmd() *cobra.Command {
+			return &cobra.Command{
+				Use:     "version",
+				Short:   "Actual version installed of the horusec",
+				Example: "horusec version",
+				RunE: func(cmd *cobra.Command, args []string) error {
+					logger.LogPrint(cmd.Short + " is: ")
+					return nil
+				},
 			}
 		}
-	
-		if (!checkValue($form, 'input[type="submit"]', 'submit', 'View Photos')) {
-			return false;
-		}
-		if (!checkValue($form, 'input[name="email"]', 'email', 'evil@evil.com')) {
-			return false;
-		}
-		if (!checkValue($form, 'input[name="amount"]', 'amount', '100')) {
-			return false;
-		}
-	
-		alert("Congrats! You did it!");
-		return false;
-	});
-	
-	/* TODO: solution panel? */
-		return false;
-	}
+	`
 
-	alert("Congrats! You did it!");
-	return false;
-});
-
-/* TODO: solution panel? */
+	sampleJs = `
+		const http = require('http');
+		
+		const hostname = '127.0.0.1';
+		const port = 3000;
+		
+		const server = http.createServer((req, res) => {
+		  res.statusCode = 200;
+		  res.setHeader('Content-Type', 'text/plain');
+		  res.end('Hello World');
+		});
+		
+		server.listen(port, hostname, () => {
+		  console.log('Server running at https://${hostname}:${port}/'');
+		});
 `
+)
 
-	regexCompiler := regexp.MustCompile(`(?m)(?i)(^| |;)(alert|confirm|prompt)\(.*`)
-	findingIndex := regexCompiler.FindStringIndex(exampleJsFile)
-
-	jsTextFile, err := NewTextFile("example/cmd/version.js", []byte(exampleJsFile))
-
-	if err != nil {
-		t.Error(err)
+func getFindingIndex(sample, expression string) (int, error) {
+	indexes := regexp.MustCompile(expression).FindIndex([]byte(sample))
+	if len(indexes) > 0 {
+		return indexes[0], nil
 	}
 
-	line, column := jsTextFile.FindLineAndColumn(findingIndex[0])
-	if line != 1 || column != 19 {
-		t.Errorf(
-			"Failed to find the right line and column. Wanted: %d:%d. Found: %d:%d",
-			1, 19,
-			line, column,
-		)
+	return 0, errors.New("failed to get finding indexes")
+}
+
+func TestFindLineAndColumn(t *testing.T) {
+	testCases := []struct {
+		name            string
+		regexExpression string
+		codeSample      string
+		expectedLine    int
+		expectedColumn  int
+	}{
+		{
+			name:            "Should success find line and column for kotlin",
+			regexExpression: `name\:`,
+			codeSample:      sampleKotlin,
+			expectedLine:    15,
+			expectedColumn:  70,
+		},
+		{
+			name:            "Should success find line and column for go",
+			regexExpression: `cmd\.Short`,
+			codeSample:      sampleGo,
+			expectedLine:    26,
+			expectedColumn:  21,
+		},
+		{
+			name:            "Should success find line and column for js",
+			regexExpression: `server\.listen`,
+			codeSample:      sampleJs,
+			expectedLine:    13,
+			expectedColumn:  2,
+		},
+	}
+
+	for index, testCase := range testCases {
+		t.Run(testCase.name, func(t *testing.T) {
+			findingIndex, err := getFindingIndex(testCase.codeSample, testCase.regexExpression)
+			assert.NoError(t, err)
+
+			file, err := NewTextFile("test", []byte(testCase.codeSample))
+			assert.NoError(t, err)
+
+			line, column := file.FindLineAndColumn(findingIndex)
+			assert.Equalf(t, testCase.expectedLine, line, "failed to find correct line, test case: %d", index)
+			assert.Equalf(t, testCase.expectedColumn, column, "failed to find correct column, test case: %d", index)
+		})
 	}
 }
 
-func TestNameFormattingAndDisplaying(t *testing.T) {
-	expectedName := "version.go"
-
-	goTextFile, err := NewTextFile("example/cmd/version.go", []byte{})
-
-	if err != nil {
-		t.Error(err)
+func TestExtractSample(t *testing.T) {
+	testCases := []struct {
+		name               string
+		regexExpression    string
+		codeSample         string
+		expectedCodeSample string
+	}{
+		{
+			name:               "Should success find code sample for kotlin",
+			regexExpression:    `name\:`,
+			codeSample:         sampleKotlin,
+			expectedCodeSample: "fun greeting(@RequestParam(value = \"name\", defaultValue = \"World\") name: String) =",
+		},
+		{
+			name:               "Should success find code sample for go",
+			regexExpression:    `cmd\.Short`,
+			codeSample:         sampleGo,
+			expectedCodeSample: "logger.LogPrint(cmd.Short + \" is: \")",
+		},
+		{
+			name:               "Should success find code sample for js",
+			regexExpression:    `server\.listen`,
+			codeSample:         sampleJs,
+			expectedCodeSample: "server.listen(port, hostname, () => {",
+		},
 	}
 
-	if goTextFile.Name != expectedName {
-		t.Errorf(
-			"Failed to format the Name of the TextFile for Golang. Wanted: %s, Got: %s",
-			expectedName,
-			goTextFile.Name,
-		)
-	}
-}
+	for index, testCase := range testCases {
+		t.Run(testCase.name, func(t *testing.T) {
+			findingIndex, err := getFindingIndex(testCase.codeSample, testCase.regexExpression)
+			assert.NoError(t, err)
 
-func TestReadAndCreateTextFileWithELFFile(t *testing.T) {
-	textFile, err := ReadAndCreateTextFile(filepath.Join("examples", "elf", "example1", "test.elf"))
+			file, err := NewTextFile("test", []byte(testCase.codeSample))
+			assert.NoError(t, err)
 
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	t.Log(textFile.DisplayName)
-
-	if textFile.DisplayName != "" || textFile.Name != "" || textFile.RawString != "" {
-		t.Fatal("Should not return anything")
-	}
-}
-
-func TestReadAndCreateTextFileWithPEFile(t *testing.T) {
-	textFile, err := ReadAndCreateTextFile(filepath.Join("examples", "pe", "example1", "test.pe"))
-
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	t.Log(textFile.DisplayName)
-
-	if textFile.DisplayName != "" || textFile.Name != "" || textFile.RawString != "" {
-		t.Fatal("Should not return anything")
+			sample := file.ExtractSample(findingIndex)
+			assert.Equalf(t, testCase.expectedCodeSample, sample, "failed to find code sample, test case: %d", index)
+		})
 	}
 }
 
-func TestReadAndCreateTextFileWithMachOFile(t *testing.T) {
-	t.Log("TODO: Skip Mach-O files")
-	t.Skip()
+func TestNewTextFile(t *testing.T) {
+	t.Run("Should success create a new text file", func(t *testing.T) {
+		relativeFilePath := filepath.Join("examples", "go", "example1", "api", "server.go")
 
-	textFile, err := ReadAndCreateTextFile(filepath.Join("examples", "pe", "example1", "test.macho"))
+		file, err := NewTextFile(relativeFilePath, []byte(sampleGo))
+		assert.NoError(t, err)
 
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	t.Log(textFile.DisplayName)
-
-	if textFile.DisplayName != "" || textFile.Name != "" || textFile.RawString != "" {
-		t.Fatal("Should not return anything")
-	}
-}
-
-func TestTextFiles_GetAllFilesUnits(t *testing.T) {
-	t.Run("Should return unit with nine files when get any files", func(t *testing.T) {
-		path, err := filepath.Abs("examples")
-		assert.NoError(t, err)
-		textUnit, err := LoadDirIntoSingleUnit(path, []string{"**"})
-		assert.NoError(t, err)
-		assert.Equal(t, 237, len(textUnit.Files))
-	})
-	t.Run("Should return multi unit with 4 textFiles and max of 3 files per textFile when get any files", func(t *testing.T) {
-		path, err := filepath.Abs("examples")
-		assert.NoError(t, err)
-		textUnit, err := LoadDirIntoMultiUnit(path, 3, []string{"**"})
-		assert.NoError(t, err)
-		assert.Equal(t, 80, len(textUnit))
-		for _, item := range textUnit {
-			assert.LessOrEqual(t, len(item.Files), 3)
-		}
-	})
-	t.Run("Should return unit with tree files when get go files", func(t *testing.T) {
-		path, err := filepath.Abs("examples")
-		assert.NoError(t, err)
-		textUnit, err := LoadDirIntoSingleUnit(path, []string{".perf"})
-		assert.NoError(t, err)
-		assert.Equal(t, 5, len(textUnit.Files))
-	})
-	t.Run("Should return error when path not exists", func(t *testing.T) {
-		path := "./not-exist-path.go"
-		units, err := LoadDirIntoSingleUnit(path, []string{".go"})
-		assert.Error(t, err)
-		assert.Empty(t, units.Files)
+		assert.Truef(t, filepath.IsAbs(file.AbsolutePath), "path it's not absolute")
+		assert.Equalf(t, relativeFilePath, file.RelativePath, "failed to match relative path")
+		assert.Equalf(t, sampleGo, string(file.Content), "failed to match content")
+		assert.Equalf(t, filepath.Base(relativeFilePath), file.Name, "failed to match file name")
+		assert.Lenf(t, file.newlineIndexes, 30, "sample go contains 30 new line indexes")
+		assert.Lenf(t, file.newlineEndingIndexes, 30, "sample go contains 30 ending indexes")
 	})
 }
