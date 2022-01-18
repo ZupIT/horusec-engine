@@ -16,6 +16,7 @@ package javascript_test
 
 import (
 	"bytes"
+	"flag"
 	"fmt"
 	"io/fs"
 	"os"
@@ -27,6 +28,21 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
+
+func TestMain(m *testing.M) {
+	rewrite := flag.Bool("rewrite", false, "Rewrite expected AST output files")
+	flag.Parse()
+
+	if *rewrite {
+		fmt.Println("rewriting expected ASTs")
+		if err := rewriteExpectedASTs(); err != nil {
+			fmt.Fprintf(os.Stderr, "Error to rewrite ASTs: %v\n", err)
+			os.Exit(1)
+		}
+	}
+
+	os.Exit(m.Run())
+}
 
 type testcase struct {
 	name string
@@ -68,28 +84,20 @@ const f2 (a, b) => { return a / b }
 }
 
 func TestJavaScriptParseFile(t *testing.T) {
-	wd, err := os.Getwd()
-	require.NoError(t, err, "Expected no error to get current working directory: %v", err)
-	sources := filepath.Join(wd, "testdata", "source")
-	expecteds := filepath.Join(wd, "testdata", "expected")
-
-	err = filepath.Walk(sources, func(path string, info fs.FileInfo, err error) error {
+	sources := sourceFilesPath()
+	err := filepath.Walk(sources, func(path string, info fs.FileInfo, err error) error {
 		if err != nil || info.IsDir() {
 			return err
 		}
 		t.Run(info.Name(), func(t *testing.T) {
-
-			src, err := os.ReadFile(path)
-			require.NoError(t, err, "Expected no error to read source file: %v", err)
-
-			f, err := javascript.ParseFile(info.Name(), src)
+			f, err := astFromFile(info, path)
 			require.NoError(t, err, "Expected no error to parse source file: %v", err)
 
 			buf := bytes.NewBufferString("")
 
 			ast.Fprint(buf, f)
 
-			expectedAst, err := os.ReadFile(filepath.Join(expecteds, fmt.Sprintf("%s.out", info.Name())))
+			expectedAst, err := os.ReadFile(expectedFilePath(info))
 			require.NoError(t, err, "Expected no error to expected ast: %v", err)
 
 			assert.Equal(t, string(expectedAst), buf.String())
@@ -99,4 +107,53 @@ func TestJavaScriptParseFile(t *testing.T) {
 	})
 
 	assert.NoError(t, err, "Expected no error to walk on source code files: %v", err)
+}
+
+func astFromFile(info fs.FileInfo, path string) (*ast.File, error) {
+	src, err := os.ReadFile(path)
+	if err != nil {
+		return nil, err
+	}
+	return javascript.ParseFile(info.Name(), src)
+}
+
+// rewriteExpectedASTs rewrite all expected AST files on testdata/expected to all source
+// all inside testdata/sources.
+func rewriteExpectedASTs() error {
+	err := filepath.Walk(sourceFilesPath(), func(path string, info fs.FileInfo, err error) error {
+		if err != nil || info.IsDir() {
+			return err
+		}
+		f, err := astFromFile(info, path)
+		if err != nil {
+			return err
+		}
+
+		expectedFile, err := os.OpenFile(expectedFilePath(info), os.O_WRONLY, fs.ModePerm)
+		if err != nil {
+			return err
+		}
+		defer expectedFile.Close()
+
+		return ast.Fprint(expectedFile, f)
+	})
+
+	return err
+}
+
+// sourceFilesPath return the absoulute path that contains all source files.
+func sourceFilesPath() string {
+	wd, _ := os.Getwd()
+	return filepath.Join(wd, "testdata", "source")
+}
+
+// expectedFilePath return the absolute path of expected AST to a given source file info.
+func expectedFilePath(info fs.FileInfo) string {
+	return filepath.Join(expectedFilesPath(), fmt.Sprintf("%s.out", info.Name()))
+}
+
+// expectedFilesPath return the absoulute path that contains all expected AST files.
+func expectedFilesPath() string {
+	wd, _ := os.Getwd()
+	return filepath.Join(wd, "testdata", "expected")
 }
