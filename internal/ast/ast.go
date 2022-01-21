@@ -250,19 +250,36 @@ type (
 		Body *BlockStmt // body of if branch
 		Else Stmt       // else branch; or nil
 	}
+
+	TryStmt struct {
+		Position
+		Body        *BlockStmt
+		CatchClause []*CatchClause
+		Finalizer   *BlockStmt
+	}
+
+	CatchClause struct {
+		Position
+		Parameter *Ident
+		Body      *BlockStmt
+	}
 )
 
-func (*BlockStmt) stmt()  {}
-func (*AssignStmt) stmt() {}
-func (*ExprStmt) stmt()   {}
-func (*ReturnStmt) stmt() {}
-func (*IfStmt) stmt()     {}
+func (*BlockStmt) stmt()   {}
+func (*AssignStmt) stmt()  {}
+func (*ExprStmt) stmt()    {}
+func (*ReturnStmt) stmt()  {}
+func (*IfStmt) stmt()      {}
+func (*TryStmt) stmt()     {}
+func (*CatchClause) stmt() {}
 
-func (*BlockStmt) node()  {}
-func (*AssignStmt) node() {}
-func (*ExprStmt) node()   {}
-func (*ReturnStmt) node() {}
-func (*IfStmt) node()     {}
+func (*BlockStmt) node()   {}
+func (*AssignStmt) node()  {}
+func (*ExprStmt) node()    {}
+func (*ReturnStmt) node()  {}
+func (*IfStmt) node()      {}
+func (*TryStmt) node()     {}
+func (*CatchClause) node() {}
 
 // ----------------------------------------------------------------------------
 // Declarations

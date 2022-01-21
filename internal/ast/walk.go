@@ -138,6 +138,18 @@ func Walk(v Visitor, node Node) {
 		}
 		walkDeclList(v, n.Decls)
 		walkExprList(v, n.Exprs)
+	case *TryStmt:
+		if n.Body != nil {
+			Walk(v, n.Body)
+		}
+
+		for _, value := range n.CatchClause {
+			Walk(v, value)
+		}
+
+		if n.Finalizer != nil {
+			Walk(v, n.Finalizer)
+		}
 	default:
 		panic(fmt.Sprintf("ast.Walk: unexpected node type %T", n))
 	}
