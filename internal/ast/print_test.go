@@ -39,7 +39,8 @@ func TestPrint(t *testing.T) {
 			e: `
 0  *ast.Ident {
 1  .  Name: "foo"
-2  }
+2  .  Position: ast.Position {}
+3  }
 			`,
 		},
 		{
@@ -49,9 +50,10 @@ func TestPrint(t *testing.T) {
 			},
 			e: `
 0  *ast.BasicLit {
-1  .  Kind: "number"
-2  .  Value: "10"
-3  }
+1  .  Position: ast.Position {}
+2  .  Kind: "number"
+3  .  Value: "10"
+4  }
 			`,
 		},
 		{
@@ -70,21 +72,25 @@ func TestPrint(t *testing.T) {
 				},
 			},
 			e: `
-
 0  *ast.FieldList {
-1  .  List: []*ast.Field (len = 2) {
-2  .  .  0: *ast.Field {
-3  .  .  .  Name: *ast.Ident {
-4  .  .  .  .  Name: "a"
-5  .  .  .  }
-6  .  .  }
-7  .  .  1: *ast.Field {
-8  .  .  .  Name: *ast.Ident {
-9  .  .  .  .  Name: "b"
-10  .  .  .  }
-11  .  .  }
-12  .  }
-13  }
+1  .  Position: ast.Position {}
+2  .  List: []*ast.Field (len = 2) {
+3  .  .  0: *ast.Field {
+4  .  .  .  Position: ast.Position {}
+5  .  .  .  Name: *ast.Ident {
+6  .  .  .  .  Name: "a"
+7  .  .  .  .  Position: ast.Position {}
+8  .  .  .  }
+9  .  .  }
+10  .  .  1: *ast.Field {
+11  .  .  .  Position: ast.Position {}
+12  .  .  .  Name: *ast.Ident {
+13  .  .  .  .  Name: "b"
+14  .  .  .  .  Position: ast.Position {}
+15  .  .  .  }
+16  .  .  }
+17  .  }
+18  }
 			`,
 		},
 		{
@@ -97,10 +103,14 @@ func TestPrint(t *testing.T) {
 			},
 			e: `
 0  *ast.FuncLit {
-1  .  Type: *ast.FuncType {
-2  .  .  Params: *ast.FieldList {}
-3  .  }
-4  }
+1  .  Position: ast.Position {}
+2  .  Type: *ast.FuncType {
+3  .  .  Position: ast.Position {}
+4  .  .  Params: *ast.FieldList {
+5  .  .  .  Position: ast.Position {}
+6  .  .  }
+7  .  }
+8  }
 			`,
 		},
 	}
