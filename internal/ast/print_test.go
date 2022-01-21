@@ -19,8 +19,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/ZupIT/horusec-engine/internal/ast"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/ZupIT/horusec-engine/internal/ast"
 )
 
 func TestPrint(t *testing.T) {

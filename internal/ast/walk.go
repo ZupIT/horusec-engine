@@ -36,6 +36,8 @@ func Inspect(node Node, f func(Node) bool) {
 // v.Visit(node) is not nil, Walk is invoked recursively with visitor
 // w for each of the non-nil children of node, followed by a call of
 // w.Visit(nil).
+//
+// nolint:funlen,gocognit,gocyclo // To many type checks to do.
 func Walk(v Visitor, node Node) {
 	if v = v.Visit(node); v == nil {
 		return
@@ -173,5 +175,6 @@ func (f inspector) Visit(node Node) Visitor {
 	if f(node) {
 		return f
 	}
+
 	return nil
 }

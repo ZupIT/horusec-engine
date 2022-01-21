@@ -23,10 +23,11 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/ZupIT/horusec-engine/internal/ast"
-	javascript "github.com/ZupIT/horusec-engine/internal/horusec-javascript"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/ZupIT/horusec-engine/internal/ast"
+	javascript "github.com/ZupIT/horusec-engine/internal/horusec-javascript"
 )
 
 func TestMain(m *testing.M) {
