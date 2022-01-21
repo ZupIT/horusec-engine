@@ -69,4 +69,7 @@ const (
 	IfStatement         = "if_statement"
 	ElseClause          = "else_clause"
 	StatementBlock      = "statement_block"
+	TryStatement        = "try_statement"
+	FinallyClause       = "finally_clause"
+	CatchClause         = "catch_clause"
 )

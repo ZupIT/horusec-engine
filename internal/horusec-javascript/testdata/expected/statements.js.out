@@ -1,0 +1,164 @@
+     0  *ast.File {
+     1  .  Position: ast.Position {}
+     2  .  Name: *ast.Ident {
+     3  .  .  Name: "statements.js"
+     4  .  .  Position: ast.Position {}
+     5  .  }
+     6  .  Decls: []ast.Decl (len = 1) {
+     7  .  .  0: *ast.FuncDecl {
+     8  .  .  .  Position: ast.Position {}
+     9  .  .  .  Name: *ast.Ident {
+    10  .  .  .  .  Name: "TryStatement"
+    11  .  .  .  .  Position: ast.Position {}
+    12  .  .  .  }
+    13  .  .  .  Type: *ast.FuncType {
+    14  .  .  .  .  Position: ast.Position {}
+    15  .  .  .  .  Params: *ast.FieldList {
+    16  .  .  .  .  .  Position: ast.Position {}
+    17  .  .  .  .  }
+    18  .  .  .  }
+    19  .  .  .  Body: *ast.BlockStmt {
+    20  .  .  .  .  Position: ast.Position {}
+    21  .  .  .  .  List: []ast.Stmt (len = 1) {
+    22  .  .  .  .  .  0: *ast.TryStmt {
+    23  .  .  .  .  .  .  Position: ast.Position {}
+    24  .  .  .  .  .  .  Body: *ast.BlockStmt {
+    25  .  .  .  .  .  .  .  Position: ast.Position {}
+    26  .  .  .  .  .  .  .  List: []ast.Stmt (len = 2) {
+    27  .  .  .  .  .  .  .  .  0: *ast.AssignStmt {
+    28  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+    29  .  .  .  .  .  .  .  .  .  LHS: []ast.Expr (len = 1) {
+    30  .  .  .  .  .  .  .  .  .  .  0: *ast.Ident {
+    31  .  .  .  .  .  .  .  .  .  .  .  Name: "value"
+    32  .  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+    33  .  .  .  .  .  .  .  .  .  .  }
+    34  .  .  .  .  .  .  .  .  .  }
+    35  .  .  .  .  .  .  .  .  .  RHS: []ast.Expr (len = 1) {
+    36  .  .  .  .  .  .  .  .  .  .  0: *ast.BasicLit {
+    37  .  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+    38  .  .  .  .  .  .  .  .  .  .  .  Kind: "string"
+    39  .  .  .  .  .  .  .  .  .  .  .  Value: "test"
+    40  .  .  .  .  .  .  .  .  .  .  }
+    41  .  .  .  .  .  .  .  .  .  }
+    42  .  .  .  .  .  .  .  .  }
+    43  .  .  .  .  .  .  .  .  1: *ast.ExprStmt {
+    44  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+    45  .  .  .  .  .  .  .  .  .  Expr: *ast.CallExpr {
+    46  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+    47  .  .  .  .  .  .  .  .  .  .  Fun: *ast.SelectorExpr {
+    48  .  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+    49  .  .  .  .  .  .  .  .  .  .  .  Expr: *ast.Ident {
+    50  .  .  .  .  .  .  .  .  .  .  .  .  Name: "console"
+    51  .  .  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+    52  .  .  .  .  .  .  .  .  .  .  .  }
+    53  .  .  .  .  .  .  .  .  .  .  .  Sel: *ast.Ident {
+    54  .  .  .  .  .  .  .  .  .  .  .  .  Name: "log"
+    55  .  .  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+    56  .  .  .  .  .  .  .  .  .  .  .  }
+    57  .  .  .  .  .  .  .  .  .  .  }
+    58  .  .  .  .  .  .  .  .  .  .  Args: []ast.Expr (len = 1) {
+    59  .  .  .  .  .  .  .  .  .  .  .  0: *ast.Ident {
+    60  .  .  .  .  .  .  .  .  .  .  .  .  Name: "value"
+    61  .  .  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+    62  .  .  .  .  .  .  .  .  .  .  .  }
+    63  .  .  .  .  .  .  .  .  .  .  }
+    64  .  .  .  .  .  .  .  .  .  }
+    65  .  .  .  .  .  .  .  .  }
+    66  .  .  .  .  .  .  .  }
+    67  .  .  .  .  .  .  }
+    68  .  .  .  .  .  .  CatchClause: []*ast.CatchClause (len = 1) {
+    69  .  .  .  .  .  .  .  0: *ast.CatchClause {
+    70  .  .  .  .  .  .  .  .  Position: ast.Position {}
+    71  .  .  .  .  .  .  .  .  Parameter: *ast.Ident {
+    72  .  .  .  .  .  .  .  .  .  Name: "err"
+    73  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+    74  .  .  .  .  .  .  .  .  }
+    75  .  .  .  .  .  .  .  .  Body: *ast.BlockStmt {
+    76  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+    77  .  .  .  .  .  .  .  .  .  List: []ast.Stmt (len = 1) {
+    78  .  .  .  .  .  .  .  .  .  .  0: *ast.ExprStmt {
+    79  .  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+    80  .  .  .  .  .  .  .  .  .  .  .  Expr: *ast.CallExpr {
+    81  .  .  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+    82  .  .  .  .  .  .  .  .  .  .  .  .  Fun: *ast.SelectorExpr {
+    83  .  .  .  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+    84  .  .  .  .  .  .  .  .  .  .  .  .  .  Expr: *ast.Ident {
+    85  .  .  .  .  .  .  .  .  .  .  .  .  .  .  Name: "console"
+    86  .  .  .  .  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+    87  .  .  .  .  .  .  .  .  .  .  .  .  .  }
+    88  .  .  .  .  .  .  .  .  .  .  .  .  .  Sel: *ast.Ident {
+    89  .  .  .  .  .  .  .  .  .  .  .  .  .  .  Name: "error"
+    90  .  .  .  .  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+    91  .  .  .  .  .  .  .  .  .  .  .  .  .  }
+    92  .  .  .  .  .  .  .  .  .  .  .  .  }
+    93  .  .  .  .  .  .  .  .  .  .  .  .  Args: []ast.Expr (len = 1) {
+    94  .  .  .  .  .  .  .  .  .  .  .  .  .  0: *ast.Ident {
+    95  .  .  .  .  .  .  .  .  .  .  .  .  .  .  Name: "err"
+    96  .  .  .  .  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+    97  .  .  .  .  .  .  .  .  .  .  .  .  .  }
+    98  .  .  .  .  .  .  .  .  .  .  .  .  }
+    99  .  .  .  .  .  .  .  .  .  .  .  }
+   100  .  .  .  .  .  .  .  .  .  .  }
+   101  .  .  .  .  .  .  .  .  .  }
+   102  .  .  .  .  .  .  .  .  }
+   103  .  .  .  .  .  .  .  }
+   104  .  .  .  .  .  .  }
+   105  .  .  .  .  .  .  Finalizer: *ast.BlockStmt {
+   106  .  .  .  .  .  .  .  Position: ast.Position {}
+   107  .  .  .  .  .  .  .  List: []ast.Stmt (len = 2) {
+   108  .  .  .  .  .  .  .  .  0: *ast.AssignStmt {
+   109  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+   110  .  .  .  .  .  .  .  .  .  LHS: []ast.Expr (len = 1) {
+   111  .  .  .  .  .  .  .  .  .  .  0: *ast.Ident {
+   112  .  .  .  .  .  .  .  .  .  .  .  Name: "sum"
+   113  .  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+   114  .  .  .  .  .  .  .  .  .  .  }
+   115  .  .  .  .  .  .  .  .  .  }
+   116  .  .  .  .  .  .  .  .  .  RHS: []ast.Expr (len = 1) {
+   117  .  .  .  .  .  .  .  .  .  .  0: *ast.BinaryExpr {
+   118  .  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+   119  .  .  .  .  .  .  .  .  .  .  .  Left: *ast.BasicLit {
+   120  .  .  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+   121  .  .  .  .  .  .  .  .  .  .  .  .  Kind: "number"
+   122  .  .  .  .  .  .  .  .  .  .  .  .  Value: "1"
+   123  .  .  .  .  .  .  .  .  .  .  .  }
+   124  .  .  .  .  .  .  .  .  .  .  .  Op: ""
+   125  .  .  .  .  .  .  .  .  .  .  .  Right: *ast.BasicLit {
+   126  .  .  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+   127  .  .  .  .  .  .  .  .  .  .  .  .  Kind: "number"
+   128  .  .  .  .  .  .  .  .  .  .  .  .  Value: "1"
+   129  .  .  .  .  .  .  .  .  .  .  .  }
+   130  .  .  .  .  .  .  .  .  .  .  }
+   131  .  .  .  .  .  .  .  .  .  }
+   132  .  .  .  .  .  .  .  .  }
+   133  .  .  .  .  .  .  .  .  1: *ast.ExprStmt {
+   134  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+   135  .  .  .  .  .  .  .  .  .  Expr: *ast.CallExpr {
+   136  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+   137  .  .  .  .  .  .  .  .  .  .  Fun: *ast.SelectorExpr {
+   138  .  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+   139  .  .  .  .  .  .  .  .  .  .  .  Expr: *ast.Ident {
+   140  .  .  .  .  .  .  .  .  .  .  .  .  Name: "console"
+   141  .  .  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+   142  .  .  .  .  .  .  .  .  .  .  .  }
+   143  .  .  .  .  .  .  .  .  .  .  .  Sel: *ast.Ident {
+   144  .  .  .  .  .  .  .  .  .  .  .  .  Name: "log"
+   145  .  .  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+   146  .  .  .  .  .  .  .  .  .  .  .  }
+   147  .  .  .  .  .  .  .  .  .  .  }
+   148  .  .  .  .  .  .  .  .  .  .  Args: []ast.Expr (len = 1) {
+   149  .  .  .  .  .  .  .  .  .  .  .  0: *ast.Ident {
+   150  .  .  .  .  .  .  .  .  .  .  .  .  Name: "sum"
+   151  .  .  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+   152  .  .  .  .  .  .  .  .  .  .  .  }
+   153  .  .  .  .  .  .  .  .  .  .  }
+   154  .  .  .  .  .  .  .  .  .  }
+   155  .  .  .  .  .  .  .  .  }
+   156  .  .  .  .  .  .  .  }
+   157  .  .  .  .  .  .  }
+   158  .  .  .  .  .  }
+   159  .  .  .  .  }
+   160  .  .  .  }
+   161  .  .  }
+   162  .  }
+   163  }
