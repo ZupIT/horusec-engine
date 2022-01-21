@@ -115,7 +115,7 @@ linters:
     - gci
     - gofumpt
     - testpackage
-    - wsl
+    # - wsl
     - nlreturn
     - nestif
     - gocognit

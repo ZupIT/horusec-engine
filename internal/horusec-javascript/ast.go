@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// nolint:funlen,gocyclo // We need a lot of lines and if to parse CST to AST
 package javascript
 
 import (
@@ -19,6 +20,7 @@ import (
 	"fmt"
 
 	"github.com/ZupIT/horusec-devkit/pkg/enums/languages"
+
 	"github.com/ZupIT/horusec-engine/internal/ast"
 	"github.com/ZupIT/horusec-engine/internal/cst"
 )
@@ -35,8 +37,7 @@ func ParseFile(name string, src []byte) (*ast.File, error) {
 	return p.parseCST(name, root), nil
 }
 
-type parser struct {
-}
+type parser struct{}
 
 // parseCST parse a tree-sitter CST to a generic AST.
 func (p *parser) parseCST(name string, root *cst.Node) *ast.File {
@@ -200,7 +201,7 @@ func (p *parser) parseVarDecl(node *cst.Node) []ast.Decl {
 				if decl := p.parseRequireCallExpr(value); decl != nil {
 					decls = append(decls, decl)
 				}
-				// TODO: Parse correclty lexical declaration to a call expression
+				// TODO: Parse correctly lexical declaration to a call expression
 				// when call_expression is outside an expression
 				// e.g: let foo = bar();
 				return

@@ -69,6 +69,7 @@ func (f inspector) Visit(node *Node) Visitor {
 	if f(node) {
 		return f
 	}
+
 	return nil
 }
 
@@ -83,6 +84,8 @@ func Inspect(node *Node, f func(*Node) bool) {
 
 // Parse parse a src into a tree and return the root node of the tree.
 // The src should be a valid code
+//
+// nolint:funlen,exhaustive // We don't support all languages yet.
 func Parse(src []byte, language languages.Language) (*Node, error) {
 	parser := treesitter.NewParser()
 
@@ -125,6 +128,7 @@ func (n *Node) NamedChild(idx int) *Node {
 	if child := n.node.NamedChild(idx); child != nil {
 		return newNode(child, n.src)
 	}
+
 	return nil
 }
 
@@ -139,6 +143,7 @@ func (n *Node) ChildByFieldName(name string) *Node {
 	if child != nil {
 		return newNode(child, n.src)
 	}
+
 	return nil
 }
 
@@ -147,6 +152,7 @@ func (n *Node) Parent() *Node {
 	if p := n.node.Parent(); p != nil {
 		return newNode(p, n.src)
 	}
+
 	return nil
 }
 
@@ -200,6 +206,7 @@ func SanitizeNodeValue(b []byte) []byte {
 	if bytes.HasPrefix(b, []byte("'")) || bytes.HasPrefix(b, []byte(`"`)) || bytes.HasPrefix(b, []byte("`")) {
 		return b[1 : len(b)-1]
 	}
+
 	return b
 }
 

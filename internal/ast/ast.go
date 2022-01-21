@@ -33,7 +33,7 @@ func (p Pos) String() string {
 
 // Position wraps Pos with a start and end position of a node.
 //
-// Position implements Node.Start and Node.End methods to easily embeded
+// Position implements Node.Start and Node.End methods to easily embedded
 // on Node implementations, so Node implementations can just inherit Position
 // and these Nodes will fully implement the Node interface.
 type Position struct {
@@ -45,6 +45,7 @@ type Position struct {
 func NewPosition(n *cst.Node) Position {
 	start := n.StartPoint()
 	end := n.EndPoint()
+
 	return Position{
 		start: Pos{
 			Byte:   n.StartByte(),
