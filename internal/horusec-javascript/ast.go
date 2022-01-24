@@ -63,6 +63,7 @@ func (p *parser) parseCST(name string, root *cst.Node) *ast.File {
 			file.Decls = append(file.Decls, p.parseClassDecl(node))
 
 		// Top-level expressions
+		// TODO: check for more top level statements
 		case ExpressionStatement:
 			file.Exprs = append(file.Exprs, p.parseExpr(node))
 		default:
@@ -287,12 +288,33 @@ func (p *parser) parseStmt(node *cst.Node) ast.Stmt {
 		}
 		return stmt
 	case ElseClause, StatementBlock:
-		// Here we just need to get the first named child that is an statement.
+		// Here we just need to get the first named child that is a statement.
 		if child := node.NamedChild(0); child != nil {
 			// We can have an else branch without body.
 			return p.parseStmt(child)
 		}
 		return nil
+	case TryStatement:
+		stmt := &ast.TryStmt{
+			Position: ast.NewPosition(node),
+			Body:     p.parseFuncBody(node.ChildByFieldName("body")),
+		}
+
+		if catchClause := node.ChildByFieldName("handler"); catchClause != nil {
+			stmt.CatchClause = []*ast.CatchClause{
+				{
+					Position:  ast.NewPosition(catchClause),
+					Parameter: ast.NewIdent(catchClause.ChildByFieldName("parameter")),
+					Body:      p.parseFuncBody(catchClause.ChildByFieldName("body")),
+				},
+			}
+		}
+
+		if finalizer := node.ChildByFieldName("finalizer"); finalizer != nil {
+			stmt.Finalizer = p.parseFuncBody(finalizer.ChildByFieldName("body"))
+		}
+
+		return stmt
 	default:
 		panic(fmt.Sprintf("not handled statement of type <%s>", node.Type()))
 	}
