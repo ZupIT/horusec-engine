@@ -251,19 +251,38 @@ type (
 		Body *BlockStmt // body of if branch
 		Else Stmt       // else branch; or nil
 	}
+
+	// TryStmt node represents a try catch finally block
+	TryStmt struct {
+		Position
+		Body        *BlockStmt     // Body of try
+		CatchClause []*CatchClause // List of catches or nil
+		Finalizer   *BlockStmt     // Block of finally statement or nil
+	}
+
+	// CatchClause node represents a catch inside a try catch statement
+	CatchClause struct {
+		Position
+		Parameter *Ident     // Parameter inside catch block
+		Body      *BlockStmt // Body of catch clause
+	}
 )
 
-func (*BlockStmt) stmt()  {}
-func (*AssignStmt) stmt() {}
-func (*ExprStmt) stmt()   {}
-func (*ReturnStmt) stmt() {}
-func (*IfStmt) stmt()     {}
+func (*BlockStmt) stmt()   {}
+func (*AssignStmt) stmt()  {}
+func (*ExprStmt) stmt()    {}
+func (*ReturnStmt) stmt()  {}
+func (*IfStmt) stmt()      {}
+func (*TryStmt) stmt()     {}
+func (*CatchClause) stmt() {}
 
-func (*BlockStmt) node()  {}
-func (*AssignStmt) node() {}
-func (*ExprStmt) node()   {}
-func (*ReturnStmt) node() {}
-func (*IfStmt) node()     {}
+func (*BlockStmt) node()   {}
+func (*AssignStmt) node()  {}
+func (*ExprStmt) node()    {}
+func (*ReturnStmt) node()  {}
+func (*IfStmt) node()      {}
+func (*TryStmt) node()     {}
+func (*CatchClause) node() {}
 
 // ----------------------------------------------------------------------------
 // Declarations
