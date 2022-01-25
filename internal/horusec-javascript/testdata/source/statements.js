@@ -31,3 +31,21 @@ function WhileStatement() {
         console.log('test')
     }
 }
+
+function SwitchStatement() {
+    let fruits = 'Oranges'
+
+    switch (fruits) {
+        case 'Oranges':
+            console.log('Oranges')
+            break
+        case 'Mangoes':
+            console.log('Mangoes')
+            break
+        case 'Papayas':
+            console.log('Papayas')
+            break
+        default:
+            console.log('No fruits')
+    }
+}
