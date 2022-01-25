@@ -159,6 +159,7 @@ func (p *parser) parseParameters(node *cst.Node) *ast.FieldList {
 			Position: ast.NewPosition(node),
 		})
 	})
+
 	return &ast.FieldList{
 		List:     parameters,
 		Position: ast.NewPosition(node),
@@ -198,6 +199,7 @@ func (p *parser) parseVarDecl(node *cst.Node) []ast.Decl {
 				// If value of variable_declaration is an arrow_function
 				// we need to convert to a normal function.
 				decls = append(decls, p.parseArrowFunc(ast.NewIdent(name), value))
+
 				return
 			case CallExpression:
 				// If value of variable_declaration is a function call to
@@ -255,6 +257,7 @@ func (p *parser) parseStmt(node *cst.Node) ast.Stmt {
 		case AssignmentExpression:
 			left := child.ChildByFieldName("left")
 			right := child.ChildByFieldName("right")
+
 			return &ast.AssignStmt{
 				LHS:      []ast.Expr{p.parseExpr(left)},
 				RHS:      []ast.Expr{p.parseExpr(right)},
@@ -274,6 +277,7 @@ func (p *parser) parseStmt(node *cst.Node) ast.Stmt {
 				Position: ast.NewPosition(node),
 			}
 		}
+
 		return &ast.ReturnStmt{
 			Results: []ast.Expr{
 				p.parseExpr(expr),
@@ -289,6 +293,7 @@ func (p *parser) parseStmt(node *cst.Node) ast.Stmt {
 		if alt := node.ChildByFieldName("alternative"); alt != nil {
 			stmt.Else = p.parseStmt(alt)
 		}
+
 		return stmt
 	case ElseClause, StatementBlock:
 		// Here we just need to get the first named child that is a statement.
@@ -296,6 +301,7 @@ func (p *parser) parseStmt(node *cst.Node) ast.Stmt {
 			// We can have an else branch without body.
 			return p.parseStmt(child)
 		}
+
 		return nil
 	case TryStatement:
 		stmt := &ast.TryStmt{
@@ -318,6 +324,15 @@ func (p *parser) parseStmt(node *cst.Node) ast.Stmt {
 		}
 
 		return stmt
+	case WhileStatement:
+		stmt := &ast.WhileStmt{
+			Position: ast.NewPosition(node),
+			Cond:     p.parseExpr(node.ChildByFieldName("condition")),
+			Body:     p.parseFuncBody(node.ChildByFieldName("body")),
+		}
+
+		return stmt
+
 	default:
 		panic(fmt.Sprintf("not handled statement of type <%s>", node.Type()))
 	}
@@ -385,6 +400,7 @@ func (p *parser) parseExpr(node *cst.Node) ast.Expr {
 		cst.IterNamedChilds(node, func(pair *cst.Node) {
 			obj.Elts = append(obj.Elts, p.parseExpr(pair))
 		})
+
 		return &obj
 	case Pair:
 		return &ast.KeyValueExpr{
@@ -397,10 +413,12 @@ func (p *parser) parseExpr(node *cst.Node) ast.Expr {
 		cst.IterNamedChilds(node, func(node *cst.Node) {
 			obj.Elts = append(obj.Elts, p.parseExpr(node))
 		})
+
 		return &obj
 	case BinaryExpression:
 		// TODO: tree-sitter doesn't expose a operator node
 		// we need to find a way to get this operator.
+
 		return &ast.BinaryExpr{
 			Left:     p.parseExpr(node.ChildByFieldName("left")),
 			Right:    p.parseExpr(node.ChildByFieldName("right")),
@@ -458,6 +476,7 @@ func (p *parser) parseExpr(node *cst.Node) ast.Expr {
 		cst.IterNamedChilds(node, func(node *cst.Node) {
 			exprs = append(exprs, p.parseExpr(node.NamedChild(0)))
 		})
+
 		return &ast.TemplateExpr{
 			Value:    string(cst.SanitizeNodeValue(node.Value())),
 			Subs:     exprs,
@@ -494,6 +513,7 @@ func (p *parser) parseRequireCallExpr(node *cst.Node) ast.Decl {
 			}
 		}
 	}
+
 	return nil
 }
 
@@ -546,6 +566,7 @@ func (p *parser) parseImportStmt(node *cst.Node) []ast.Decl {
 				})
 			}
 		})
+
 		return imports
 	case NamespaceImport:
 		// Handle `import * as name from 'module-name'`
@@ -557,6 +578,7 @@ func (p *parser) parseImportStmt(node *cst.Node) []ast.Decl {
 			},
 		}
 	}
+
 	return []ast.Decl{}
 }
 
