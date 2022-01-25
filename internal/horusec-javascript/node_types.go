@@ -72,4 +72,11 @@ const (
 	TryStatement        = "try_statement"
 	FinallyClause       = "finally_clause"
 	CatchClause         = "catch_clause"
+
+	// ------------------------------------------------
+	//
+	//
+	// Others nodes
+
+	Comment = "comment"
 )

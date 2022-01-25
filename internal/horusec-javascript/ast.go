@@ -66,6 +66,9 @@ func (p *parser) parseCST(name string, root *cst.Node) *ast.File {
 		// TODO: check for more top level statements
 		case ExpressionStatement:
 			file.Exprs = append(file.Exprs, p.parseExpr(node))
+
+		case Comment:
+			// TODO(matheus): Handle comments.
 		default:
 			panic(fmt.Sprintf("unexpected node type %s", node.Type()))
 		}
