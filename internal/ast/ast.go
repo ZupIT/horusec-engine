@@ -266,6 +266,13 @@ type (
 		Parameter *Ident     // Parameter inside catch block
 		Body      *BlockStmt // Body of catch clause
 	}
+
+	// WhileStmt node represents a while block
+	WhileStmt struct {
+		Position
+		Cond Expr       // Cond represents while loop condition
+		Body *BlockStmt // Body of catch clause
+	}
 )
 
 func (*BlockStmt) stmt()   {}
@@ -275,6 +282,7 @@ func (*ReturnStmt) stmt()  {}
 func (*IfStmt) stmt()      {}
 func (*TryStmt) stmt()     {}
 func (*CatchClause) stmt() {}
+func (*WhileStmt) stmt()   {}
 
 func (*BlockStmt) node()   {}
 func (*AssignStmt) node()  {}
@@ -283,6 +291,7 @@ func (*ReturnStmt) node()  {}
 func (*IfStmt) node()      {}
 func (*TryStmt) node()     {}
 func (*CatchClause) node() {}
+func (*WhileStmt) node()   {}
 
 // ----------------------------------------------------------------------------
 // Declarations
