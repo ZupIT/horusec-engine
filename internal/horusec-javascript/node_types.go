@@ -72,6 +72,7 @@ const (
 	TryStatement        = "try_statement"
 	FinallyClause       = "finally_clause"
 	CatchClause         = "catch_clause"
+	WhileStatement      = "while_statement"
 
 	// ------------------------------------------------
 	//
