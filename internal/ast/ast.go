@@ -267,11 +267,11 @@ type (
 		Body      *BlockStmt // Body of catch clause
 	}
 
-	// WhileStmt node represents a while block
+	// WhileStmt node represents a while block.
 	WhileStmt struct {
 		Position
-		Cond Expr       // Cond represents while loop condition
-		Body *BlockStmt // Body of catch clause
+		Cond Expr       // While loop condition.
+		Body *BlockStmt // Body of while.
 	}
 )
 
