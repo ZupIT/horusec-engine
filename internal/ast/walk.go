@@ -111,7 +111,11 @@ func Walk(v Visitor, node Node) {
 		if n.Else != nil {
 			Walk(v, n.Else)
 		}
-
+	case *WhileStmt:
+		Walk(v, n.Cond)
+		if n.Body != nil {
+			Walk(v, n.Body)
+		}
 	// Declarations
 	case *ImportDecl:
 		if n.Name != nil {
