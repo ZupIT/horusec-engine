@@ -27,8 +27,27 @@ function TryStatement() {
 }
 
 function WhileStatement() {
-    while (i <= 5) {
+    whileStmt :while ( i <= 5){
         console.log('test')
+        if (i === 4 ){
+            console.log("finish")
+            break whileStmt
+        }
+        if (i === 2){
+            console.log("two")
+            continue whileStmt
+        }
+    }
+    while ( i <= 5){
+        console.log('test')
+        if (i === 2){
+            console.log("two")
+            continue
+        }
+        if (i === 4 ){
+            console.log("finish")
+            break
+        }
     }
 }
 
