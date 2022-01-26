@@ -31,3 +31,5 @@ function g(a, b = 1) {}
 const h = 1, b = 2;
 
 let i;
+
+let foo = bar();

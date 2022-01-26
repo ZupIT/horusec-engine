@@ -206,11 +206,11 @@ func (p *parser) parseVarDecl(node *cst.Node) []ast.Decl {
 				// require, we need to convert to a import_statement.
 				if decl := p.parseRequireCallExpr(value); decl != nil {
 					decls = append(decls, decl)
+					return
+				} else {
+					// Otherwise if parse as a normal call expression.
+					varDecl.Values = append(varDecl.Values, p.parseCallExpr(value))
 				}
-				// TODO: Parse correctly lexical declaration to a call expression
-				// when call_expression is outside an expression
-				// e.g: let foo = bar();
-				return
 			default:
 				// Otherwise we just parse value as an expression.
 				varDecl.Values = append(varDecl.Values, p.parseExpr(value))
@@ -437,19 +437,7 @@ func (p *parser) parseExpr(node *cst.Node) ast.Expr {
 			Position: ast.NewPosition(node),
 		}
 	case CallExpression:
-		fn := node.ChildByFieldName("function")
-		args := node.ChildByFieldName("arguments")
-
-		argsExpr := make([]ast.Expr, 0, args.NamedChildCount())
-		cst.IterNamedChilds(args, func(node *cst.Node) {
-			argsExpr = append(argsExpr, p.parseExpr(node))
-		})
-
-		return &ast.CallExpr{
-			Fun:      p.parseExpr(fn),
-			Args:     argsExpr,
-			Position: ast.NewPosition(node),
-		}
+		return p.parseCallExpr(node)
 	case MemberExpression:
 		return &ast.SelectorExpr{
 			Expr:     p.parseExpr(node.ChildByFieldName("object")),
@@ -580,6 +568,22 @@ func (p *parser) parseImportStmt(node *cst.Node) []ast.Decl {
 	}
 
 	return []ast.Decl{}
+}
+
+func (p *parser) parseCallExpr(node *cst.Node) *ast.CallExpr {
+	fn := node.ChildByFieldName("function")
+	args := node.ChildByFieldName("arguments")
+
+	argsExpr := make([]ast.Expr, 0, args.NamedChildCount())
+	cst.IterNamedChilds(args, func(node *cst.Node) {
+		argsExpr = append(argsExpr, p.parseExpr(node))
+	})
+
+	return &ast.CallExpr{
+		Fun:      p.parseExpr(fn),
+		Args:     argsExpr,
+		Position: ast.NewPosition(node),
+	}
 }
 
 func assertNodeType(node *cst.Node, typ string) {
