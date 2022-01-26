@@ -4,7 +4,7 @@
      3  .  .  Name: "var_declarations.js"
      4  .  .  Position: ast.Position {}
      5  .  }
-     6  .  Decls: []ast.Decl (len = 9) {
+     6  .  Decls: []ast.Decl (len = 10) {
      7  .  .  0: *ast.ValueDecl {
      8  .  .  .  Position: ast.Position {}
      9  .  .  .  Names: []*ast.Ident (len = 1) {
@@ -292,5 +292,24 @@
    291  .  .  .  .  }
    292  .  .  .  }
    293  .  .  }
-   294  .  }
-   295  }
+   294  .  .  9: *ast.ValueDecl {
+   295  .  .  .  Position: ast.Position {}
+   296  .  .  .  Names: []*ast.Ident (len = 1) {
+   297  .  .  .  .  0: *ast.Ident {
+   298  .  .  .  .  .  Name: "foo"
+   299  .  .  .  .  .  Position: ast.Position {}
+   300  .  .  .  .  }
+   301  .  .  .  }
+   302  .  .  .  Values: []ast.Expr (len = 1) {
+   303  .  .  .  .  0: *ast.CallExpr {
+   304  .  .  .  .  .  Position: ast.Position {}
+   305  .  .  .  .  .  Fun: *ast.Ident {
+   306  .  .  .  .  .  .  Name: "bar"
+   307  .  .  .  .  .  .  Position: ast.Position {}
+   308  .  .  .  .  .  }
+   309  .  .  .  .  .  Args: []ast.Expr (len = 0) {}
+   310  .  .  .  .  }
+   311  .  .  .  }
+   312  .  .  }
+   313  .  }
+   314  }
