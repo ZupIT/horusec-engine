@@ -94,6 +94,10 @@ func Walk(v Visitor, node Node) {
 	case *KeyValueExpr:
 		Walk(v, n.Key)
 		Walk(v, n.Value)
+	case *IncExpr:
+		if n.Arg != nil {
+			Walk(v, n.Arg)
+		}
 
 	// Statements
 	case *AssignStmt:
@@ -113,6 +117,62 @@ func Walk(v Visitor, node Node) {
 		}
 	case *WhileStmt:
 		Walk(v, n.Cond)
+		if n.Body != nil {
+			Walk(v, n.Body)
+		}
+	case *TryStmt:
+		if n.Body != nil {
+			Walk(v, n.Body)
+		}
+
+		for _, value := range n.CatchClause {
+			Walk(v, value)
+		}
+
+		if n.Finalizer != nil {
+			Walk(v, n.Finalizer)
+		}
+	case *SwitchStatement:
+		if n.Value != nil {
+			Walk(v, n.Value)
+		}
+
+		if n.Body != nil {
+			Walk(v, n.Body)
+		}
+	case *SwitchCase:
+		if n.Cond != nil {
+			Walk(v, n.Cond)
+		}
+
+		walkStmtList(v, n.Body)
+	case *SwitchDefault:
+		walkStmtList(v, n.Body)
+	case *ForStatement:
+		if n.VarDecl != nil {
+			Walk(v, n.VarDecl)
+		}
+
+		if n.Cond != nil {
+			Walk(v, n.Cond)
+		}
+
+		if n.Increment != nil {
+			Walk(v, n.Increment)
+		}
+
+		if n.Body != nil {
+			Walk(v, n.Body)
+		}
+	case *ForInStatement:
+		if n.Left != nil {
+			Walk(v, n.Left)
+		}
+
+		if n.Right != nil {
+			Walk(v, n.Right)
+		}
+
 		if n.Body != nil {
 			Walk(v, n.Body)
 		}
@@ -144,34 +204,7 @@ func Walk(v Visitor, node Node) {
 		}
 		walkDeclList(v, n.Decls)
 		walkExprList(v, n.Exprs)
-	case *TryStmt:
-		if n.Body != nil {
-			Walk(v, n.Body)
-		}
 
-		for _, value := range n.CatchClause {
-			Walk(v, value)
-		}
-
-		if n.Finalizer != nil {
-			Walk(v, n.Finalizer)
-		}
-	case *SwitchStatement:
-		if n.Value != nil {
-			Walk(v, n.Value)
-		}
-
-		if n.Body != nil {
-			Walk(v, n.Body)
-		}
-	case *SwitchCase:
-		if n.Cond != nil {
-			Walk(v, n.Cond)
-		}
-
-		walkStmtList(v, n.Body)
-	case *SwitchDefault:
-		walkStmtList(v, n.Body)
 	default:
 		panic(fmt.Sprintf("ast.Walk: unexpected node type %T", n))
 	}
