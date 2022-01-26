@@ -73,6 +73,11 @@ const (
 	FinallyClause       = "finally_clause"
 	CatchClause         = "catch_clause"
 	WhileStatement      = "while_statement"
+	SwitchStatement     = "switch_statement"
+	SwitchBody          = "switch_body"
+	SwitchCase          = "switch_case"
+	SwitchDefault       = "switch_default"
+	BreakStatement      = "break_statement"
 
 	// ------------------------------------------------
 	//

@@ -332,7 +332,60 @@ func (p *parser) parseStmt(node *cst.Node) ast.Stmt {
 		}
 
 		return stmt
+	case SwitchStatement:
+		// TODO: handle switch cases with labels
+		// inner: switch (i) {
+		// case 1:
+		//	 break inner
+		// }
+		stmt := &ast.SwitchStatement{
+			Position: ast.NewPosition(node),
+			Value:    p.parseExpr(node.ChildByFieldName("value")),
+			Body:     p.parseFuncBody(node.ChildByFieldName("body")),
+		}
 
+		return stmt
+	case SwitchCase:
+		stmt := &ast.SwitchCase{
+			Position: ast.NewPosition(node),
+			Cond:     p.parseExpr(node.ChildByFieldName("value")),
+		}
+
+		body := make([]ast.Stmt, 0, node.NamedChildCount()-1)
+
+		// The first named child of switch case is the condition, here we just need to iterate over the
+		// statements of switch case. The condition of switch case is parsed above.
+		for i := 1; i < node.NamedChildCount(); i++ {
+			body = append(body, p.parseStmt(node.NamedChild(i)))
+		}
+
+		stmt.Body = body
+
+		return stmt
+	case SwitchDefault:
+		stmt := &ast.SwitchDefault{
+			Position: ast.NewPosition(node),
+		}
+
+		body := make([]ast.Stmt, 0, node.NamedChildCount())
+
+		cst.IterNamedChilds(node, func(node *cst.Node) {
+			body = append(body, p.parseStmt(node))
+		})
+
+		stmt.Body = body
+
+		return stmt
+	case BreakStatement:
+		stmt := &ast.BreakStatement{
+			Position: ast.NewPosition(node),
+		}
+
+		if label := node.ChildByFieldName("label"); label != nil {
+			stmt.Label = p.parseStmt(label)
+		}
+
+		return stmt
 	default:
 		panic(fmt.Sprintf("not handled statement of type <%s>", node.Type()))
 	}

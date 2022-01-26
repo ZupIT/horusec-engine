@@ -156,6 +156,22 @@ func Walk(v Visitor, node Node) {
 		if n.Finalizer != nil {
 			Walk(v, n.Finalizer)
 		}
+	case *SwitchStatement:
+		if n.Value != nil {
+			Walk(v, n.Value)
+		}
+
+		if n.Body != nil {
+			Walk(v, n.Body)
+		}
+	case *SwitchCase:
+		if n.Cond != nil {
+			Walk(v, n.Cond)
+		}
+
+		walkStmtList(v, n.Body)
+	case *SwitchDefault:
+		walkStmtList(v, n.Body)
 	default:
 		panic(fmt.Sprintf("ast.Walk: unexpected node type %T", n))
 	}
