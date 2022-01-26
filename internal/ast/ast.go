@@ -273,25 +273,59 @@ type (
 		Cond Expr       // While loop condition.
 		Body *BlockStmt // Body of while.
 	}
+
+	// SwitchStatement node represents a switch statement
+	SwitchStatement struct {
+		Position
+		Value Expr       // Value to switch case
+		Body  *BlockStmt // Switch body
+	}
+
+	// SwitchCase node represents a single switch case
+	SwitchCase struct {
+		Position
+		Cond Expr   // Condition that needs to match to enter this case
+		Body []Stmt // Switch case body or nil
+	}
+
+	// SwitchDefault node represents a switch default statement
+	SwitchDefault struct {
+		Position
+		Body []Stmt // Switch default case body
+	}
+
+	// BreakStatement node represents a break statement
+	BreakStatement struct {
+		Position
+		Label Stmt // Break statement label
+	}
 )
 
-func (*BlockStmt) stmt()   {}
-func (*AssignStmt) stmt()  {}
-func (*ExprStmt) stmt()    {}
-func (*ReturnStmt) stmt()  {}
-func (*IfStmt) stmt()      {}
-func (*TryStmt) stmt()     {}
-func (*CatchClause) stmt() {}
-func (*WhileStmt) stmt()   {}
+func (*BlockStmt) stmt()       {}
+func (*AssignStmt) stmt()      {}
+func (*ExprStmt) stmt()        {}
+func (*ReturnStmt) stmt()      {}
+func (*IfStmt) stmt()          {}
+func (*TryStmt) stmt()         {}
+func (*CatchClause) stmt()     {}
+func (*WhileStmt) stmt()       {}
+func (*SwitchStatement) stmt() {}
+func (*SwitchCase) stmt()      {}
+func (*SwitchDefault) stmt()   {}
+func (*BreakStatement) stmt()  {}
 
-func (*BlockStmt) node()   {}
-func (*AssignStmt) node()  {}
-func (*ExprStmt) node()    {}
-func (*ReturnStmt) node()  {}
-func (*IfStmt) node()      {}
-func (*TryStmt) node()     {}
-func (*CatchClause) node() {}
-func (*WhileStmt) node()   {}
+func (*BlockStmt) node()       {}
+func (*AssignStmt) node()      {}
+func (*ExprStmt) node()        {}
+func (*ReturnStmt) node()      {}
+func (*IfStmt) node()          {}
+func (*TryStmt) node()         {}
+func (*CatchClause) node()     {}
+func (*WhileStmt) node()       {}
+func (*SwitchStatement) node() {}
+func (*SwitchCase) node()      {}
+func (*SwitchDefault) node()   {}
+func (*BreakStatement) node()  {}
 
 // ----------------------------------------------------------------------------
 // Declarations
