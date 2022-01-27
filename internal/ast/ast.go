@@ -185,6 +185,12 @@ type (
 		Key   Expr
 		Value Expr
 	}
+
+	// IncExpr node represents a variable increment expression
+	IncExpr struct {
+		Position
+		Arg *Ident // identifier of the argument being incremented
+	}
 )
 
 func (*Ident) expr()        {}
@@ -199,6 +205,7 @@ func (*KeyValueExpr) expr() {}
 func (*FuncType) expr()     {}
 func (*FuncLit) expr()      {}
 func (*TemplateExpr) expr() {}
+func (*IncExpr) expr()      {}
 
 func (*Ident) node()        {}
 func (*Field) node()        {}
@@ -212,6 +219,7 @@ func (*KeyValueExpr) node() {}
 func (*FuncType) node()     {}
 func (*FuncLit) node()      {}
 func (*TemplateExpr) node() {}
+func (*IncExpr) node()      {}
 
 // ----------------------------------------------------------------------------
 // Statements
@@ -299,6 +307,23 @@ type (
 		Position
 		Label Stmt // Break statement label
 	}
+
+	// ForStatement node represents a for statement
+	ForStatement struct {
+		Position
+		VarDecl   Stmt       // For initializer
+		Cond      Stmt       // Condition needed to match
+		Increment Expr       // For Increment expression
+		Body      *BlockStmt // For body
+	}
+
+	// ForInStatement node represents a for in statement
+	ForInStatement struct {
+		Position
+		Left  Expr       // Value on the left side of for in containing the value of the current iteration
+		Right Expr       // Value on the right side of for in containing an array to iterate over
+		Body  *BlockStmt // For in body
+	}
 )
 
 func (*BlockStmt) stmt()       {}
@@ -313,6 +338,8 @@ func (*SwitchStatement) stmt() {}
 func (*SwitchCase) stmt()      {}
 func (*SwitchDefault) stmt()   {}
 func (*BreakStatement) stmt()  {}
+func (*ForStatement) stmt()    {}
+func (*ForInStatement) stmt()  {}
 
 func (*BlockStmt) node()       {}
 func (*AssignStmt) node()      {}
@@ -326,6 +353,8 @@ func (*SwitchStatement) node() {}
 func (*SwitchCase) node()      {}
 func (*SwitchDefault) node()   {}
 func (*BreakStatement) node()  {}
+func (*ForStatement) node()    {}
+func (*ForInStatement) node()  {}
 
 // ----------------------------------------------------------------------------
 // Declarations

@@ -206,11 +206,12 @@ func (p *parser) parseVarDecl(node *cst.Node) []ast.Decl {
 				// require, we need to convert to a import_statement.
 				if decl := p.parseRequireCallExpr(value); decl != nil {
 					decls = append(decls, decl)
+
 					return
-				} else {
-					// Otherwise if parse as a normal call expression.
-					varDecl.Values = append(varDecl.Values, p.parseCallExpr(value))
 				}
+
+				// Otherwise just parse as a normal call expression.
+				varDecl.Values = append(varDecl.Values, p.parseCallExpr(value))
 			default:
 				// Otherwise we just parse value as an expression.
 				varDecl.Values = append(varDecl.Values, p.parseExpr(value))
@@ -386,6 +387,21 @@ func (p *parser) parseStmt(node *cst.Node) ast.Stmt {
 		}
 
 		return stmt
+	case ForStatement:
+		return &ast.ForStatement{
+			Position:  ast.NewPosition(node),
+			VarDecl:   p.parseStmt(node.ChildByFieldName("initializer")),
+			Cond:      p.parseStmt(node.ChildByFieldName("condition")),
+			Increment: p.parseExpr(node.ChildByFieldName("increment")),
+			Body:      p.parseFuncBody(node.ChildByFieldName("body")),
+		}
+	case ForInStatement:
+		return &ast.ForInStatement{
+			Position: ast.NewPosition(node),
+			Left:     p.parseExpr(node.ChildByFieldName("left")),
+			Right:    p.parseExpr(node.ChildByFieldName("right")),
+			Body:     p.parseFuncBody(node.ChildByFieldName("body")),
+		}
 	default:
 		panic(fmt.Sprintf("not handled statement of type <%s>", node.Type()))
 	}
@@ -527,6 +543,10 @@ func (p *parser) parseExpr(node *cst.Node) ast.Expr {
 		// ExpressionStatement is composed only by an expression and semicolon
 		// so here we just need to get and parse the expression.
 		return p.parseExpr(node.NamedChild(0))
+	case UpdateExpression:
+		return &ast.IncExpr{
+			Arg: ast.NewIdent(node.ChildByFieldName("argument")),
+		}
 	default:
 		panic(fmt.Sprintf("not handled expression of type <%s>", node.Type()))
 	}
