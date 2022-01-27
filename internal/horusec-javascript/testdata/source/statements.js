@@ -27,7 +27,7 @@ function TryStatement() {
 }
 
 function WhileStatement() {
-    while ( i <= 5){
+    while (i <= 5) {
         console.log('test')
     }
 }
@@ -47,5 +47,19 @@ function SwitchStatement() {
             break
         default:
             console.log('No fruits')
+    }
+}
+
+function ForStatement() {
+    for (let i = 0; i < 9; i++) {
+        console.log(i);
+    }
+}
+
+function ForInStatement() {
+    const values = ['a', 'b', 'c'];
+
+    for (let value in values) {
+        console.log(value)
     }
 }

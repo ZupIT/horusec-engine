@@ -55,6 +55,7 @@ const (
 	SequenceExpression      = "sequence_expression"
 	TemplateString          = "template_string"
 	Function                = "function"
+	UpdateExpression        = "update_expression"
 
 	// ------------------------------------------------
 	//
@@ -78,6 +79,8 @@ const (
 	SwitchCase          = "switch_case"
 	SwitchDefault       = "switch_default"
 	BreakStatement      = "break_statement"
+	ForStatement        = "for_statement"
+	ForInStatement      = "for_in_statement"
 
 	// ------------------------------------------------
 	//
