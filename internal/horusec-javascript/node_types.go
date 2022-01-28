@@ -84,6 +84,9 @@ const (
 	ContinueStatement   = "continue_statement"
 	StatementIdentifier = "statement_identifier"
 	LabeledStatement    = "labeled_statement"
+	ExportStatement     = "export_statement"
+	ExportClause        = "export_clause"
+	ExportSpecifier     = "export_specifier"
 
 	// ------------------------------------------------
 	//

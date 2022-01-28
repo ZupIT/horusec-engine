@@ -82,3 +82,47 @@ function ForInStatement() {
         console.log(value)
     }
 }
+
+
+function ExportStatement() {
+    export let test1, test2, test3
+
+    export let test4 = 'test4', test5 = 'test5', test6;
+
+    export function testFunc1() {
+        console.log('test')
+    }
+
+    export class TestExportClass {
+        constructor() {
+            console.log('test')
+        }
+
+    }
+
+    export {test7, test8, test9};
+
+    export {test10 as alias10, test11 as alias11, test12};
+
+    export default test13;
+
+    export default function () {
+        console.log('test')
+    }
+
+    export default function testFunc2() {
+        console.log('test')
+    }
+
+    export {name14 as default, nome15};
+
+    export * from 'test1.js';
+
+    export * as name16 from 'test2.js';
+
+    export {name17, name18, name19} from 'test3.js';
+
+    export {name20 as alias20, name21 as alias21, name22} from 'test4.js';
+
+    export {default, name23} from 'test5.js';
+}

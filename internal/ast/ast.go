@@ -324,6 +324,7 @@ type (
 		Right Expr       // Value on the right side of for in containing an array to iterate over
 		Body  *BlockStmt // For in body
 	}
+
 	// ContinueStatement node represents a continue statement
 	ContinueStatement struct {
 		Position
@@ -335,6 +336,28 @@ type (
 		Position
 		Label *Ident // LabeledStatement label
 		Body  []Stmt
+	}
+
+	// ExportStatement node represents a export statement
+	ExportStatement struct {
+		Position
+		Ident        Expr // Identifier of the export statement
+		Decl         Decl // Declaration which can be a lexical, function or class declaration
+		ExportClause Stmt // Export clause
+		Source       Expr // String containing the export source
+	}
+
+	// ExportClause node represents a export clause
+	ExportClause struct {
+		Position
+		Specifiers []Stmt // Export specifiers
+	}
+
+	// ExportSpecifier node represents a export specifier
+	ExportSpecifier struct {
+		Position
+		Name  Expr // Export name
+		Alias Expr // Export alias
 	}
 )
 
@@ -354,6 +377,9 @@ func (*ForStatement) stmt()      {}
 func (*ContinueStatement) stmt() {}
 func (*LabeledStatement) stmt()  {}
 func (*ForInStatement) stmt()    {}
+func (*ExportStatement) stmt()   {}
+func (*ExportClause) stmt()      {}
+func (*ExportSpecifier) stmt()   {}
 
 func (*BlockStmt) node()         {}
 func (*AssignStmt) node()        {}
@@ -371,6 +397,9 @@ func (*ContinueStatement) node() {}
 func (*LabeledStatement) node()  {}
 func (*ForStatement) node()      {}
 func (*ForInStatement) node()    {}
+func (*ExportStatement) node()   {}
+func (*ExportClause) node()      {}
+func (*ExportSpecifier) node()   {}
 
 // ----------------------------------------------------------------------------
 // Declarations
@@ -412,19 +441,27 @@ type (
 		Name *Ident    // Class name.
 		Body *BodyDecl // Class body.
 	}
+
+	// LexicalDecl node represents a lexical declaration
+	LexicalDecl struct {
+		Position
+		Vars []Decl // Variable declarations
+	}
 )
 
-func (*ImportDecl) decl() {}
-func (*FuncDecl) decl()   {}
-func (*ValueDecl) decl()  {}
-func (*ClassDecl) decl()  {}
-func (*BodyDecl) decl()   {}
+func (*ImportDecl) decl()  {}
+func (*FuncDecl) decl()    {}
+func (*ValueDecl) decl()   {}
+func (*ClassDecl) decl()   {}
+func (*BodyDecl) decl()    {}
+func (*LexicalDecl) decl() {}
 
-func (*ImportDecl) node() {}
-func (*FuncDecl) node()   {}
-func (*ValueDecl) node()  {}
-func (*ClassDecl) node()  {}
-func (*BodyDecl) node()   {}
+func (*ImportDecl) node()  {}
+func (*FuncDecl) node()    {}
+func (*ValueDecl) node()   {}
+func (*ClassDecl) node()   {}
+func (*BodyDecl) node()    {}
+func (*LexicalDecl) node() {}
 
 // File node represents a program source file.
 type File struct {

@@ -189,7 +189,10 @@ func Walk(v Visitor, node Node) {
 			Walk(v, n.Label)
 		}
 		walkStmtList(v, n.Body)
-
+	case *ExportStatement:
+		if n.Decl != nil {
+			Walk(v, n.Decl)
+		}
 	// Declarations
 	case *ImportDecl:
 		if n.Name != nil {

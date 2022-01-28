@@ -212,6 +212,16 @@ func (p *parser) parseVarDecl(node *cst.Node) []ast.Decl {
 
 				// Otherwise just parse as a normal call expression.
 				varDecl.Values = append(varDecl.Values, p.parseCallExpr(value))
+			case LexicalDeclaration:
+				decl := &ast.LexicalDecl{
+					Position: ast.NewPosition(node),
+				}
+
+				cst.IterNamedChilds(node, func(node *cst.Node) {
+					decl.Vars = p.parseVarDecl(node)
+				})
+
+				decls = append(decls, decl)
 			default:
 				// Otherwise we just parse value as an expression.
 				varDecl.Values = append(varDecl.Values, p.parseExpr(value))
@@ -397,7 +407,6 @@ func (p *parser) parseStmt(node *cst.Node) ast.Stmt {
 			Right:    p.parseExpr(node.ChildByFieldName("right")),
 			Body:     p.parseFuncBody(node.ChildByFieldName("body")),
 		}
-
 	case ContinueStatement:
 		stmt := &ast.ContinueStatement{
 			Position: ast.NewPosition(node),
@@ -426,6 +435,32 @@ func (p *parser) parseStmt(node *cst.Node) ast.Stmt {
 
 		return stmt
 
+	case ExportStatement:
+		return p.parseExportStmt(node)
+	case ExportClause:
+		stmt := &ast.ExportClause{
+			Position: ast.NewPosition(node),
+		}
+
+		cst.IterNamedChilds(node, func(node *cst.Node) {
+			stmt.Specifiers = append(stmt.Specifiers, p.parseStmt(node))
+		})
+
+		return stmt
+	case ExportSpecifier:
+		stmt := &ast.ExportSpecifier{
+			Position: ast.NewPosition(node),
+		}
+
+		if name := node.ChildByFieldName("name"); name != nil {
+			stmt.Name = p.parseExpr(name)
+		}
+
+		if alias := node.ChildByFieldName("alias"); alias != nil {
+			stmt.Alias = p.parseExpr(alias)
+		}
+
+		return stmt
 	default:
 		panic(fmt.Sprintf("not handled statement of type <%s>", node.Type()))
 	}
@@ -687,4 +722,41 @@ func assertNodeType(node *cst.Node, typ string) {
 	if node.Type() != typ {
 		panic(fmt.Sprintf("Expected <%s> node, got <%s>", typ, node.Type()))
 	}
+}
+
+// TODO: handle 'object_pattern' export nodes
+// export const { name1, name2: bar, name1, name2: bar  } = o;
+func (p *parser) parseExportStmt(node *cst.Node) ast.Stmt {
+	stmt := &ast.ExportStatement{
+		Position: ast.NewPosition(node),
+	}
+
+	if source := node.ChildByFieldName("source"); source != nil {
+		stmt.Source = p.parseExpr(source)
+	}
+
+	if value := node.ChildByFieldName("value"); value != nil {
+		stmt.Ident = p.parseExpr(value)
+	}
+
+	if declaration := node.ChildByFieldName("declaration"); declaration != nil {
+		switch declaration.Type() {
+		case FunctionDeclaration:
+			stmt.Decl = p.parseFuncDecl(declaration)
+
+		case LexicalDeclaration:
+			if decls := p.parseVarDecl(declaration); len(decls) > 0 {
+				stmt.Decl = decls[0]
+			}
+
+		case ClassDeclaration:
+			stmt.Decl = p.parseClassDecl(declaration)
+		}
+	}
+
+	if exportClause := node.NamedChild(0); exportClause != nil && exportClause.Type() == ExportClause {
+		stmt.ExportClause = p.parseStmt(exportClause)
+	}
+
+	return stmt
 }
