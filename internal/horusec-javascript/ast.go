@@ -425,7 +425,10 @@ func (p *parser) parseStmt(node *cst.Node) ast.Stmt {
 		stmt.Body = body
 
 		return stmt
-
+	case ExportStatement:
+		// Since export statements will not be very useful information in our ast for now,
+		// we will ignore this statement.
+		return nil
 	default:
 		panic(fmt.Sprintf("not handled statement of type <%s>", node.Type()))
 	}
