@@ -82,3 +82,7 @@ function ForInStatement() {
         console.log(value)
     }
 }
+
+function ExportStatement() {
+    export let test1, test2, test3
+}
