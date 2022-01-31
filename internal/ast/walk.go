@@ -176,6 +176,20 @@ func Walk(v Visitor, node Node) {
 		if n.Body != nil {
 			Walk(v, n.Body)
 		}
+	case *ContinueStatement:
+		if n.Label != nil {
+			Walk(v, n.Label)
+		}
+	case *BreakStatement:
+		if n.Label != nil {
+			Walk(v, n.Label)
+		}
+	case *LabeledStatement:
+		if n.Label != nil {
+			Walk(v, n.Label)
+		}
+		walkStmtList(v, n.Body)
+
 	// Declarations
 	case *ImportDecl:
 		if n.Name != nil {
