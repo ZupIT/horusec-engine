@@ -305,7 +305,7 @@ type (
 	// BreakStatement node represents a break statement
 	BreakStatement struct {
 		Position
-		Label Stmt // Break statement label
+		Label *Ident // Break statement label
 	}
 
 	// ForStatement node represents a for statement
@@ -324,37 +324,53 @@ type (
 		Right Expr       // Value on the right side of for in containing an array to iterate over
 		Body  *BlockStmt // For in body
 	}
+	// ContinueStatement node represents a continue statement
+	ContinueStatement struct {
+		Position
+		Label *Ident // Continue statement label
+	}
+
+	// LabeledStatement node represents a labeled statement
+	LabeledStatement struct {
+		Position
+		Label *Ident // LabeledStatement label
+		Body  []Stmt
+	}
 )
 
-func (*BlockStmt) stmt()       {}
-func (*AssignStmt) stmt()      {}
-func (*ExprStmt) stmt()        {}
-func (*ReturnStmt) stmt()      {}
-func (*IfStmt) stmt()          {}
-func (*TryStmt) stmt()         {}
-func (*CatchClause) stmt()     {}
-func (*WhileStmt) stmt()       {}
-func (*SwitchStatement) stmt() {}
-func (*SwitchCase) stmt()      {}
-func (*SwitchDefault) stmt()   {}
-func (*BreakStatement) stmt()  {}
-func (*ForStatement) stmt()    {}
-func (*ForInStatement) stmt()  {}
+func (*BlockStmt) stmt()         {}
+func (*AssignStmt) stmt()        {}
+func (*ExprStmt) stmt()          {}
+func (*ReturnStmt) stmt()        {}
+func (*IfStmt) stmt()            {}
+func (*TryStmt) stmt()           {}
+func (*CatchClause) stmt()       {}
+func (*WhileStmt) stmt()         {}
+func (*SwitchStatement) stmt()   {}
+func (*SwitchCase) stmt()        {}
+func (*SwitchDefault) stmt()     {}
+func (*BreakStatement) stmt()    {}
+func (*ForStatement) stmt()      {}
+func (*ContinueStatement) stmt() {}
+func (*LabeledStatement) stmt()  {}
+func (*ForInStatement) stmt()    {}
 
-func (*BlockStmt) node()       {}
-func (*AssignStmt) node()      {}
-func (*ExprStmt) node()        {}
-func (*ReturnStmt) node()      {}
-func (*IfStmt) node()          {}
-func (*TryStmt) node()         {}
-func (*CatchClause) node()     {}
-func (*WhileStmt) node()       {}
-func (*SwitchStatement) node() {}
-func (*SwitchCase) node()      {}
-func (*SwitchDefault) node()   {}
-func (*BreakStatement) node()  {}
-func (*ForStatement) node()    {}
-func (*ForInStatement) node()  {}
+func (*BlockStmt) node()         {}
+func (*AssignStmt) node()        {}
+func (*ExprStmt) node()          {}
+func (*ReturnStmt) node()        {}
+func (*IfStmt) node()            {}
+func (*TryStmt) node()           {}
+func (*CatchClause) node()       {}
+func (*WhileStmt) node()         {}
+func (*SwitchStatement) node()   {}
+func (*SwitchCase) node()        {}
+func (*SwitchDefault) node()     {}
+func (*BreakStatement) node()    {}
+func (*ContinueStatement) node() {}
+func (*LabeledStatement) node()  {}
+func (*ForStatement) node()      {}
+func (*ForInStatement) node()    {}
 
 // ----------------------------------------------------------------------------
 // Declarations

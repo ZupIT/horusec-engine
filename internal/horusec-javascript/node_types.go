@@ -81,6 +81,9 @@ const (
 	BreakStatement      = "break_statement"
 	ForStatement        = "for_statement"
 	ForInStatement      = "for_in_statement"
+	ContinueStatement   = "continue_statement"
+	StatementIdentifier = "statement_identifier"
+	LabeledStatement    = "labeled_statement"
 
 	// ------------------------------------------------
 	//

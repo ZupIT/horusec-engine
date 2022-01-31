@@ -334,11 +334,6 @@ func (p *parser) parseStmt(node *cst.Node) ast.Stmt {
 
 		return stmt
 	case SwitchStatement:
-		// TODO: handle switch cases with labels
-		// inner: switch (i) {
-		// case 1:
-		//	 break inner
-		// }
 		stmt := &ast.SwitchStatement{
 			Position: ast.NewPosition(node),
 			Value:    p.parseExpr(node.ChildByFieldName("value")),
@@ -383,7 +378,7 @@ func (p *parser) parseStmt(node *cst.Node) ast.Stmt {
 		}
 
 		if label := node.ChildByFieldName("label"); label != nil {
-			stmt.Label = p.parseStmt(label)
+			stmt.Label = ast.NewIdent(label)
 		}
 
 		return stmt
@@ -402,6 +397,35 @@ func (p *parser) parseStmt(node *cst.Node) ast.Stmt {
 			Right:    p.parseExpr(node.ChildByFieldName("right")),
 			Body:     p.parseFuncBody(node.ChildByFieldName("body")),
 		}
+
+	case ContinueStatement:
+		stmt := &ast.ContinueStatement{
+			Position: ast.NewPosition(node),
+		}
+
+		if label := node.ChildByFieldName("label"); label != nil {
+			stmt.Label = ast.NewIdent(label)
+		}
+
+		return stmt
+	case LabeledStatement:
+		stmt := &ast.LabeledStatement{
+			Position: ast.NewPosition(node),
+		}
+		body := make([]ast.Stmt, 0, node.NamedChildCount())
+
+		// The first named child of switch case is the condition, here we just need to iterate over the
+		// statements of switch case. The condition of switch case is parsed above.
+		for i := 1; i < node.NamedChildCount(); i++ {
+			body = append(body, p.parseStmt(node.NamedChild(i)))
+		}
+		if label := node.ChildByFieldName("label"); label != nil {
+			stmt.Label = ast.NewIdent(label)
+		}
+		stmt.Body = body
+
+		return stmt
+
 	default:
 		panic(fmt.Sprintf("not handled statement of type <%s>", node.Type()))
 	}
