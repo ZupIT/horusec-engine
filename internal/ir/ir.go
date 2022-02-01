@@ -15,8 +15,18 @@
 package ir
 
 import (
+	"fmt"
+
 	"github.com/ZupIT/horusec-engine/internal/ast"
 )
+
+// Member is a member of a file, like functions, global variables and constants.
+type Member interface {
+	member()
+
+	// Name returns the declared name of the package member
+	Name() string
+}
 
 // Value is an IR value that can be referenced by an instruction.
 type Value interface {
@@ -37,6 +47,20 @@ type Instruction interface {
 	instr()
 }
 
+// File represents a single file converted to IR representation.
+type File struct {
+	Members map[string]Member // All file members keyed by name.
+}
+
+// ExternalMember represents a member that is declared outside the file that is being used.
+//
+// ExternalMember is created from imports of a single file.
+type ExternalMember struct {
+	name  string // Named import member.
+	Path  string // Full import path of member.
+	Alias string // Alias declared on import; or empty.
+}
+
 // BasicBlock represents an IR basic block.
 type BasicBlock struct {
 	Comment string        // Optional label; no semantic significance
@@ -45,7 +69,8 @@ type BasicBlock struct {
 
 // Function represents a function or method with the parameters and signature.
 type Function struct {
-	Name      string          // Function name.
+	name      string          // Function name.
+	File      *File           // File that this function belongs.
 	Signature *Signature      // Function signature.
 	Locals    map[string]*Var // Local variables of this function.
 	Blocks    []*BasicBlock   // Basic blocks of the function; nil => external function.
@@ -89,7 +114,49 @@ type Call struct {
 	Args     []Value   // The call function parameters.
 }
 
-func (*Const) value() {}
-func (*Var) value()   {}
+func (*Const) value()         {}
+func (c *Const) Name() string { return c.Value }
+
+func (*Var) value()         {}
+func (v *Var) Name() string { return v.name }
 
 func (*Call) instr() {}
+
+func (*Function) member()        {}
+func (m *Function) Name() string { return m.name }
+
+func (*ExternalMember) member() {}
+func (m *ExternalMember) Name() string {
+	if m.Alias != "" {
+		return m.Alias
+	}
+
+	return m.name
+}
+
+// Func returns the file-level function of the specified name or nil
+// if not found.
+//
+// If the specified name is a imported function, Func will instantiate
+// a new Function object using the path and name of imported function
+// as a function name.
+//
+// nolint:funlen // There is no need to break this method.
+func (f *File) Func(name string) *Function {
+	fn, exists := f.Members[name]
+	if !exists {
+		return nil
+	}
+
+	switch fn := fn.(type) {
+	case *Function:
+		return fn
+	case *ExternalMember:
+		return &Function{
+			name: fmt.Sprintf("%s.%s", fn.Path, fn.name),
+			File: f,
+		}
+	default:
+		panic(fmt.Sprintf("ir.File.Func: unexpected function member %T", fn))
+	}
+}

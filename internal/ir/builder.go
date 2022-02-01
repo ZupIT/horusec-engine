@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// nolint:funlen // We need a lot of lines and if to convert an AST to IR.
+// nolint:funlen // We need a lot of lines and if's to convert an AST to IR.
 package ir
 
 import (
@@ -21,7 +21,19 @@ import (
 	"github.com/ZupIT/horusec-engine/internal/ast"
 )
 
+// Build build all function members of file f.
+func (f *File) Build() {
+	for _, member := range f.Members {
+		if fn, ok := member.(*Function); ok {
+			fn.Build()
+		}
+	}
+}
+
 // Build the IR code for this function.
+//
+// nolint: stylecheck // Linter ask to change fn receiver to f to
+// follow the same signature of File.Build, but this is not necessary.
 func (fn *Function) Build() {
 	var b builder
 
