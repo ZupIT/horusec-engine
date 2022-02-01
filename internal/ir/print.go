@@ -19,7 +19,7 @@ import (
 )
 
 func (c *Call) String() string {
-	buf := bytes.NewBufferString(c.Function.Name)
+	buf := bytes.NewBufferString(c.Function.Name())
 	buf.WriteString("(")
 
 	for i, arg := range c.Args {
@@ -33,6 +33,3 @@ func (c *Call) String() string {
 
 	return buf.String()
 }
-
-func (c *Const) Name() string { return c.Value }
-func (v *Var) Name() string   { return v.name }

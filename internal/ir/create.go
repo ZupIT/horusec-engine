@@ -21,17 +21,58 @@ import (
 	"github.com/ZupIT/horusec-engine/internal/ast"
 )
 
+// NewFile create a new File to a given ast.File.
+//
+// The real work of building the IR form for a file is not done
+// untila call to File.Build().
+//
+// NewFile only map function declarations and imports on retuned File.
+//
+// nolint:gocyclo // Some checks is needed here.
+func NewFile(f *ast.File) *File {
+	file := &File{
+		Members: make(map[string]Member),
+	}
+
+	for _, decl := range f.Decls {
+		switch decl := decl.(type) {
+		case *ast.FuncDecl:
+			fn := file.NewFunction(decl)
+			if _, exists := file.Members[fn.Name()]; exists {
+				panic(fmt.Sprintf("ir.NewFile: already existed function member: %s", fn.Name()))
+			}
+			file.Members[fn.Name()] = fn
+		case *ast.ImportDecl:
+			var alias string
+			if decl.Alias != nil {
+				alias = decl.Alias.Name
+			}
+			importt := &ExternalMember{
+				name:  decl.Name.Name,
+				Path:  decl.Path.Name,
+				Alias: alias,
+			}
+			file.Members[importt.Name()] = importt
+		default:
+			panic(fmt.Sprintf("ir.NewFile: unhadled declaration type: %T", decl))
+		}
+	}
+
+	return file
+}
+
 // NewFunction create a new Function to a given function declaration.
 //
 // The real work of building the IR form for a function is not done
 // until a call to Function.Build().
-func NewFunction(decl *ast.FuncDecl) *Function {
+func (f *File) NewFunction(decl *ast.FuncDecl) *Function {
 	var (
 		params  []*Parameter
 		results []*Parameter
 		fn      = &Function{
-			Name:   decl.Name.Name,
+			name:   decl.Name.Name,
 			syntax: decl,
+			File:   f,
 			Blocks: make([]*BasicBlock, 0),
 			Locals: make(map[string]*Var),
 		}
@@ -90,7 +131,7 @@ func exprValue(e ast.Expr) Value {
 // If CallExpr arguments use a variable declared inside parent function
 // call arguments will point to to this declared variable.
 //
-// nolint:gocritic // More switch cases will be added.
+// nolint:gocyclo // Some checks is needed here.
 func newCall(parent *Function, call *ast.CallExpr) *Call {
 	args := make([]Value, 0, len(call.Args))
 
@@ -107,20 +148,24 @@ func newCall(parent *Function, call *ast.CallExpr) *Call {
 		args = append(args, exprValue(arg))
 	}
 
-	var fn Function
+	fn := new(Function)
 
 	switch call := call.Fun.(type) {
 	case *ast.Ident:
-		// TODO(matheus): Check if this function is declared inside the module that parent belongs
-		// if its presents use this function function pointer on Call structure.
-		//
-		// Note: We still don't have a module representation to fix this.
-		fn.Name = call.Name
+		// TODO(matheus): This will not work if function is defined inside parent.
+		if f := parent.File.Func(call.Name); f != nil {
+			fn = f
+
+			break
+		}
+		fn.name = call.Name
+	default:
+		panic(fmt.Sprintf("ir.newCall: unhandled type of call function: %T", call))
 	}
 
 	return &Call{
 		Parent:   parent,
-		Function: &fn,
+		Function: fn,
 		Args:     args,
 	}
 }
