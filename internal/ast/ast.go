@@ -381,8 +381,9 @@ type (
 	// ImportDecl node represents a single package/module import.
 	ImportDecl struct {
 		Position
-		Name *Ident // Import name.
-		Path *Ident // Import path.
+		Name  *Ident // Import name.
+		Alias *Ident // Alias name or nil.
+		Path  *Ident // Import path.
 	}
 
 	// ValueDecl node represents a constant or variable declaration.

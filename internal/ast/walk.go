@@ -195,6 +195,9 @@ func Walk(v Visitor, node Node) {
 		if n.Name != nil {
 			Walk(v, n.Name)
 		}
+		if n.Alias != nil {
+			Walk(v, n.Alias)
+		}
 		if n.Path != nil {
 			Walk(v, n.Path)
 		}

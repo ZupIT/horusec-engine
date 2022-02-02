@@ -650,6 +650,7 @@ func (p *parser) parseImportStmt(node *cst.Node) []ast.Decl {
 				imports = append(imports, &ast.ImportDecl{
 					Name:     ast.NewIdent(name),
 					Path:     ast.NewIdent(source),
+					Alias:    p.aliasFromImportStmt(importIdentifier),
 					Position: ast.NewPosition(node),
 				})
 			}
@@ -668,6 +669,17 @@ func (p *parser) parseImportStmt(node *cst.Node) []ast.Decl {
 	}
 
 	return []ast.Decl{}
+}
+
+// aliasFromImportStmt return an *ast.Ident with the alias name from import_specifier node.
+//
+// Return nil if import_specifier node don't have an alias.
+func (p *parser) aliasFromImportStmt(node *cst.Node) *ast.Ident {
+	if a := node.ChildByFieldName("alias"); a != nil {
+		return ast.NewIdent(a)
+	}
+
+	return nil
 }
 
 func (p *parser) parseCallExpr(node *cst.Node) *ast.CallExpr {
