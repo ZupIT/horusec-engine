@@ -14,18 +14,16 @@
  * limitations under the License.
  */
 
-import * as foo from 'bar'
+import * as fs from 'fs'
 
-import foo from 'bar'
+import net from 'net'
 
-import { foo } from 'bar';
+import { spawn } from 'child_process';
 
-import { foo, bar } from 'baz';
+import { Readable, Writable } from 'stream';
 
-import 'foo'
+import 'process'
 
-import { foo as baz } from 'bar';
+import { readFile as fsRead } from 'fs';
 
-const foo = require('foo')
-
-const foo = require('bar')
+const os = require('os');
