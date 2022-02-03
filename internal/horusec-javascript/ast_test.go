@@ -15,12 +15,6 @@
 package javascript_test
 
 import (
-	"bytes"
-	"flag"
-	"fmt"
-	"io/fs"
-	"os"
-	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -29,27 +23,6 @@ import (
 	"github.com/ZupIT/horusec-engine/internal/ast"
 	javascript "github.com/ZupIT/horusec-engine/internal/horusec-javascript"
 )
-
-func TestMain(m *testing.M) {
-	rewrite := flag.Bool("rewrite", false, "Rewrite expected AST output files")
-	flag.Parse()
-
-	if *rewrite {
-		fmt.Println("rewriting expected ASTs")
-		if err := rewriteExpectedASTs(); err != nil {
-			fmt.Fprintf(os.Stderr, "Error to rewrite ASTs: %v\n", err)
-			os.Exit(1)
-		}
-	}
-
-	os.Exit(m.Run())
-}
-
-type testcase struct {
-	name string
-	src  string
-	file ast.File
-}
 
 func TestJavaScriptParseFileFillAllPositions(t *testing.T) {
 	src := []byte(`
@@ -82,79 +55,4 @@ const f2 (a, b) => { return a / b }
 
 		return true
 	})
-}
-
-func TestJavaScriptParseFile(t *testing.T) {
-	sources := sourceFilesPath()
-	err := filepath.Walk(sources, func(path string, info fs.FileInfo, err error) error {
-		if err != nil || info.IsDir() {
-			return err
-		}
-		t.Run(info.Name(), func(t *testing.T) {
-			f, err := astFromFile(info, path)
-			require.NoError(t, err, "Expected no error to parse source file: %v", err)
-
-			buf := bytes.NewBufferString("")
-
-			ast.Fprint(buf, f)
-
-			expectedAst, err := os.ReadFile(expectedFilePath(info))
-			require.NoError(t, err, "Expected no error to expected ast: %v", err)
-
-			assert.Equal(t, string(expectedAst), buf.String())
-		})
-
-		return nil
-	})
-
-	assert.NoError(t, err, "Expected no error to walk on source code files: %v", err)
-}
-
-func astFromFile(info fs.FileInfo, path string) (*ast.File, error) {
-	src, err := os.ReadFile(path)
-	if err != nil {
-		return nil, err
-	}
-	return javascript.ParseFile(info.Name(), src)
-}
-
-// rewriteExpectedASTs rewrite all expected AST files on testdata/expected to all source
-// all inside testdata/sources.
-func rewriteExpectedASTs() error {
-	err := filepath.Walk(sourceFilesPath(), func(path string, info fs.FileInfo, err error) error {
-		if err != nil || info.IsDir() {
-			return err
-		}
-		f, err := astFromFile(info, path)
-		if err != nil {
-			return err
-		}
-
-		expectedFile, err := os.OpenFile(expectedFilePath(info), os.O_WRONLY, fs.ModePerm)
-		if err != nil {
-			return err
-		}
-		defer expectedFile.Close()
-
-		return ast.Fprint(expectedFile, f)
-	})
-
-	return err
-}
-
-// sourceFilesPath return the absoulute path that contains all source files.
-func sourceFilesPath() string {
-	wd, _ := os.Getwd()
-	return filepath.Join(wd, "testdata", "source")
-}
-
-// expectedFilePath return the absolute path of expected AST to a given source file info.
-func expectedFilePath(info fs.FileInfo) string {
-	return filepath.Join(expectedFilesPath(), fmt.Sprintf("%s.out", info.Name()))
-}
-
-// expectedFilesPath return the absoulute path that contains all expected AST files.
-func expectedFilesPath() string {
-	wd, _ := os.Getwd()
-	return filepath.Join(wd, "testdata", "expected")
 }

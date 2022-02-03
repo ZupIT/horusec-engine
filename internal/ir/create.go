@@ -30,6 +30,12 @@ import (
 //
 // nolint:gocyclo // Some checks is needed here.
 func NewFile(f *ast.File) *File {
+	// TODO(matheus): Decide how to support expressions that is not
+	// inside a declaration.
+	if len(f.Exprs) > 0 {
+		panic("ir.NewFile: AST expressions it not handled yet")
+	}
+
 	file := &File{
 		Members: make(map[string]Member),
 		name:    f.Name.Name,
