@@ -32,6 +32,7 @@ import (
 func NewFile(f *ast.File) *File {
 	file := &File{
 		Members: make(map[string]Member),
+		name:    f.Name.Name,
 	}
 
 	for _, decl := range f.Decls {
@@ -103,7 +104,7 @@ func newParameter(fn *Function, expr ast.Expr) *Parameter {
 	case *ast.Ident:
 		return &Parameter{
 			parent: fn,
-			Name:   expr.Name,
+			name:   expr.Name,
 			Value:  nil,
 		}
 	default:

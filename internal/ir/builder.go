@@ -57,6 +57,7 @@ func (fn *Function) Build() {
 // It does not automatically become the current block for subsequent calls to emit.
 func (fn *Function) newBasicBlock(comment string) *BasicBlock {
 	b := &BasicBlock{
+		Index:   len(fn.Blocks),
 		Comment: comment,
 		Instrs:  make([]Instruction, 0),
 	}

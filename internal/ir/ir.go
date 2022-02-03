@@ -49,6 +49,7 @@ type Instruction interface {
 
 // File represents a single file converted to IR representation.
 type File struct {
+	name    string            // Name of file.
 	Members map[string]Member // All file members keyed by name.
 }
 
@@ -63,6 +64,7 @@ type ExternalMember struct {
 
 // BasicBlock represents an IR basic block.
 type BasicBlock struct {
+	Index   int           // Index of this block on Function that this block belongs.
 	Comment string        // Optional label; no semantic significance
 	Instrs  []Instruction // Instructions in order.
 }
@@ -90,7 +92,7 @@ type Signature struct {
 
 // Parameter represents an input parameter of a function or method.
 type Parameter struct {
-	Name  string // Name of parameter.
+	name  string // Name of parameter.
 	Value Value  // Default value of parameter or nil.
 
 	parent *Function // Function that the this parameter belongs.
@@ -120,10 +122,16 @@ func (c *Const) Name() string { return c.Value }
 func (*Var) value()         {}
 func (v *Var) Name() string { return v.name }
 
+func (*Parameter) value()         {}
+func (p *Parameter) Name() string { return p.name }
+
 func (*Call) instr() {}
 
 func (*Function) member()        {}
 func (m *Function) Name() string { return m.name }
+
+func (*File) member()        {}
+func (f *File) Name() string { return f.name }
 
 func (*ExternalMember) member() {}
 func (m *ExternalMember) Name() string {
