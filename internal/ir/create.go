@@ -50,14 +50,10 @@ func NewFile(f *ast.File) *File {
 			}
 			file.Members[fn.Name()] = fn
 		case *ast.ImportDecl:
-			var alias string
-			if decl.Alias != nil {
-				alias = decl.Alias.Name
-			}
 			importt := &ExternalMember{
-				name:  decl.Name.Name,
+				name:  identNameIfNotNil(decl.Name),
 				Path:  decl.Path.Name,
-				Alias: alias,
+				Alias: identNameIfNotNil(decl.Alias),
 			}
 			file.Members[importt.Name()] = importt
 		default:
@@ -175,4 +171,11 @@ func newCall(parent *Function, call *ast.CallExpr) *Call {
 		Function: fn,
 		Args:     args,
 	}
+}
+
+func identNameIfNotNil(i *ast.Ident) string {
+	if i != nil {
+		return i.Name
+	}
+	return ""
 }

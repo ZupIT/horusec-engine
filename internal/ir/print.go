@@ -85,8 +85,8 @@ func WriteFile(buf *bytes.Buffer, f *File) {
 	sort.Strings(names)
 
 	// Write all imports before.
-	for _, mem := range f.Members {
-		if ext, ok := mem.(*ExternalMember); ok {
+	for _, name := range names {
+		if ext, ok := f.Members[name].(*ExternalMember); ok {
 			fmt.Fprintf(buf, "  import  %-*s\n", maxname, ext.Path)
 		}
 	}
