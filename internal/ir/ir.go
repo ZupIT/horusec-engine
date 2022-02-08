@@ -51,6 +51,8 @@ type Instruction interface {
 type File struct {
 	name    string            // Name of file.
 	Members map[string]Member // All file members keyed by name.
+
+	imported map[string]*ExternalMember // All importable packages, keyed by import path.
 }
 
 // ExternalMember represents a member that is declared outside the file that is being used.
@@ -160,6 +162,7 @@ func (f *File) Func(name string) *Function {
 	case *Function:
 		return fn
 	case *ExternalMember:
+		// TODO(matheus): Deal with empty ExternalMember.name fields.
 		return &Function{
 			name: fmt.Sprintf("%s.%s", fn.Path, fn.name),
 			File: f,
@@ -167,4 +170,9 @@ func (f *File) Func(name string) *Function {
 	default:
 		panic(fmt.Sprintf("ir.File.Func: unexpected function member %T", fn))
 	}
+}
+
+// ImportedPackage returns the importable package to a given name.
+func (f *File) ImportedPackage(name string) *ExternalMember {
+	return f.imported[name]
 }

@@ -125,7 +125,6 @@ func (b *builder) stmt(fn *Function, s ast.Stmt) {
 }
 
 // expr convert an expression e to a IR form.
-//
 func (b *builder) expr(fn *Function, e ast.Expr) {
 	switch expr := e.(type) {
 	case *ast.CallExpr:

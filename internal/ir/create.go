@@ -37,8 +37,9 @@ func NewFile(f *ast.File) *File {
 	}
 
 	file := &File{
-		Members: make(map[string]Member),
-		name:    f.Name.Name,
+		Members:  make(map[string]Member),
+		imported: make(map[string]*ExternalMember),
+		name:     f.Name.Name,
 	}
 
 	for _, decl := range f.Decls {
@@ -56,6 +57,7 @@ func NewFile(f *ast.File) *File {
 				Alias: identNameIfNotNil(decl.Alias),
 			}
 			file.Members[importt.Name()] = importt
+			file.imported[importt.Name()] = importt
 		default:
 			panic(fmt.Sprintf("ir.NewFile: unhadled declaration type: %T", decl))
 		}
@@ -162,6 +164,24 @@ func newCall(parent *Function, call *ast.CallExpr) *Call {
 			break
 		}
 		fn.name = call.Name
+	case *ast.SelectorExpr:
+		expr, ok := call.Expr.(*ast.Ident)
+		if !ok {
+			panic(fmt.Sprintf("ir.newCall: unhandled type of expression field from SelectorExpr: %T", call.Expr))
+		}
+
+		var ident string
+
+		// Expr.Name could be an alias imported name, so need to check if this
+		// identifier is imported so we use your real name. Otherwise we just
+		// use the expression identifier name.
+		if importt := parent.File.ImportedPackage(expr.Name); importt != nil {
+			ident = importt.name
+		} else {
+			ident = expr.Name
+		}
+
+		fn.name = fmt.Sprintf("%s.%s", ident, call.Sel.Name)
 	default:
 		panic(fmt.Sprintf("ir.newCall: unhandled type of call function: %T", call))
 	}
