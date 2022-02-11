@@ -75,6 +75,7 @@ func (fn *Function) emit(instr Instruction) {
 // appendLocal create a new local Var on function context to a given ident and value.
 func (fn *Function) appendLocal(ident *ast.Ident, value ast.Expr) {
 	fn.Locals[ident.Name] = &Var{
+		node:  node{ident},
 		name:  ident.Name,
 		Value: exprValue(value),
 	}

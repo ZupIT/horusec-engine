@@ -78,7 +78,6 @@ func (p Position) Pos() Position { return p }
 // All node types implement the Node interface.
 type Node interface {
 	Pos() Position
-	node()
 }
 
 // Decl represents declaration nodes.
@@ -208,20 +207,6 @@ func (*FuncType) expr()     {}
 func (*FuncLit) expr()      {}
 func (*TemplateExpr) expr() {}
 func (*IncExpr) expr()      {}
-
-func (*Ident) node()        {}
-func (*Field) node()        {}
-func (*FieldList) node()    {}
-func (*BasicLit) node()     {}
-func (*BinaryExpr) node()   {}
-func (*CallExpr) node()     {}
-func (*SelectorExpr) node() {}
-func (*ObjectExpr) node()   {}
-func (*KeyValueExpr) node() {}
-func (*FuncType) node()     {}
-func (*FuncLit) node()      {}
-func (*TemplateExpr) node() {}
-func (*IncExpr) node()      {}
 
 // ----------------------------------------------------------------------------
 // Statements
@@ -357,23 +342,6 @@ func (*ContinueStatement) stmt() {}
 func (*LabeledStatement) stmt()  {}
 func (*ForInStatement) stmt()    {}
 
-func (*BlockStmt) node()         {}
-func (*AssignStmt) node()        {}
-func (*ExprStmt) node()          {}
-func (*ReturnStmt) node()        {}
-func (*IfStmt) node()            {}
-func (*TryStmt) node()           {}
-func (*CatchClause) node()       {}
-func (*WhileStmt) node()         {}
-func (*SwitchStatement) node()   {}
-func (*SwitchCase) node()        {}
-func (*SwitchDefault) node()     {}
-func (*BreakStatement) node()    {}
-func (*ContinueStatement) node() {}
-func (*LabeledStatement) node()  {}
-func (*ForStatement) node()      {}
-func (*ForInStatement) node()    {}
-
 // ----------------------------------------------------------------------------
 // Declarations
 //
@@ -423,12 +391,6 @@ func (*ValueDecl) decl()  {}
 func (*ClassDecl) decl()  {}
 func (*BodyDecl) decl()   {}
 
-func (*ImportDecl) node() {}
-func (*FuncDecl) node()   {}
-func (*ValueDecl) node()  {}
-func (*ClassDecl) node()  {}
-func (*BodyDecl) node()   {}
-
 // File node represents a program source file.
 type File struct {
 	Position
@@ -436,8 +398,6 @@ type File struct {
 	Decls []Decl // top-level declarations or nil.
 	Exprs []Expr // top-level expressions or nil.
 }
-
-func (f *File) node() {}
 
 func NewIdent(node *cst.Node) *Ident {
 	return &Ident{

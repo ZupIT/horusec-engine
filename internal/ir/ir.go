@@ -94,6 +94,7 @@ type Signature struct {
 
 // Parameter represents an input parameter of a function or method.
 type Parameter struct {
+	node
 	name  string // Name of parameter.
 	Value Value  // Default value of parameter or nil.
 
@@ -102,23 +103,36 @@ type Parameter struct {
 
 // Const represents the value of a constant expression.
 type Const struct {
+	node
 	Value string // Value of constant.
 }
 
 // Var represents a variable
 type Var struct {
+	node
 	name  string // Name of variable.
 	Value Value  // Value of variable
 }
 
 // Call instruction represents a function or method call.
 type Call struct {
+	node
 	Parent   *Function // Function that Call is inside.
 	Function *Function // The function that is being called.
 	Args     []Value   // The call function parameters.
 }
 
-func (*Const) value()         {}
+// node is a mix-in embedded by all IR nodes to provide source code information.
+//
+// Since node is embedded by all IR nodes (Value's and Instruction's), these nodes
+// implements the ast.Node interface which provide the original source code location.
+type node struct {
+	syntax ast.Node // Original code used to create the IR Value/Instruction.
+}
+
+func (n node) Pos() ast.Position { return n.syntax.Pos() }
+
+func (c *Const) value()       {}
 func (c *Const) Name() string { return c.Value }
 
 func (*Var) value()         {}

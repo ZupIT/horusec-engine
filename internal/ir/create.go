@@ -120,14 +120,18 @@ func newParameter(fn *Function, expr ast.Expr) *Parameter {
 func exprValue(e ast.Expr) Value {
 	switch expr := e.(type) {
 	case *ast.BasicLit:
-		return &Const{expr.Value}
+		return &Const{
+			node:  node{e},
+			Value: expr.Value,
+		}
 	case *ast.Ident:
 		return &Var{
+			node:  node{e},
 			name:  expr.Name,
 			Value: nil,
 		}
 	default:
-		panic(fmt.Sprintf("ir.newValue: unhandled expression type: %T", expr))
+		panic(fmt.Sprintf("ir.exprValue: unhandled expression type: %T", expr))
 	}
 }
 
@@ -187,6 +191,9 @@ func newCall(parent *Function, call *ast.CallExpr) *Call {
 	}
 
 	return &Call{
+		node: node{
+			syntax: call,
+		},
 		Parent:   parent,
 		Function: fn,
 		Args:     args,
