@@ -123,7 +123,8 @@ func WriteFunction(buf *bytes.Buffer, fn *Function) {
 		fmt.Fprintf(buf, "# File: %s\n", fn.File.Name())
 	}
 
-	fmt.Fprintf(buf, "# Location: %s:%d:%d\n", fn.File.Name(), fn.syntax.Start().Row, fn.syntax.Start().Column)
+	pos := fn.syntax.Pos().Start()
+	fmt.Fprintf(buf, "# Location: %s:%d:%d\n", fn.File.Name(), pos.Row, pos.Column)
 
 	fmt.Fprintf(buf, "func %s%s:\n", fn.Name(), fn.Signature)
 

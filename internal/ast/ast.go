@@ -33,9 +33,9 @@ func (p Pos) String() string {
 
 // Position wraps Pos with a start and end position of a node.
 //
-// Position implements Node.Start and Node.End methods to easily embedded
-// on Node implementations, so Node implementations can just inherit Position
-// and these Nodes will fully implement the Node interface.
+// Position implements Node.Pos method to easily embedded on Node implementations,
+// so Node implementations can just inherit Position and these Nodes will fully
+// implement the Node interface.
 type Position struct {
 	start Pos
 	end   Pos
@@ -60,11 +60,14 @@ func NewPosition(n *cst.Node) Position {
 	}
 }
 
-// Start implements Node.Start.
+// Start return the start position.
 func (p Position) Start() Pos { return p.start }
 
-// End implements Node.End.
+// End return the end position.
 func (p Position) End() Pos { return p.end }
+
+// Start implements Node.Pos.
+func (p Position) Pos() Position { return p }
 
 // Node represents a generic node on AST.
 //
@@ -74,8 +77,7 @@ func (p Position) End() Pos { return p.end }
 //
 // All node types implement the Node interface.
 type Node interface {
-	Start() Pos
-	End() Pos
+	Pos() Position
 	node()
 }
 
