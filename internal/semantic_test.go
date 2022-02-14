@@ -125,6 +125,9 @@ func TestParseAST(t *testing.T) {
 }
 
 func TestParseIR(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping IR parsing tests")
+	}
 	testcases := []testcase{
 		{
 			name:         "Javascript",
