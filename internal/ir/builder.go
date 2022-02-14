@@ -72,8 +72,8 @@ func (fn *Function) emit(instr Instruction) {
 	fn.currentBlock.Instrs = append(fn.currentBlock.Instrs, instr)
 }
 
-// appendLocal create a new local Var on function context to a given ident and value.
-func (fn *Function) appendLocal(ident *ast.Ident, value ast.Expr) {
+// newLocal create a new local Var on function context to a given ident and value.
+func (fn *Function) newLocal(ident *ast.Ident, value ast.Expr) {
 	fn.Locals[ident.Name] = &Var{
 		node:  node{ident},
 		name:  ident.Name,
@@ -113,7 +113,7 @@ func (b *builder) stmt(fn *Function, s ast.Stmt) {
 			for idx := range stmt.LHS {
 				lh, rh := stmt.LHS[idx], stmt.RHS[idx]
 				// TODO(matheus): lh will always be an *ast.Ident?
-				fn.appendLocal(lh.(*ast.Ident), rh)
+				fn.newLocal(lh.(*ast.Ident), rh)
 			}
 
 			break
