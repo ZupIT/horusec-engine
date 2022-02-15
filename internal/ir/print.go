@@ -126,6 +126,14 @@ func WriteFunction(buf *bytes.Buffer, fn *Function) {
 	pos := fn.syntax.Pos().Start()
 	fmt.Fprintf(buf, "# Location: %s:%d:%d\n", fn.File.Name(), pos.Row, pos.Column)
 
+	if len(fn.Locals) > 0 {
+		buf.WriteString("# Locals:\n")
+		idx := 0
+		for _, l := range fn.Locals {
+			fmt.Fprintf(buf, "# % 3d:\t%s\n", idx, l.Name())
+		}
+	}
+
 	fmt.Fprintf(buf, "func %s%s:\n", fn.Name(), fn.Signature)
 
 	if fn.Blocks == nil {
@@ -146,11 +154,11 @@ func WriteFunction(buf *bytes.Buffer, fn *Function) {
 
 		for _, instr := range b.Instrs {
 			buf.WriteString("\t")
-			switch instr := instr.(type) {
-			case *Call:
-				buf.WriteString(instr.String())
+			switch v := instr.(type) {
+			case Value:
+				fmt.Fprintf(buf, "%s = %s", v.Name(), instr.String())
 			default:
-				panic(fmt.Sprintf("ir.WriteFunction: unhandled instruction type: %T", instr))
+				buf.WriteString(instr.String())
 			}
 			buf.WriteString("\n")
 		}

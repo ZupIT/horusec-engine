@@ -72,13 +72,15 @@ func (fn *Function) emit(instr Instruction) {
 	fn.currentBlock.Instrs = append(fn.currentBlock.Instrs, instr)
 }
 
-// newLocal create a new local Var on function context to a given ident and value.
+// newLocal creates a local variable and adds it to function fn.
 func (fn *Function) newLocal(ident *ast.Ident, value ast.Expr) {
-	fn.Locals[ident.Name] = &Var{
+	v := &Var{
 		node:  node{ident},
 		name:  ident.Name,
 		Value: exprValue(value),
 	}
+	fn.Locals[ident.Name] = v
+	fn.emit(v)
 }
 
 // builder controls how a function is converted from AST to a IR.

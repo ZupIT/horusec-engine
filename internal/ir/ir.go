@@ -43,8 +43,14 @@ type Value interface {
 }
 
 // Instruction is an IR instruction that computes a new Value or has some effect.
+//
+// An Instruction that defines a value also implements the Value interface, an
+// Instruction that only has an effect does not.
 type Instruction interface {
 	instr()
+
+	// String returns the disassembled form of this value.
+	String() string
 }
 
 // File represents a single file converted to IR representation.
@@ -107,7 +113,7 @@ type Const struct {
 	Value string // Value of constant.
 }
 
-// Var represents a variable
+// Var represents a variable declaration.
 type Var struct {
 	node
 	name  string // Name of variable.
@@ -133,10 +139,12 @@ type node struct {
 func (n node) Pos() ast.Position { return n.syntax.Pos() }
 
 func (c *Const) value()       {}
-func (c *Const) Name() string { return c.Value }
+func (c *Const) Name() string { return fmt.Sprintf("%q", c.Value) }
 
-func (*Var) value()         {}
-func (v *Var) Name() string { return v.name }
+func (*Var) value()           {}
+func (*Var) instr()           {}
+func (v *Var) Name() string   { return v.name }
+func (v *Var) String() string { return v.Value.Name() }
 
 func (*Parameter) value()         {}
 func (p *Parameter) Name() string { return p.name }
