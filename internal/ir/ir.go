@@ -198,3 +198,8 @@ func (f *File) Func(name string) *Function {
 func (f *File) ImportedPackage(name string) *ExternalMember {
 	return f.imported[name]
 }
+
+// lookup return the declared variable with the given name.
+func (fn *Function) lookup(name string) *Var {
+	return fn.Locals[name]
+}

@@ -73,6 +73,8 @@ func (fn *Function) emit(instr Instruction) {
 }
 
 // newLocal creates a local variable and adds it to function fn.
+//
+// Subsequent calls to fn.lookup(ident.Name) will return the same variable.
 func (fn *Function) newLocal(ident *ast.Ident, value ast.Expr) {
 	v := &Var{
 		node:  node{ident},

@@ -148,7 +148,7 @@ func newCall(parent *Function, call *ast.CallExpr) *Call {
 		if ident, ok := arg.(*ast.Ident); ok {
 			// If identifier used on function call is declared inside the parent function
 			// we use this declared variable as argument to function call.
-			if local, exists := parent.Locals[ident.Name]; exists {
+			if local := parent.lookup(ident.Name); local != nil {
 				args = append(args, local)
 
 				continue
