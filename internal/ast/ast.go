@@ -49,12 +49,12 @@ func NewPosition(n *cst.Node) Position {
 	return Position{
 		start: Pos{
 			Byte:   n.StartByte(),
-			Row:    start.Row,
+			Row:    start.Row + 1, // tree-sitter row start at 0.
 			Column: start.Column,
 		},
 		end: Pos{
 			Byte:   n.EndByte(),
-			Row:    end.Row,
+			Row:    end.Row + 1, // tree-sitter row start at 0.
 			Column: end.Column,
 		},
 	}

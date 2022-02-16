@@ -64,7 +64,7 @@ func NewIssue(filename string, node ast.Node) Issue {
 		Filename:    filename,
 		StartOffset: int(start.Byte),
 		EndOffset:   int(end.Byte),
-		Line:        int(start.Row) + 1, // tree-sitter row start at 0.
+		Line:        int(start.Row),
 		Column:      int(start.Column),
 	}
 }
