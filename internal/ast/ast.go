@@ -98,6 +98,15 @@ type Stmt interface {
 	stmt()
 }
 
+// BadNode node is a placeholder for a syntax errors or syntaxes that
+// is no supported yet.
+//
+// BadNode implements Decl, Expr and Stmt so can be used in any place.
+type BadNode struct {
+	Position
+	Comment string // Optional comment for debugging.
+}
+
 // ----------------------------------------------------------------------------
 // Expressions
 //
@@ -207,6 +216,7 @@ func (*FuncType) expr()     {}
 func (*FuncLit) expr()      {}
 func (*TemplateExpr) expr() {}
 func (*IncExpr) expr()      {}
+func (*BadNode) expr()      {}
 
 // ----------------------------------------------------------------------------
 // Statements
@@ -341,6 +351,7 @@ func (*ForStatement) stmt()      {}
 func (*ContinueStatement) stmt() {}
 func (*LabeledStatement) stmt()  {}
 func (*ForInStatement) stmt()    {}
+func (*BadNode) stmt()           {}
 
 // ----------------------------------------------------------------------------
 // Declarations
@@ -390,6 +401,15 @@ func (*FuncDecl) decl()   {}
 func (*ValueDecl) decl()  {}
 func (*ClassDecl) decl()  {}
 func (*BodyDecl) decl()   {}
+func (*BadNode) decl()    {}
+
+// NewUnsupportedNode create a new BadNode for unsupported cst nodes.
+func NewUnsupportedNode(n *cst.Node) *BadNode {
+	return &BadNode{
+		Position: NewPosition(n),
+		Comment:  fmt.Sprintf("unsupported node type <%s>", n.Type()),
+	}
+}
 
 // File node represents a program source file.
 type File struct {

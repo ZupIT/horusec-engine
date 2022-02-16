@@ -430,7 +430,7 @@ func (p *parser) parseStmt(node *cst.Node) ast.Stmt {
 		// we will ignore this statement.
 		return nil
 	default:
-		panic(fmt.Sprintf("not handled statement of type <%s>", node.Type()))
+		return ast.NewUnsupportedNode(node)
 	}
 }
 
@@ -575,7 +575,7 @@ func (p *parser) parseExpr(node *cst.Node) ast.Expr {
 			Arg: ast.NewIdent(node.ChildByFieldName("argument")),
 		}
 	default:
-		panic(fmt.Sprintf("not handled expression of type <%s>", node.Type()))
+		return ast.NewUnsupportedNode(node)
 	}
 }
 
