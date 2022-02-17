@@ -40,12 +40,18 @@ type Value interface {
 	// Functions and Vars.
 	// For constants, it is a representation of the constant's value
 	Name() string
+
+	// String returns its disassembled form if this value is an Instruction;
+	// otherwise it returns the name of the Value.
+	String() string
 }
 
 // Instruction is an IR instruction that computes a new Value or has some effect.
 //
 // An Instruction that defines a value also implements the Value interface, an
-// Instruction that only has an effect does not.
+// Instruction that only has an effect does not. For example, Var and Call
+// implement Instruction and Value interfaces because both can define a value;
+// Var define a new variable value and the call can set a value with its return.
 type Instruction interface {
 	instr()
 
@@ -145,24 +151,30 @@ type node struct {
 	syntax ast.Node // Original code used to create the IR Value/Instruction.
 }
 
+// Pos implements ast.Node interface.
 func (n node) Pos() ast.Position { return n.syntax.Pos() }
 
-func (c *Const) value()       {}
-func (c *Const) Name() string { return fmt.Sprintf("%q", c.Value) }
+func (c *Const) value()         {}
+func (c *Const) Name() string   { return fmt.Sprintf("%q", c.Value) }
+func (c *Const) String() string { return c.Name() }
 
-func (*Global) value()         {}
-func (*Global) member()        {}
-func (g *Global) Name() string { return g.name }
+func (*Global) value()           {}
+func (*Global) member()          {}
+func (g *Global) Name() string   { return g.name }
+func (g *Global) String() string { return g.Name() }
 
 func (*Var) value()           {}
 func (*Var) instr()           {}
 func (v *Var) Name() string   { return v.name }
-func (v *Var) String() string { return v.Value.Name() }
+func (v *Var) String() string { return v.Value.String() }
 
-func (*Parameter) value()         {}
-func (p *Parameter) Name() string { return p.name }
+func (*Parameter) value()           {}
+func (p *Parameter) Name() string   { return p.name }
+func (p *Parameter) String() string { return p.Name() }
 
-func (*Call) instr() {}
+func (*Call) instr()         {}
+func (*Call) value()         {}
+func (c *Call) Name() string { return c.String() }
 
 func (*Function) member()        {}
 func (m *Function) Name() string { return m.name }

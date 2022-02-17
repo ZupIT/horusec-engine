@@ -81,7 +81,7 @@ func (fn *Function) newLocal(ident *ast.Ident, value ast.Expr) {
 	v := &Var{
 		node:  node{ident},
 		name:  ident.Name,
-		Value: exprValue(value),
+		Value: exprValue(fn, value),
 	}
 	fn.Locals[ident.Name] = v
 	fn.emit(v)

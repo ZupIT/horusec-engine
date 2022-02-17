@@ -116,7 +116,7 @@ func newParameter(fn *Function, expr ast.Expr) *Parameter {
 			// Since default paramenter values can not have more than
 			// one value, we check if the value really exists and use
 			// to create the parameter value.
-			v = exprValue(expr.Elts[0])
+			v = exprValue(fn, expr.Elts[0])
 		}
 		return &Parameter{
 			parent: fn,
@@ -129,7 +129,7 @@ func newParameter(fn *Function, expr ast.Expr) *Parameter {
 }
 
 // exprValue lowers a single-result expression e to IR form and return the Value defined by the expression.
-func exprValue(e ast.Expr) Value {
+func exprValue(parent *Function, e ast.Expr) Value {
 	switch expr := e.(type) {
 	case *ast.BasicLit:
 		return &Const{
@@ -142,6 +142,8 @@ func exprValue(e ast.Expr) Value {
 			name:  expr.Name,
 			Value: nil,
 		}
+	case *ast.CallExpr:
+		return newCall(parent, expr)
 	default:
 		panic(fmt.Sprintf("ir.exprValue: unhandled expression type: %T", expr))
 	}
@@ -166,7 +168,7 @@ func newCall(parent *Function, call *ast.CallExpr) *Call {
 				continue
 			}
 		}
-		args = append(args, exprValue(arg))
+		args = append(args, exprValue(parent, arg))
 	}
 
 	fn := new(Function)
