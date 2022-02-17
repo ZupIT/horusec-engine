@@ -53,6 +53,10 @@ func NewFile(f *ast.File) *File {
 			}
 			file.Members[importt.Name()] = importt
 			file.imported[importt.Name()] = importt
+		case *ast.ValueDecl:
+			for _, g := range newGlobals(decl) {
+				file.Members[g.Name()] = g
+			}
 		default:
 			panic(fmt.Sprintf("ir.NewFile: unhadled declaration type: %T", decl))
 		}
@@ -105,6 +109,19 @@ func newParameter(fn *Function, expr ast.Expr) *Parameter {
 			parent: fn,
 			name:   expr.Name,
 			Value:  nil,
+		}
+	case *ast.ObjectExpr:
+		var v Value
+		if len(expr.Elts) > 0 {
+			// Since default paramenter values can not have more than
+			// one value, we check if the value really exists and use
+			// to create the parameter value.
+			v = exprValue(expr.Elts[0])
+		}
+		return &Parameter{
+			parent: fn,
+			name:   expr.Name.Name,
+			Value:  v,
 		}
 	default:
 		panic(fmt.Sprintf("ir.newParameter: unhandled expression type: %T", expr))
@@ -193,6 +210,45 @@ func newCall(parent *Function, call *ast.CallExpr) *Call {
 		Function: fn,
 		Args:     args,
 	}
+}
+
+// newGlobals create new global variable declarations to a given value declaration.
+//
+// A new global declaration will be returned for each decl.Name and decl.Value.
+func newGlobals(decl *ast.ValueDecl) []*Global {
+	if len(decl.Names) < len(decl.Values) {
+		panic("ir.create.newGlobals: global declaration values with more values than names")
+	}
+
+	globals := make([]*Global, 0)
+
+	appendGlobal := func(ident *ast.Ident, value ast.Expr) {
+		globals = append(globals, &Global{
+			node:  node{decl},
+			name:  ident.Name,
+			Value: value,
+		})
+	}
+
+	// Handle a, b = 1, 2
+	if len(decl.Names) == len(decl.Values) {
+		for idx := range decl.Names {
+			appendGlobal(decl.Names[idx], decl.Values[idx])
+		}
+	} else {
+		var value ast.Expr
+
+		// Global variables can be declared without a initial value.
+		if len(decl.Values) > 0 {
+			value = decl.Values[0]
+		}
+
+		for _, name := range decl.Names {
+			appendGlobal(name, value)
+		}
+	}
+
+	return globals
 }
 
 func identNameIfNotNil(i *ast.Ident) string {

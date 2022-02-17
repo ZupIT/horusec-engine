@@ -95,7 +95,9 @@ func WriteFile(buf *bytes.Buffer, f *File) {
 		switch mem := f.Members[name].(type) {
 		case *ExternalMember:
 		case *Function:
-			fmt.Fprintf(buf, "  func    %-*s %s\n", maxname, name, mem.Signature)
+			fmt.Fprintf(buf, "  func  %-*s %s\n", maxname, name, mem.Signature)
+		case *Global:
+			fmt.Fprintf(buf, "  var   %-*s\n", maxname, name)
 		default:
 			panic(fmt.Sprintf("ir.WriteFile: unhandled member type: %T", mem))
 		}

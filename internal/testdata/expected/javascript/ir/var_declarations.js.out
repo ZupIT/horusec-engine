@@ -1,0 +1,22 @@
+file var_declarations.js:
+  var   a  
+  var   b  
+  var   c  
+  var   d  
+  var   e  
+  var   f  
+  var   foo
+  func  g   (a, b)
+  var   h  
+  var   i  
+
+
+
+============================
+
+# Name: g
+# File: var_declarations.js
+# Location: var_declarations.js:29:0
+func g(a, b):
+0:                                                                    entry
+

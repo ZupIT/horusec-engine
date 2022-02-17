@@ -114,6 +114,14 @@ type Const struct {
 	Value string // Value of constant.
 }
 
+// Global is a named Value holding the address of a file-level
+// variable.
+type Global struct {
+	node
+	name  string   // Name of variable.
+	Value ast.Expr // Value of global variable.
+}
+
 // Var represents a variable declaration.
 type Var struct {
 	node
@@ -141,6 +149,10 @@ func (n node) Pos() ast.Position { return n.syntax.Pos() }
 
 func (c *Const) value()       {}
 func (c *Const) Name() string { return fmt.Sprintf("%q", c.Value) }
+
+func (*Global) value()         {}
+func (*Global) member()        {}
+func (g *Global) Name() string { return g.name }
 
 func (*Var) value()           {}
 func (*Var) instr()           {}
