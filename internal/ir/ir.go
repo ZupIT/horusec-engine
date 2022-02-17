@@ -58,7 +58,8 @@ type File struct {
 	name    string            // Name of file.
 	Members map[string]Member // All file members keyed by name.
 
-	imported map[string]*ExternalMember // All importable packages, keyed by import path.
+	expresions []ast.Expr                 // Top level file expressions.
+	imported   map[string]*ExternalMember // All importable packages, keyed by import path.
 }
 
 // ExternalMember represents a member that is declared outside the file that is being used.

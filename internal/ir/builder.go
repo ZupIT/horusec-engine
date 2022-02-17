@@ -22,6 +22,8 @@ import (
 )
 
 // Build build all function members of file f.
+//
+// TODO(matheus): Decide how to deal with top level expressions on f.expresions.
 func (f *File) Build() {
 	for _, member := range f.Members {
 		if fn, ok := member.(*Function); ok {
