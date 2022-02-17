@@ -126,6 +126,8 @@ func (b *builder) stmt(fn *Function, s ast.Stmt) {
 		}
 		// TODO(matheus): Handle cases like a, b = foo()
 		panic("ir.builder.stmt: not implemented tuple assignments")
+	case *ast.BadNode:
+		// Do nothing with bad nodes.
 	default:
 		panic(fmt.Sprintf("ir.builder.stmt: unhandled expression type: %T", stmt))
 	}
