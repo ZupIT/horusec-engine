@@ -114,18 +114,7 @@ func (b *builder) stmt(fn *Function, s ast.Stmt) {
 	case *ast.ExprStmt:
 		b.expr(fn, stmt.Expr)
 	case *ast.AssignStmt:
-		// Handle a, b = 1, 2
-		if len(stmt.LHS) == len(stmt.RHS) {
-			for idx := range stmt.LHS {
-				lh, rh := stmt.LHS[idx], stmt.RHS[idx]
-				// TODO(matheus): lh will always be an *ast.Ident?
-				fn.newLocal(lh.(*ast.Ident), rh)
-			}
-
-			break
-		}
-		// TODO(matheus): Handle cases like a, b = foo()
-		panic("ir.builder.stmt: not implemented tuple assignments")
+		b.assignStmt(fn, stmt.LHS, stmt.RHS)
 	case *ast.ReturnStmt:
 		results := make([]Value, 0, len(stmt.Results))
 
@@ -149,6 +138,32 @@ func (b *builder) expr(fn *Function, e ast.Expr) {
 		fn.emit(callExpr(fn, expr))
 	default:
 		panic(fmt.Sprintf("ir.builder.expr: unhandled expression type: %T", expr))
+	}
+}
+
+// assignStmt emits code to fn for a parallel assignment of rhss to lhss.
+func (b *builder) assignStmt(fn *Function, lhss, rhss []ast.Expr) {
+	if len(lhss) == len(rhss) {
+		// Simple assignment:      x     = f()
+		// or Parallel assignment: x, y  = f(), g()
+		for idx := range lhss {
+			b.assign(fn, lhss[idx], rhss[idx])
+		}
+
+		return
+	}
+	// TODO(matheus): Handle cases like a, b = foo()
+	panic("ir.builder.assignStmt: not implemented tuple assignments")
+}
+
+// assign emits to fn code to initialize the lhs with the value
+// of expression rhs.
+func (b *builder) assign(fn *Function, lhs, rhs ast.Expr) {
+	switch lhs := lhs.(type) {
+	case *ast.Ident:
+		fn.newLocal(lhs, rhs)
+	default:
+		panic(fmt.Sprintf("ir.builder.assingStmt: not handled lhs assignment type: %T", lhs))
 	}
 }
 
