@@ -122,7 +122,7 @@
    121  .  .  .  .  .  .  .  .  .  .  .  .  Kind: "number"
    122  .  .  .  .  .  .  .  .  .  .  .  .  Value: "1"
    123  .  .  .  .  .  .  .  .  .  .  .  }
-   124  .  .  .  .  .  .  .  .  .  .  .  Op: ""
+   124  .  .  .  .  .  .  .  .  .  .  .  Op: "+"
    125  .  .  .  .  .  .  .  .  .  .  .  Right: *ast.BasicLit {
    126  .  .  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
    127  .  .  .  .  .  .  .  .  .  .  .  .  Kind: "number"
@@ -190,7 +190,7 @@
    189  .  .  .  .  .  .  .  .  .  .  Name: "i"
    190  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
    191  .  .  .  .  .  .  .  .  .  }
-   192  .  .  .  .  .  .  .  .  .  Op: ""
+   192  .  .  .  .  .  .  .  .  .  Op: "<="
    193  .  .  .  .  .  .  .  .  .  Right: *ast.BasicLit {
    194  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
    195  .  .  .  .  .  .  .  .  .  .  Kind: "number"
@@ -232,7 +232,7 @@
    231  .  .  .  .  .  .  .  .  .  .  .  .  .  Name: "i"
    232  .  .  .  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
    233  .  .  .  .  .  .  .  .  .  .  .  .  }
-   234  .  .  .  .  .  .  .  .  .  .  .  .  Op: ""
+   234  .  .  .  .  .  .  .  .  .  .  .  .  Op: "==="
    235  .  .  .  .  .  .  .  .  .  .  .  .  Right: *ast.BasicLit {
    236  .  .  .  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
    237  .  .  .  .  .  .  .  .  .  .  .  .  .  Kind: "number"
@@ -284,7 +284,7 @@
    283  .  .  .  .  .  .  .  .  .  .  .  .  .  Name: "i"
    284  .  .  .  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
    285  .  .  .  .  .  .  .  .  .  .  .  .  }
-   286  .  .  .  .  .  .  .  .  .  .  .  .  Op: ""
+   286  .  .  .  .  .  .  .  .  .  .  .  .  Op: "==="
    287  .  .  .  .  .  .  .  .  .  .  .  .  Right: *ast.BasicLit {
    288  .  .  .  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
    289  .  .  .  .  .  .  .  .  .  .  .  .  .  Kind: "number"
@@ -341,7 +341,7 @@
    340  .  .  .  .  .  .  .  .  Name: "i"
    341  .  .  .  .  .  .  .  .  Position: ast.Position {}
    342  .  .  .  .  .  .  .  }
-   343  .  .  .  .  .  .  .  Op: ""
+   343  .  .  .  .  .  .  .  Op: "<="
    344  .  .  .  .  .  .  .  Right: *ast.BasicLit {
    345  .  .  .  .  .  .  .  .  Position: ast.Position {}
    346  .  .  .  .  .  .  .  .  Kind: "number"
@@ -383,7 +383,7 @@
    382  .  .  .  .  .  .  .  .  .  .  .  Name: "i"
    383  .  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
    384  .  .  .  .  .  .  .  .  .  .  }
-   385  .  .  .  .  .  .  .  .  .  .  Op: ""
+   385  .  .  .  .  .  .  .  .  .  .  Op: "==="
    386  .  .  .  .  .  .  .  .  .  .  Right: *ast.BasicLit {
    387  .  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
    388  .  .  .  .  .  .  .  .  .  .  .  Kind: "number"
@@ -431,7 +431,7 @@
    430  .  .  .  .  .  .  .  .  .  .  .  Name: "i"
    431  .  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
    432  .  .  .  .  .  .  .  .  .  .  }
-   433  .  .  .  .  .  .  .  .  .  .  Op: ""
+   433  .  .  .  .  .  .  .  .  .  .  Op: "==="
    434  .  .  .  .  .  .  .  .  .  .  Right: *ast.BasicLit {
    435  .  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
    436  .  .  .  .  .  .  .  .  .  .  .  Kind: "number"
@@ -704,7 +704,7 @@
    703  .  .  .  .  .  .  .  .  .  Name: "i"
    704  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
    705  .  .  .  .  .  .  .  .  }
-   706  .  .  .  .  .  .  .  .  Op: ""
+   706  .  .  .  .  .  .  .  .  Op: "<"
    707  .  .  .  .  .  .  .  .  Right: *ast.BasicLit {
    708  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
    709  .  .  .  .  .  .  .  .  .  Kind: "number"

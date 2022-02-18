@@ -143,6 +143,14 @@ type Call struct {
 	Args     []Value   // The call function parameters.
 }
 
+// BinOp instruction yields the result of binary operation Left Op Right.
+type BinOp struct {
+	node
+	Op    string // Operator.
+	Left  Value  // Left operand.
+	Right Value  // Right operand.
+}
+
 // node is a mix-in embedded by all IR nodes to provide source code information.
 //
 // Since node is embedded by all IR nodes (Value's and Instruction's), these nodes
@@ -174,7 +182,14 @@ func (p *Parameter) String() string { return p.Name() }
 
 func (*Call) instr()         {}
 func (*Call) value()         {}
-func (c *Call) Name() string { return c.String() }
+func (c *Call) Name() string { return "" }
+
+func (*BinOp) instr()         {}
+func (*BinOp) value()         {}
+func (b *BinOp) Name() string { return b.String() }
+func (b *BinOp) String() string {
+	return fmt.Sprintf("%s %s %s", b.Left.Name(), b.Op, b.Right.Name())
+}
 
 func (*Function) member()        {}
 func (m *Function) Name() string { return m.name }

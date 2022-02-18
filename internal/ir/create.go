@@ -54,7 +54,7 @@ func NewFile(f *ast.File) *File {
 			file.Members[importt.Name()] = importt
 			file.imported[importt.Name()] = importt
 		case *ast.ValueDecl:
-			for _, g := range newGlobals(decl) {
+			for _, g := range valueDecl(decl) {
 				file.Members[g.Name()] = g
 			}
 		default:
@@ -143,19 +143,33 @@ func exprValue(parent *Function, e ast.Expr) Value {
 			Value: nil,
 		}
 	case *ast.CallExpr:
-		return newCall(parent, expr)
+		return callExpr(parent, expr)
+	case *ast.BinaryExpr:
+		return binaryExpr(parent, expr)
 	default:
 		panic(fmt.Sprintf("ir.exprValue: unhandled expression type: %T", expr))
 	}
 }
 
-// newCall create new Call to a given ast.CallExpr
+// binaryExpr create a new IR BinOp from the given binary expression expr.
+//
+// The operands of binary expression is resolved recursively.
+func binaryExpr(parent *Function, expr *ast.BinaryExpr) *BinOp {
+	return &BinOp{
+		node:  node{expr},
+		Op:    expr.Op,
+		Left:  exprValue(parent, expr.Left),
+		Right: exprValue(parent, expr.Right),
+	}
+}
+
+// callExpr create new Call to a given ast.CallExpr
 //
 // If CallExpr arguments use a variable declared inside parent function
 // call arguments will point to to this declared variable.
 //
 // nolint:gocyclo // Some checks is needed here.
-func newCall(parent *Function, call *ast.CallExpr) *Call {
+func callExpr(parent *Function, call *ast.CallExpr) *Call {
 	args := make([]Value, 0, len(call.Args))
 
 	for _, arg := range call.Args {
@@ -214,15 +228,15 @@ func newCall(parent *Function, call *ast.CallExpr) *Call {
 	}
 }
 
-// newGlobals create new global variable declarations to a given value declaration.
+// valueDecl create global variable declarations to a given value declaration.
 //
 // A new global declaration will be returned for each decl.Name and decl.Value.
-func newGlobals(decl *ast.ValueDecl) []*Global {
+func valueDecl(decl *ast.ValueDecl) []*Global {
 	if len(decl.Names) < len(decl.Values) {
 		panic("ir.create.newGlobals: global declaration values with more values than names")
 	}
 
-	globals := make([]*Global, 0)
+	globals := make([]*Global, 0, len(decl.Names))
 
 	appendGlobal := func(ident *ast.Ident, value ast.Expr) {
 		globals = append(globals, &Global{

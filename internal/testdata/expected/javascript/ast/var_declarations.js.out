@@ -189,7 +189,7 @@
    188  .  .  .  .  .  .  Kind: "number"
    189  .  .  .  .  .  .  Value: "10"
    190  .  .  .  .  .  }
-   191  .  .  .  .  .  Op: ""
+   191  .  .  .  .  .  Op: "+"
    192  .  .  .  .  .  Right: *ast.BinaryExpr {
    193  .  .  .  .  .  .  Position: ast.Position {}
    194  .  .  .  .  .  .  Left: *ast.BasicLit {
@@ -197,7 +197,7 @@
    196  .  .  .  .  .  .  .  Kind: "number"
    197  .  .  .  .  .  .  .  Value: "10"
    198  .  .  .  .  .  .  }
-   199  .  .  .  .  .  .  Op: ""
+   199  .  .  .  .  .  .  Op: "*"
    200  .  .  .  .  .  .  Right: *ast.BinaryExpr {
    201  .  .  .  .  .  .  .  Position: ast.Position {}
    202  .  .  .  .  .  .  .  Left: *ast.BasicLit {
@@ -205,7 +205,7 @@
    204  .  .  .  .  .  .  .  .  Kind: "number"
    205  .  .  .  .  .  .  .  .  Value: "20"
    206  .  .  .  .  .  .  .  }
-   207  .  .  .  .  .  .  .  Op: ""
+   207  .  .  .  .  .  .  .  Op: "/"
    208  .  .  .  .  .  .  .  Right: *ast.Ident {
    209  .  .  .  .  .  .  .  .  Name: "x"
    210  .  .  .  .  .  .  .  .  Position: ast.Position {}

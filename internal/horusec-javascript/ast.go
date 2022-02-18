@@ -512,12 +512,10 @@ func (p *parser) parseExpr(node *cst.Node) ast.Expr {
 
 		return &obj
 	case BinaryExpression:
-		// TODO: tree-sitter doesn't expose a operator node
-		// we need to find a way to get this operator.
-
 		return &ast.BinaryExpr{
 			Left:     p.parseExpr(node.ChildByFieldName("left")),
 			Right:    p.parseExpr(node.ChildByFieldName("right")),
+			Op:       node.ChildByFieldName("operator").Type(), // Type will return the operador cleaned.
 			Position: ast.NewPosition(node),
 		}
 	case ParenthesizedExpression:

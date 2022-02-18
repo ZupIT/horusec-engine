@@ -137,7 +137,7 @@ func (b *builder) stmt(fn *Function, s ast.Stmt) {
 func (b *builder) expr(fn *Function, e ast.Expr) {
 	switch expr := e.(type) {
 	case *ast.CallExpr:
-		fn.emit(newCall(fn, expr))
+		fn.emit(callExpr(fn, expr))
 	default:
 		panic(fmt.Sprintf("ir.builder.expr: unhandled expression type: %T", expr))
 	}

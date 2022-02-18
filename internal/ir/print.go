@@ -158,7 +158,10 @@ func WriteFunction(buf *bytes.Buffer, fn *Function) {
 			buf.WriteString("\t")
 			switch v := instr.(type) {
 			case Value:
-				fmt.Fprintf(buf, "%s = %s", v.Name(), instr.String())
+				if name := v.Name(); name != "" {
+					fmt.Fprintf(buf, "%s = ", name)
+				}
+				fmt.Fprintf(buf, "%s", instr.String())
 			default:
 				buf.WriteString(instr.String())
 			}
