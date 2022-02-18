@@ -48,14 +48,19 @@ type Value interface {
 
 // Instruction is an IR instruction that computes a new Value or has some effect.
 //
-// An Instruction that defines a value also implements the Value interface, an
-// Instruction that only has an effect does not. For example, Var and Call
-// implement Instruction and Value interfaces because both can define a value;
-// Var define a new variable value and the call can set a value with its return.
+// An Instruction that defines a value (e.g BinOp) also implements the Value interface,
+// an Instruction that only has an effect (e.g Return) does not.
 type Instruction interface {
 	instr()
 
 	// String returns the disassembled form of this value.
+	//
+	// Examples of Instructions that are Values:
+	//       "x + y"     (BinOp)
+	//       "len([])"   (Call)
+	//
+	// Examples of Instructions that are not Values:
+	//       "return x"  (Return)
 	String() string
 }
 
@@ -71,6 +76,8 @@ type File struct {
 // ExternalMember represents a member that is declared outside the file that is being used.
 //
 // ExternalMember is created from imports of a single file.
+//
+// The ExternalMember implements Member interface.
 type ExternalMember struct {
 	name  string // Named import member.
 	Path  string // Full import path of member.
@@ -85,6 +92,8 @@ type BasicBlock struct {
 }
 
 // Function represents a function or method with the parameters and signature.
+//
+// The Global implements Member interface.
 type Function struct {
 	name      string          // Function name.
 	File      *File           // File that this function belongs.
@@ -106,6 +115,8 @@ type Signature struct {
 }
 
 // Parameter represents an input parameter of a function or method.
+//
+// The Parameter implements Value interface.
 type Parameter struct {
 	node
 	name  string // Name of parameter.
@@ -115,6 +126,8 @@ type Parameter struct {
 }
 
 // Const represents the value of a constant expression.
+//
+// The Const implements Value interface.
 type Const struct {
 	node
 	Value string // Value of constant.
@@ -122,6 +135,11 @@ type Const struct {
 
 // Global is a named Value holding the address of a file-level
 // variable.
+//
+// Example printed form:
+// var a
+//
+// The Global implements Value and Member interfaces.
 type Global struct {
 	node
 	name  string   // Name of variable.
@@ -129,6 +147,12 @@ type Global struct {
 }
 
 // Var represents a variable declaration.
+//
+// Example printed form:
+// a = "hello"
+// b = "20" // TODO(matheus): We should try to add a simple type checker to print the value correctly.
+//
+// The Var implements Value and Instruction interfaces.
 type Var struct {
 	node
 	name  string // Name of variable.
@@ -136,6 +160,12 @@ type Var struct {
 }
 
 // Call instruction represents a function or method call.
+//
+// Example printed form:
+// 	foo()
+// 	bar.foo(10, 20)
+//
+// The Call implements Value and Instruction interfaces.
 type Call struct {
 	node
 	Parent   *Function // Function that Call is inside.
@@ -144,11 +174,35 @@ type Call struct {
 }
 
 // BinOp instruction yields the result of binary operation Left Op Right.
+//
+// Example printed form:
+// a + b
+// a + b - c
+//
+// The BinOp implements Value and Instruction interfaces.
 type BinOp struct {
 	node
 	Op    string // Operator.
 	Left  Value  // Left operand.
 	Right Value  // Right operand.
+}
+
+// Return instruction contains the return values of a function in some BasicBlock.
+//
+// In theory len(Results) is always be equal to the number of results in the
+// function's signature, but since some languages don't declare the return values
+// of a function, these values could be different.
+//
+// Return **must** be the last instruction of its containing BasicBlock.
+//
+// Example printed form:
+// 	return
+// 	return "x", 10
+//
+// The Return implements Instruction interface.
+type Return struct {
+	node
+	Results []Value
 }
 
 // node is a mix-in embedded by all IR nodes to provide source code information.
@@ -190,6 +244,8 @@ func (b *BinOp) Name() string { return b.String() }
 func (b *BinOp) String() string {
 	return fmt.Sprintf("%s %s %s", b.Left.Name(), b.Op, b.Right.Name())
 }
+
+func (*Return) instr() {}
 
 func (*Function) member()        {}
 func (m *Function) Name() string { return m.name }

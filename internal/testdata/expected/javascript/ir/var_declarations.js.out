@@ -18,5 +18,5 @@ file var_declarations.js:
 # File: var_declarations.js
 # Location: var_declarations.js:29:0
 func g(a, b):
-0:                                                                    entry
+0:                                                                         entry
 

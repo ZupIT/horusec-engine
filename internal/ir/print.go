@@ -59,6 +59,16 @@ func (c *Call) String() string {
 	return buf.String()
 }
 
+func (r *Return) String() string {
+	buf := bytes.NewBufferString("return ")
+
+	if len(r.Results) > 0 {
+		joinValues(buf, r.Results)
+	}
+
+	return buf.String()
+}
+
 // WriteTo writes to w a human-readable summary of file.
 func (f *File) WriteTo(w io.Writer) (int64, error) {
 	buf := bytes.NewBufferString("")
@@ -152,7 +162,7 @@ func WriteFunction(buf *bytes.Buffer, fn *Function) {
 
 		// Pretty write the index and name of the current block using indentation.
 		n, _ := fmt.Fprintf(buf, "%d:", b.Index)
-		fmt.Fprintf(buf, "%*s\n", width-n-len(b.Comment), b.Comment)
+		fmt.Fprintf(buf, "%*s%s\n", width-n-len(b.Comment), "", b.Comment)
 
 		for _, instr := range b.Instrs {
 			buf.WriteString("\t")

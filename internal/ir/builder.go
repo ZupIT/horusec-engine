@@ -126,6 +126,15 @@ func (b *builder) stmt(fn *Function, s ast.Stmt) {
 		}
 		// TODO(matheus): Handle cases like a, b = foo()
 		panic("ir.builder.stmt: not implemented tuple assignments")
+	case *ast.ReturnStmt:
+		results := make([]Value, 0, len(stmt.Results))
+
+		for _, res := range stmt.Results {
+			results = append(results, exprValue(fn, res))
+		}
+
+		fn.emit(&Return{Results: results, node: node{stmt}})
+		fn.currentBlock = fn.newBasicBlock("unreachable")
 	case *ast.BadNode:
 		// Do nothing with bad nodes.
 	default:
