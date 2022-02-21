@@ -161,6 +161,11 @@ func (b *builder) assignStmt(fn *Function, lhss, rhss []ast.Expr) {
 func (b *builder) assign(fn *Function, lhs, rhs ast.Expr) {
 	switch lhs := lhs.(type) {
 	case *ast.Ident:
+		if closure, isFuncLit := rhs.(*ast.FuncLit); isFuncLit {
+			fn.emit(funcLit(fn, lhs.Name, closure))
+
+			return
+		}
 		fn.newLocal(lhs, rhs)
 	default:
 		panic(fmt.Sprintf("ir.builder.assingStmt: not handled lhs assignment type: %T", lhs))

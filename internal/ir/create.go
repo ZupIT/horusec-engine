@@ -70,33 +70,16 @@ func NewFile(f *ast.File) *File {
 // The real work of building the IR form for a function is not done
 // until a call to Function.Build().
 func (f *File) NewFunction(decl *ast.FuncDecl) *Function {
-	var (
-		params  []*Parameter
-		results []*Parameter
-		fn      = &Function{
-			name:   decl.Name.Name,
-			syntax: decl,
-			File:   f,
-			Blocks: make([]*BasicBlock, 0),
-			Locals: make(map[string]*Var),
-		}
-	)
-
-	if decl.Type.Params != nil {
-		params = make([]*Parameter, 0, len(decl.Type.Params.List))
-		for _, p := range decl.Type.Params.List {
-			params = append(params, newParameter(fn, p.Name))
-		}
+	fn := &Function{
+		name:      decl.Name.Name,
+		syntax:    decl,
+		File:      f,
+		Blocks:    make([]*BasicBlock, 0),
+		Locals:    make(map[string]*Var),
+		AnonFuncs: make([]*Function, 0),
+		parent:    nil,
 	}
-
-	if decl.Type.Results != nil {
-		results = make([]*Parameter, 0, len(decl.Type.Results.List))
-		for _, p := range decl.Type.Results.List {
-			results = append(results, newParameter(fn, p.Name))
-		}
-	}
-
-	fn.Signature = &Signature{params, results}
+	fn.Signature = newSignature(fn, decl.Type)
 
 	return fn
 }
@@ -128,6 +111,33 @@ func newParameter(fn *Function, expr ast.Expr) *Parameter {
 	}
 }
 
+// newSignature create a new function signature of fn to a given function type.
+//
+// NOTE: newSignature don't set fn.Signature field, it just build the IR
+// representation of parameters and results.
+func newSignature(fn *Function, funcType *ast.FuncType) *Signature {
+	var (
+		params  []*Parameter
+		results []*Parameter
+	)
+
+	if funcType.Params != nil {
+		params = make([]*Parameter, 0, len(funcType.Params.List))
+		for _, p := range funcType.Params.List {
+			params = append(params, newParameter(fn, p.Name))
+		}
+	}
+
+	if funcType.Results != nil {
+		results = make([]*Parameter, 0, len(funcType.Results.List))
+		for _, p := range funcType.Results.List {
+			results = append(results, newParameter(fn, p.Name))
+		}
+	}
+
+	return &Signature{params, results}
+}
+
 // exprValue lowers a single-result expression e to IR form and return the Value defined by the expression.
 func exprValue(parent *Function, e ast.Expr) Value {
 	switch expr := e.(type) {
@@ -146,9 +156,31 @@ func exprValue(parent *Function, e ast.Expr) Value {
 		return callExpr(parent, expr)
 	case *ast.BinaryExpr:
 		return binaryExpr(parent, expr)
+	case *ast.FuncLit:
+		// Create an anonymous function using the parent function name
+		// and the current the total of anonymouns functions as a name.
+		return funcLit(parent, fmt.Sprintf("%s$%d", parent.Name(), len(parent.AnonFuncs)+1), expr)
 	default:
 		panic(fmt.Sprintf("ir.exprValue: unhandled expression type: %T", expr))
 	}
+}
+
+// funcLit crate a new Closure to a given AST based function literal.
+func funcLit(parent *Function, name string, syntax *ast.FuncLit) *Closure {
+	fn := &Function{
+		name:   name,
+		syntax: syntax,
+		File:   parent.File,
+		parent: parent,
+		Blocks: make([]*BasicBlock, 0),
+		Locals: make(map[string]*Var),
+	}
+	fn.Signature = newSignature(fn, syntax.Type)
+	fn.Build()
+
+	parent.AnonFuncs = append(parent.AnonFuncs, fn)
+
+	return &Closure{fn}
 }
 
 // binaryExpr create a new IR BinOp from the given binary expression expr.

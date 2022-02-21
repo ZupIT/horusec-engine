@@ -100,6 +100,9 @@ type Function struct {
 	Signature *Signature      // Function signature.
 	Locals    map[string]*Var // Local variables of this function.
 	Blocks    []*BasicBlock   // Basic blocks of the function; nil => external function.
+	AnonFuncs []*Function     // Anonymous functions directly beneath this one.
+
+	parent *Function // enclosing function if anonymous; nil if global.
 
 	syntax ast.Node // AST node that represents the Function.
 
@@ -205,6 +208,20 @@ type Return struct {
 	Results []Value
 }
 
+// Closure instruction yields a closure value whose code is Fn.
+//
+// Example printed form:
+//  # Where sum is the closure function created inside a normal function.
+// 	sum = make closure sum
+//
+//  # Where f1 is the function parent of closure and $1 is the number of closures inside parent.
+// 	fs.readFile(path, f1$1)
+//
+// The Closure implements Instruction interface.
+type Closure struct {
+	Fn *Function // Closure function.
+}
+
 // node is a mix-in embedded by all IR nodes to provide source code information.
 //
 // Since node is embedded by all IR nodes (Value's and Instruction's), these nodes
@@ -246,6 +263,11 @@ func (b *BinOp) String() string {
 }
 
 func (*Return) instr() {}
+
+func (*Closure) instr()           {}
+func (*Closure) value()           {}
+func (c *Closure) Name() string   { return c.Fn.Name() }
+func (c *Closure) String() string { return fmt.Sprintf("make closure %s ", c.Name()) }
 
 func (*Function) member()        {}
 func (m *Function) Name() string { return m.name }
