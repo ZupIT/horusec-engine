@@ -139,11 +139,7 @@ func WriteFunction(buf *bytes.Buffer, fn *Function) {
 	fmt.Fprintf(buf, "# Location: %s:%d:%d\n", fn.File.Name(), pos.Row, pos.Column)
 
 	if len(fn.Locals) > 0 {
-		buf.WriteString("# Locals:\n")
-		idx := 0
-		for _, l := range fn.Locals {
-			fmt.Fprintf(buf, "# % 3d:\t%s\n", idx, l.Name())
-		}
+		writeLocals(buf, fn)
 	}
 
 	fmt.Fprintf(buf, "func %s%s:\n", fn.Name(), fn.Signature)
@@ -180,6 +176,21 @@ func WriteFunction(buf *bytes.Buffer, fn *Function) {
 	}
 
 	fmt.Fprintf(buf, "\n")
+}
+
+// writeLocals write on buf all declared local variable on fn sorted.
+func writeLocals(buf *bytes.Buffer, fn *Function) {
+	buf.WriteString("# Locals:\n")
+
+	names := make([]string, 0, len(fn.Locals))
+	for _, l := range fn.Locals {
+		names = append(names, l.Name())
+	}
+	sort.Strings(names)
+
+	for idx, name := range names {
+		fmt.Fprintf(buf, "# % 3d:\t%s\n", idx, name)
+	}
 }
 
 // joinValues concatenates the values on buf. A comma separator string is placed between elements.

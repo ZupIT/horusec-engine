@@ -29,8 +29,8 @@ func f2(a):
 # Location: functions.js:23:0
 # Locals:
 #   0:	a
-#   0:	c
-#   0:	res
+#   1:	c
+#   2:	res
 func f3(a, b):
 0:                                                                         entry
 	a = "20"
@@ -44,7 +44,8 @@ func f3(a, b):
 # File: functions.js
 # Location: functions.js:31:0
 # Locals:
-#   0:	result
+#   0:	%t0
+#   1:	result
 func f4():
 0:                                                                         entry
 	sum = make closure sum 
