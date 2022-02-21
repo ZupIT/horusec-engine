@@ -162,6 +162,18 @@ type Var struct {
 	Value Value  // Value of variable
 }
 
+// Template represents a template string.
+//
+// Example printed form:
+// "template string: ${someVar}"
+//
+// The Template implements Value interface.
+type Template struct {
+	node
+	Value string  // Template string.
+	Subs  []Value // Substitution values.
+}
+
 // Call instruction represents a function or method call.
 //
 // Example printed form:
@@ -250,6 +262,10 @@ func (v *Var) String() string { return v.Value.String() }
 func (*Parameter) value()           {}
 func (p *Parameter) Name() string   { return p.name }
 func (p *Parameter) String() string { return p.Name() }
+
+func (*Template) value()           {}
+func (t *Template) Name() string   { return t.String() }
+func (t *Template) String() string { return fmt.Sprintf("%q", t.Value) }
 
 func (*Call) instr()         {}
 func (*Call) value()         {}

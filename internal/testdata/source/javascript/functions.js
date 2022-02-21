@@ -14,15 +14,18 @@
  * limitations under the License.
  */
 
+import fs from 'fs';
+
 function f1(a, b) {}
 
-const f2 = (a, b) => {}
+const f2 = (a) => { return a + 10; }
 
 function f3(a, b) {
+    let a = 20;
 	const c = a + b;
 	console.log(c);
-	const foo = doFoo(c);
-	return foo;
+	const res = f2(c);
+	return res;
 }
 
 function f4() {
@@ -33,5 +36,11 @@ function f4() {
 		return a - b;
 	}
 	const result = doSomething(sum(10,20));
-	console.log(` result: ${result}`);
+	console.log(`result: ${result}`);
+}
+
+function f5(path) {
+    fs.readFile(path, (err, data) => {
+        console.log(data);
+    });
 }

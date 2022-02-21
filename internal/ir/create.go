@@ -160,6 +160,16 @@ func exprValue(parent *Function, e ast.Expr) Value {
 		// Create an anonymous function using the parent function name
 		// and the current the total of anonymouns functions as a name.
 		return funcLit(parent, fmt.Sprintf("%s$%d", parent.Name(), len(parent.AnonFuncs)+1), expr)
+	case *ast.TemplateExpr:
+		values := make([]Value, 0, len(expr.Subs))
+		for _, v := range expr.Subs {
+			values = append(values, exprValue(parent, v))
+		}
+		return &Template{
+			node:  node{expr},
+			Value: expr.Value,
+			Subs:  values,
+		}
 	default:
 		panic(fmt.Sprintf("ir.exprValue: unhandled expression type: %T", expr))
 	}

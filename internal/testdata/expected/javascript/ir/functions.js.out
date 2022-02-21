@@ -1,0 +1,61 @@
+file functions.js:
+  import  fs
+  func  f1 (a, b)
+  func  f2 (a)
+  func  f3 (a, b)
+  func  f4 ()
+  func  f5 (path)
+
+
+
+============================
+
+# Name: f1
+# File: functions.js
+# Location: functions.js:19:0
+func f1(a, b):
+0:                                                                         entry
+
+# Name: f2
+# File: functions.js
+# Location: functions.js:21:11
+func f2(a):
+0:                                                                         entry
+	return a + "10"
+1:                                                                   unreachable
+
+# Name: f3
+# File: functions.js
+# Location: functions.js:23:0
+# Locals:
+#   0:	a
+#   0:	c
+#   0:	res
+func f3(a, b):
+0:                                                                         entry
+	a = "20"
+	c = a + b
+	console.log(c)
+	res = f2(c)
+	return res
+1:                                                                   unreachable
+
+# Name: f4
+# File: functions.js
+# Location: functions.js:31:0
+# Locals:
+#   0:	result
+func f4():
+0:                                                                         entry
+	sum = make closure sum 
+	sub = make closure sub 
+	result = doSomething()
+	console.log("result: ${result}")
+
+# Name: f5
+# File: functions.js
+# Location: functions.js:42:0
+func f5(path):
+0:                                                                         entry
+	fs.readFile(path, f5$1)
+
