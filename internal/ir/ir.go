@@ -176,6 +176,18 @@ type Template struct {
 
 // Call instruction represents a function or method call.
 //
+// Function call arguments will never be another function call.
+// If the Call argument is another function call, a temporary
+// variable is created by associating the function call with its
+// value, and the temporary variable created is used as an argument
+// to Call.
+//
+// This code:
+// 	foo(bar())
+// Generate this IR:
+// 	%t0 = bar()
+//	foo(%t0)
+//
 // Example printed form:
 // 	foo()
 // 	bar.foo(10, 20)

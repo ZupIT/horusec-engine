@@ -74,17 +74,34 @@ func (fn *Function) emit(instr Instruction) {
 	fn.currentBlock.Instrs = append(fn.currentBlock.Instrs, instr)
 }
 
-// newLocal creates a local variable and adds it to function fn.
+// addNamedLocal creates a local variable, adds it to function fn and return it.
 //
 // Subsequent calls to fn.lookup(ident.Name) will return the same variable.
-func (fn *Function) newLocal(ident *ast.Ident, value ast.Expr) {
+func (fn *Function) addNamedLocal(name *ast.Ident, value ast.Expr) Value {
 	v := &Var{
-		node:  node{ident},
-		name:  ident.Name,
+		node:  node{name},
+		name:  name.Name,
 		Value: exprValue(fn, value),
 	}
-	fn.Locals[ident.Name] = v
+	fn.Locals[name.Name] = v
 	fn.emit(v)
+	return v
+}
+
+// addLocal create a new temporary variable, adds it to function fn and return it.
+//
+// The temporary name used is %tN where N is the current number of local variables
+// on fn. The % prefix is added on variable name to avoid collisions.
+func (fn *Function) addLocal(value Value, syntax ast.Node) Value {
+	name := fmt.Sprintf("%%t%d", len(fn.Locals))
+	v := &Var{
+		node:  node{syntax},
+		name:  name,
+		Value: value,
+	}
+	fn.Locals[name] = v
+	fn.emit(v)
+	return v
 }
 
 // builder controls how a function is converted from AST to a IR.
@@ -166,7 +183,7 @@ func (b *builder) assign(fn *Function, lhs, rhs ast.Expr) {
 
 			return
 		}
-		fn.newLocal(lhs, rhs)
+		fn.addNamedLocal(lhs, rhs)
 	default:
 		panic(fmt.Sprintf("ir.builder.assingStmt: not handled lhs assignment type: %T", lhs))
 	}

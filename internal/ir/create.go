@@ -215,16 +215,26 @@ func callExpr(parent *Function, call *ast.CallExpr) *Call {
 	args := make([]Value, 0, len(call.Args))
 
 	for _, arg := range call.Args {
-		if ident, ok := arg.(*ast.Ident); ok {
+		var v Value
+		switch arg := arg.(type) {
+		case *ast.Ident:
 			// If identifier used on function call is declared inside the parent function
-			// we use this declared variable as argument to function call.
-			if local := parent.lookup(ident.Name); local != nil {
-				args = append(args, local)
-
-				continue
+			// we use this declared variable as argument to function call, otherwise if
+			// just parse the expression value.
+			if local := parent.lookup(arg.Name); local != nil {
+				v = local
+			} else {
+				v = exprValue(parent, arg)
 			}
+		case *ast.CallExpr:
+			// If the argument value is a call expression we first create a temp variable
+			// assigin your result to this function call, and them set this temp variable
+			// as an argument to function call.
+			v = parent.addLocal(callExpr(parent, arg), arg)
+		default:
+			v = exprValue(parent, arg)
 		}
-		args = append(args, exprValue(parent, arg))
+		args = append(args, v)
 	}
 
 	fn := new(Function)

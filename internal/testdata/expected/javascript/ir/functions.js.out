@@ -50,7 +50,8 @@ func f4():
 0:                                                                         entry
 	sum = make closure sum 
 	sub = make closure sub 
-	result = doSomething()
+	%t0 = sum("10", "20")
+	result = doSomething(%t0)
 	console.log("result: ${result}")
 
 # Name: f5
