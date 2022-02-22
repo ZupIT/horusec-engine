@@ -70,7 +70,7 @@ func (p *parser) parseCST(name string, root *cst.Node) *ast.File {
 		case Comment:
 			// TODO(matheus): Handle comments.
 		default:
-			panic(fmt.Sprintf("unexpected node type %s", node.Type()))
+			file.BadNodes = append(file.BadNodes, ast.NewUnsupportedNode(node))
 		}
 	})
 

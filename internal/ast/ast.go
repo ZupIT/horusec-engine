@@ -414,9 +414,10 @@ func NewUnsupportedNode(n *cst.Node) *BadNode {
 // File node represents a program source file.
 type File struct {
 	Position
-	Name  *Ident // file name.
-	Decls []Decl // top-level declarations or nil.
-	Exprs []Expr // top-level expressions or nil.
+	Name     *Ident // file name.
+	Decls    []Decl // top-level declarations or nil.
+	Exprs    []Expr // top-level expressions or nil.
+	BadNodes []Node // top-level unsupported nodes.
 }
 
 func NewIdent(node *cst.Node) *Ident {
