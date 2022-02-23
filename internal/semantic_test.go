@@ -50,6 +50,7 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+	"runtime/debug"
 	"sort"
 	"testing"
 
@@ -145,7 +146,7 @@ func TestParseIR(t *testing.T) {
 				// test to fail in a "nice" way.
 				defer func() {
 					if err := recover(); err != nil {
-						t.Errorf("Panic on %s: %v", name, err)
+						t.Errorf("Panic on %s: %v\n%s", name, err, debug.Stack())
 					}
 				}()
 				buf := bytes.NewBufferString("")
