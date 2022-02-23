@@ -22,6 +22,15 @@ import (
 // Assert at compile time that Analyzer implements analysis.Analyzer interface.
 var _ analysis.Analyzer = &Analyzer{}
 
+const (
+	// AllArguments represents that all call arguments would be analysed using
+	// the Analyzer.ArgValue analyzer
+	AllArguments = -1
+
+	// NoArguments represents that the function arguments will not be analyzed.
+	NoArguments = -2
+)
+
 // Analyzer implements analysis.Analyzer interface.
 //
 // Call analyzer check if a function call match the configured
@@ -52,11 +61,27 @@ func (a *Analyzer) Run(pass *analysis.Pass) {
 }
 
 func (a *Analyzer) isVulnerableCall(call *ir.Call) bool {
-	if call.Function.Name() != a.Name || !a.hasRequiredArgs(call) {
+	// Fast path, if function name don't match return false directly.
+	if call.Function.Name() != a.Name {
 		return false
 	}
 
-	return !a.ArgValue.Run(call.Args[a.ArgsIndex-1])
+	// If the function arguments should not be checked, return true directly
+	// since the function name is already matched.
+	if a.ArgsIndex == NoArguments {
+		return true
+	}
+
+	if a.ArgsIndex == AllArguments {
+		for _, arg := range call.Args {
+			if !a.ArgValue.Run(arg) {
+				return true
+			}
+		}
+		return false
+	}
+
+	return a.hasRequiredArgs(call) && !a.ArgValue.Run(call.Args[a.ArgsIndex-1])
 }
 
 func (a *Analyzer) hasRequiredArgs(call *ir.Call) bool {
