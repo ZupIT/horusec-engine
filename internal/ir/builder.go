@@ -79,14 +79,14 @@ func (fn *Function) emit(instr Instruction) {
 
 // addNamedLocal creates a local variable, adds it to function fn and return it.
 //
-// Subsequent calls to fn.lookup(ident.Name) will return the same variable.
-func (fn *Function) addNamedLocal(name *ast.Ident, value ast.Expr) Value {
+// Subsequent calls to fn.lookup(name) will return the same variable.
+func (fn *Function) addNamedLocal(name string, value Value, syntax ast.Node) Value {
 	v := &Var{
-		node:  node{name},
-		name:  name.Name,
-		Value: exprValue(fn, value),
+		node:  node{syntax},
+		name:  name,
+		Value: value,
 	}
-	fn.Locals[name.Name] = v
+	fn.Locals[name] = v
 	fn.emit(v)
 	return v
 }
@@ -97,14 +97,7 @@ func (fn *Function) addNamedLocal(name *ast.Ident, value ast.Expr) Value {
 // on fn. The % prefix is added on variable name to avoid collisions.
 func (fn *Function) addLocal(value Value, syntax ast.Node) Value {
 	name := fmt.Sprintf("%%t%d", len(fn.Locals))
-	v := &Var{
-		node:  node{syntax},
-		name:  name,
-		Value: value,
-	}
-	fn.Locals[name] = v
-	fn.emit(v)
-	return v
+	return fn.addNamedLocal(name, value, syntax)
 }
 
 // builder controls how a function is converted from AST to a IR.
@@ -134,7 +127,7 @@ func (b *builder) stmt(fn *Function, s ast.Stmt) {
 	case *ast.ExprStmt:
 		b.expr(fn, stmt.Expr)
 	case *ast.AssignStmt:
-		b.assignStmt(fn, stmt.LHS, stmt.RHS)
+		b.assignStmt(fn, stmt.LHS, stmt.RHS, stmt)
 	case *ast.ReturnStmt:
 		results := make([]Value, 0, len(stmt.Results))
 
@@ -162,12 +155,12 @@ func (b *builder) expr(fn *Function, e ast.Expr) {
 }
 
 // assignStmt emits code to fn for a parallel assignment of rhss to lhss.
-func (b *builder) assignStmt(fn *Function, lhss, rhss []ast.Expr) {
+func (b *builder) assignStmt(fn *Function, lhss, rhss []ast.Expr, syntax *ast.AssignStmt) {
 	if len(lhss) == len(rhss) {
 		// Simple assignment:      x     = f()
 		// or Parallel assignment: x, y  = f(), g()
 		for idx := range lhss {
-			b.assign(fn, lhss[idx], rhss[idx])
+			b.assign(fn, lhss[idx], rhss[idx], syntax)
 		}
 
 		return
@@ -180,7 +173,7 @@ func (b *builder) assignStmt(fn *Function, lhss, rhss []ast.Expr) {
 
 // assign emits to fn code to initialize the lhs with the value
 // of expression rhs.
-func (b *builder) assign(fn *Function, lhs, rhs ast.Expr) {
+func (b *builder) assign(fn *Function, lhs, rhs ast.Expr, syntax *ast.AssignStmt) {
 	switch lhs := lhs.(type) {
 	case *ast.Ident:
 		if closure, isFuncLit := rhs.(*ast.FuncLit); isFuncLit {
@@ -188,7 +181,7 @@ func (b *builder) assign(fn *Function, lhs, rhs ast.Expr) {
 
 			return
 		}
-		fn.addNamedLocal(lhs, rhs)
+		fn.addNamedLocal(lhs.Name, exprValue(fn, rhs), syntax)
 	default:
 		unsupportedNode(lhs)
 	}
