@@ -17,11 +17,12 @@ package testutil
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	javascript "github.com/ZupIT/horusec-engine/internal/horusec-javascript"
 	"github.com/ZupIT/horusec-engine/internal/ir"
 	"github.com/ZupIT/horusec-engine/semantic/analysis"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 // TestCaseAnalyzer is a test case used to assert the assertivity of a given Analyzer.
@@ -33,6 +34,8 @@ type TestCaseAnalyzer struct {
 }
 
 // TestAnalayzer assert the assertivity of a given Analyzer.
+//
+// nolint: funlen // There is no need to break this test.
 func TestAnalayzer(t *testing.T, testcases []TestCaseAnalyzer) {
 	for _, tt := range testcases {
 		t.Run(tt.Name, func(t *testing.T) {

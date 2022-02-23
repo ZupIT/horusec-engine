@@ -21,12 +21,13 @@ import (
 	"github.com/ZupIT/horusec-devkit/pkg/enums/confidence"
 	"github.com/ZupIT/horusec-devkit/pkg/enums/languages"
 	"github.com/ZupIT/horusec-devkit/pkg/enums/severities"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	engine "github.com/ZupIT/horusec-engine"
 	"github.com/ZupIT/horusec-engine/semantic"
 	"github.com/ZupIT/horusec-engine/semantic/analysis/call"
 	"github.com/ZupIT/horusec-engine/semantic/analysis/value"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 func TestSemanticRule(t *testing.T) {

@@ -54,11 +54,12 @@ import (
 	"sort"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	"github.com/ZupIT/horusec-engine/internal/ast"
 	javascript "github.com/ZupIT/horusec-engine/internal/horusec-javascript"
 	"github.com/ZupIT/horusec-engine/internal/ir"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 var (

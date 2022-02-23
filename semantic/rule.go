@@ -19,6 +19,7 @@ import (
 	"os"
 
 	"github.com/ZupIT/horusec-devkit/pkg/enums/languages"
+
 	engine "github.com/ZupIT/horusec-engine"
 	"github.com/ZupIT/horusec-engine/internal/ast"
 	javascript "github.com/ZupIT/horusec-engine/internal/horusec-javascript"
@@ -39,16 +40,19 @@ type Rule struct {
 }
 
 // Run implements engine.Rule.Run.
+//
+// nolint: funlen,gocyclo // Method is simple enough to not split.
 func (r *Rule) Run(path string) ([]engine.Finding, error) {
 	src, err := os.ReadFile(path)
 	if err != nil {
 		return nil, fmt.Errorf("read file: %w", err)
 	}
 
-	var ast *ast.File
+	var astFile *ast.File
+	// nolint: exhaustive // We don't support all languages yet.
 	switch r.Language {
 	case languages.Javascript:
-		ast, err = javascript.ParseFile(path, src)
+		astFile, err = javascript.ParseFile(path, src)
 	default:
 		return nil, fmt.Errorf("language %s not supported", r.Language)
 	}
@@ -56,7 +60,7 @@ func (r *Rule) Run(path string) ([]engine.Finding, error) {
 		return nil, fmt.Errorf("parse %s file: %w", r.Language, err)
 	}
 
-	f := ir.NewFile(ast)
+	f := ir.NewFile(astFile)
 	f.Build()
 
 	var findings []engine.Finding

@@ -31,10 +31,10 @@ import (
 // nolint:gocyclo // Some checks is needed here.
 func NewFile(f *ast.File) *File {
 	file := &File{
-		Members:    make(map[string]Member),
-		imported:   make(map[string]*ExternalMember),
-		name:       f.Name.Name,
-		expresions: f.Exprs,
+		Members:     make(map[string]Member),
+		imported:    make(map[string]*ExternalMember),
+		name:        f.Name.Name,
+		expressions: f.Exprs,
 	}
 
 	for _, decl := range f.Decls {
@@ -140,6 +140,8 @@ func newSignature(fn *Function, funcType *ast.FuncType) *Signature {
 }
 
 // exprValue lowers a single-result expression e to IR form and return the Value defined by the expression.
+//
+// nolint: gocyclo // Some checks is needed.
 func exprValue(parent *Function, e ast.Expr) Value {
 	switch expr := e.(type) {
 	case *ast.BasicLit:
@@ -286,6 +288,8 @@ func callExpr(parent *Function, call *ast.CallExpr) *Call {
 // valueDecl create global variable declarations to a given value declaration.
 //
 // A new global declaration will be returned for each decl.Name and decl.Value.
+//
+// nolint: gocyclo // Some checks is needed.
 func valueDecl(decl *ast.ValueDecl) []*Global {
 	if len(decl.Names) < len(decl.Values) {
 		panic("ir.create.newGlobals: global declaration values with more values than names")

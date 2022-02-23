@@ -69,8 +69,8 @@ type File struct {
 	name    string            // Name of file.
 	Members map[string]Member // All file members keyed by name.
 
-	expresions []ast.Expr                 // Top level file expressions.
-	imported   map[string]*ExternalMember // All importable packages, keyed by import path.
+	expressions []ast.Expr                 // Top level file expressions.
+	imported    map[string]*ExternalMember // All importable packages, keyed by import path.
 }
 
 // ExternalMember represents a member that is declared outside the file that is being used.
@@ -297,8 +297,8 @@ func (*Closure) value()           {}
 func (c *Closure) Name() string   { return c.Fn.Name() }
 func (c *Closure) String() string { return fmt.Sprintf("make closure %s ", c.Name()) }
 
-func (*Function) member()        {}
-func (m *Function) Name() string { return m.name }
+func (*Function) member()         {}
+func (fn *Function) Name() string { return fn.name }
 
 func (*File) member()        {}
 func (f *File) Name() string { return f.name }
