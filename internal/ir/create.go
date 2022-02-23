@@ -79,64 +79,8 @@ func (f *File) NewFunction(decl *ast.FuncDecl) *Function {
 		AnonFuncs: make([]*Function, 0),
 		parent:    nil,
 	}
-	fn.Signature = newSignature(fn, decl.Type)
 
 	return fn
-}
-
-// newParameter return a new Parameter to a given expression.
-func newParameter(fn *Function, expr ast.Expr) *Parameter {
-	switch expr := expr.(type) {
-	case *ast.Ident:
-		return &Parameter{
-			parent: fn,
-			name:   expr.Name,
-			Value:  nil,
-		}
-	case *ast.ObjectExpr:
-		var v Value
-		if len(expr.Elts) > 0 {
-			// Since default paramenter values can not have more than
-			// one value, we check if the value really exists and use
-			// to create the parameter value.
-			v = exprValue(fn, expr.Elts[0])
-		}
-		return &Parameter{
-			parent: fn,
-			name:   expr.Name.Name,
-			Value:  v,
-		}
-	default:
-		unsupportedNode(expr)
-		return nil
-	}
-}
-
-// newSignature create a new function signature of fn to a given function type.
-//
-// NOTE: newSignature don't set fn.Signature field, it just build the IR
-// representation of parameters and results.
-func newSignature(fn *Function, funcType *ast.FuncType) *Signature {
-	var (
-		params  []*Parameter
-		results []*Parameter
-	)
-
-	if funcType.Params != nil {
-		params = make([]*Parameter, 0, len(funcType.Params.List))
-		for _, p := range funcType.Params.List {
-			params = append(params, newParameter(fn, p.Name))
-		}
-	}
-
-	if funcType.Results != nil {
-		results = make([]*Parameter, 0, len(funcType.Results.List))
-		for _, p := range funcType.Results.List {
-			results = append(results, newParameter(fn, p.Name))
-		}
-	}
-
-	return &Signature{params, results}
 }
 
 // exprValue lowers a single-result expression e to IR form and return the Value defined by the expression.
@@ -189,7 +133,6 @@ func funcLit(parent *Function, name string, syntax *ast.FuncLit) *Closure {
 		Blocks: make([]*BasicBlock, 0),
 		Locals: make(map[string]*Var),
 	}
-	fn.Signature = newSignature(fn, syntax.Type)
 	fn.Build()
 
 	parent.AnonFuncs = append(parent.AnonFuncs, fn)

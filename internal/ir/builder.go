@@ -36,17 +36,23 @@ func (f *File) Build() {
 func (fn *Function) Build() {
 	var b builder
 
-	var body *ast.BlockStmt
+	var (
+		body     *ast.BlockStmt
+		funcType *ast.FuncType
+	)
 
 	switch s := fn.syntax.(type) {
 	case *ast.FuncDecl:
 		body = s.Body
+		funcType = s.Type
 	case *ast.FuncLit:
 		body = s.Body
+		funcType = s.Type
 	default:
 		panic(fmt.Sprintf("ir.Function.Build: invalid syntax node of function: %T", s))
 	}
 
+	fn.Signature = b.buildFuncSignature(fn, funcType)
 	b.buildFunction(fn, body)
 }
 
@@ -192,5 +198,60 @@ func (b *builder) assign(fn *Function, lhs, rhs ast.Expr) {
 func (b *builder) stmtList(fn *Function, list []ast.Stmt) {
 	for _, s := range list {
 		b.stmt(fn, s)
+	}
+}
+
+// buildFuncSignature build function signature of fn to a given function type.
+//
+// NOTE: buildFuncSignature don't set fn.Signature field, it just build the IR
+// representation of parameters and results.
+func (b *builder) buildFuncSignature(fn *Function, funcType *ast.FuncType) *Signature {
+	var (
+		params  []*Parameter
+		results []*Parameter
+	)
+
+	if funcType.Params != nil {
+		params = make([]*Parameter, 0, len(funcType.Params.List))
+		for _, p := range funcType.Params.List {
+			params = append(params, b.buildFuncParameter(fn, p.Name))
+		}
+	}
+
+	if funcType.Results != nil {
+		results = make([]*Parameter, 0, len(funcType.Results.List))
+		for _, p := range funcType.Results.List {
+			results = append(results, b.buildFuncParameter(fn, p.Name))
+		}
+	}
+
+	return &Signature{params, results}
+}
+
+// buildFuncParameter build a new function parameter to a given expression.
+func (b *builder) buildFuncParameter(fn *Function, expr ast.Expr) *Parameter {
+	switch expr := expr.(type) {
+	case *ast.Ident:
+		return &Parameter{
+			parent: fn,
+			name:   expr.Name,
+			Value:  nil,
+		}
+	case *ast.ObjectExpr:
+		var v Value
+		if len(expr.Elts) > 0 {
+			// Since default paramenter values can not have more than
+			// one value, we check if the value really exists and use
+			// to create the parameter value.
+			v = exprValue(fn, expr.Elts[0])
+		}
+		return &Parameter{
+			parent: fn,
+			name:   expr.Name.Name,
+			Value:  v,
+		}
+	default:
+		unsupportedNode(expr)
+		return nil
 	}
 }
