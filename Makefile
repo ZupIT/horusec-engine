@@ -9,6 +9,7 @@ GO_FUMPT ?= gofumpt
 GO_GCI ?= gci
 ADDLICENSE ?= addlicense
 GO_LIST_TO_TEST ?= $$(go list ./... | grep -v /text/examples/)
+GO_TEST_FLAGS ?= -race -timeout=5m -parallel=1
 
 lint:
 	$(GO) install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
@@ -19,7 +20,12 @@ coverage:
 
 test:
 	$(GO) clean -testcache
-	$(GO) test -v $(GO_LIST_TO_TEST) -race -timeout=5m -parallel=1 -failfast -short
+	$(GO) test -v $(GO_LIST_TO_TEST) $(GO_TEST_FLAGS) -failfast -short
+
+test-all:
+	$(GO) clean -testcache
+	$(GO) test -v $(GO_LIST_TO_TEST) $(GO_TEST_FLAGS) -ldflags "-X github.com/ZupIT/horusec-engine/internal/ir.debug=1"
+
 
 format: install-format-dependencies
 	$(GOFMT) -s -l -w $(GO_FILES)
