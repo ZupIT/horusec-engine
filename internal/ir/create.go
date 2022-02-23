@@ -58,7 +58,7 @@ func NewFile(f *ast.File) *File {
 				file.Members[g.Name()] = g
 			}
 		default:
-			panic(fmt.Sprintf("ir.NewFile: unhadled declaration type: %T", decl))
+			unsupportedNode(decl)
 		}
 	}
 
@@ -107,7 +107,8 @@ func newParameter(fn *Function, expr ast.Expr) *Parameter {
 			Value:  v,
 		}
 	default:
-		panic(fmt.Sprintf("ir.newParameter: unhandled expression type: %T", expr))
+		unsupportedNode(expr)
+		return nil
 	}
 }
 
@@ -171,7 +172,8 @@ func exprValue(parent *Function, e ast.Expr) Value {
 			Subs:  values,
 		}
 	default:
-		panic(fmt.Sprintf("ir.exprValue: unhandled expression type: %T", expr))
+		unsupportedNode(expr)
+		return nil
 	}
 }
 
@@ -251,7 +253,8 @@ func callExpr(parent *Function, call *ast.CallExpr) *Call {
 	case *ast.SelectorExpr:
 		expr, ok := call.Expr.(*ast.Ident)
 		if !ok {
-			panic(fmt.Sprintf("ir.newCall: unhandled type of expression field from SelectorExpr: %T", call.Expr))
+			unsupportedNode(call.Expr)
+			break
 		}
 
 		var ident string
@@ -267,7 +270,7 @@ func callExpr(parent *Function, call *ast.CallExpr) *Call {
 
 		fn.name = fmt.Sprintf("%s.%s", ident, call.Sel.Name)
 	default:
-		panic(fmt.Sprintf("ir.newCall: unhandled type of call function: %T", call))
+		unsupportedNode(call)
 	}
 
 	return &Call{

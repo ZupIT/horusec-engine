@@ -144,7 +144,7 @@ func (b *builder) stmt(fn *Function, s ast.Stmt) {
 	case *ast.BadNode:
 		// Do nothing with bad nodes.
 	default:
-		panic(fmt.Sprintf("ir.builder.stmt: unhandled expression type: %T", stmt))
+		unsupportedNode(stmt)
 	}
 }
 
@@ -154,7 +154,7 @@ func (b *builder) expr(fn *Function, e ast.Expr) {
 	case *ast.CallExpr:
 		fn.emit(callExpr(fn, expr))
 	default:
-		panic(fmt.Sprintf("ir.builder.expr: unhandled expression type: %T", expr))
+		unsupportedNode(expr)
 	}
 }
 
@@ -170,7 +170,9 @@ func (b *builder) assignStmt(fn *Function, lhss, rhss []ast.Expr) {
 		return
 	}
 	// TODO(matheus): Handle cases like a, b = foo()
-	panic("ir.builder.assignStmt: not implemented tuple assignments")
+	if debugIsEnable() {
+		panic("ir.builder.assignStmt: not implemented tuple assignments")
+	}
 }
 
 // assign emits to fn code to initialize the lhs with the value
@@ -185,7 +187,7 @@ func (b *builder) assign(fn *Function, lhs, rhs ast.Expr) {
 		}
 		fn.addNamedLocal(lhs, rhs)
 	default:
-		panic(fmt.Sprintf("ir.builder.assingStmt: not handled lhs assignment type: %T", lhs))
+		unsupportedNode(lhs)
 	}
 }
 
