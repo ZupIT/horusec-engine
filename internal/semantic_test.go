@@ -220,6 +220,9 @@ func rewriteExpectedFile(t *testing.T, data, file string) {
 	f, err := os.OpenFile(file, os.O_WRONLY|os.O_CREATE, fs.ModePerm)
 	require.NoError(t, err, "Expected no error to open file to rewrite: %v", err)
 
+	err = f.Truncate(0)
+	require.NoError(t, err, "Expected no error to truncate file: %v", err)
+
 	_, err = f.Seek(0, io.SeekStart)
 	require.NoError(t, err, "Expected no error to seek file to start: %v", err)
 
