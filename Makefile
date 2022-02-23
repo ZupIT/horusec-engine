@@ -30,7 +30,7 @@ format: install-format-dependencies
 install-format-dependencies:
 	$(GO) install golang.org/x/tools/cmd/goimports@latest
 	$(GO) install mvdan.cc/gofumpt@latest
-	$(GO) install github.com/daixiang0/gci@latest
+	$(GO) install github.com/daixiang0/gci@v0.2.9
 
 security:
     ifeq (, $(shell which $(HORUSEC)))
