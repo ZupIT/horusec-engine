@@ -336,7 +336,7 @@ func (f *File) Func(name string) *Function {
 			File: f,
 		}
 	default:
-		panic(fmt.Sprintf("ir.File.Func: unexpected function member %T", fn))
+		panic(fmt.Sprintf("ir.File.Func: unexpected function member %s: %T", name, fn))
 	}
 }
 
