@@ -23,7 +23,7 @@ import (
 var _ analysis.Analyzer = &Analyzer{}
 
 const (
-	// AllArguments represents that all call arguments would be analysed using
+	// AllArguments represents that all call arguments would be analyzed using
 	// the Analyzer.ArgValue analyzer
 	AllArguments = -1
 
@@ -60,6 +60,7 @@ func (a *Analyzer) Run(pass *analysis.Pass) {
 	}
 }
 
+// nolint: funlen,gocyclo // There is no needed to break this function.
 func (a *Analyzer) isVulnerableCall(call *ir.Call) bool {
 	// Fast path, if function name don't match return false directly.
 	if call.Function.Name() != a.Name {
