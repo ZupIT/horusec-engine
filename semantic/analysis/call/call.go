@@ -15,6 +15,7 @@
 package call
 
 import (
+	"github.com/ZupIT/horusec-engine/internal/ast"
 	"github.com/ZupIT/horusec-engine/internal/ir"
 	"github.com/ZupIT/horusec-engine/semantic/analysis"
 )
@@ -53,11 +54,31 @@ type Analyzer struct {
 func (a *Analyzer) Run(pass *analysis.Pass) {
 	for _, block := range pass.Function.Blocks {
 		for _, instr := range block.Instrs {
-			if call, ok := instr.(*ir.Call); ok && a.isVulnerableCall(call) {
-				pass.Report(analysis.NewIssue(pass.File.Name(), call))
+			if node, isVulnerable := a.checkInstruction(instr); isVulnerable {
+				pass.Report(analysis.NewIssue(pass.File.Name(), node))
 			}
 		}
 	}
+}
+
+// checkInstruction check if an instruction instr has a vulnerable call.
+//
+// If instruction is vulnerable, the return value will the respective ast.Node
+// and a true value informing that the instruction is vulnerable, otherwise
+// a nil ast.Node and false values are returned.
+//
+// If instruction value is a variable, checkInstruction will analyze the variable
+// value to check if is vulnerable function call.
+func (a *Analyzer) checkInstruction(instr ir.Instruction) (ast.Node, bool) {
+	switch instr := instr.(type) {
+	case *ir.Call:
+		return instr, a.isVulnerableCall(instr)
+	case *ir.Var:
+		if value, ok := instr.Value.(ir.Instruction); ok {
+			return a.checkInstruction(value)
+		}
+	}
+	return nil, false
 }
 
 // nolint: funlen,gocyclo // There is no needed to break this function.

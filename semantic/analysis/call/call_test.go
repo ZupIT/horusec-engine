@@ -107,6 +107,23 @@ func TestAnalyzerCall(t *testing.T) {
 				},
 			},
 		},
+		{
+			Name: "MatchCallFromVariableValue",
+			Src:  `function f(a, b) { const a = insecureCall() }`,
+			Analyzer: &call.Analyzer{
+				Name:      "insecureCall",
+				ArgsIndex: call.NoArguments,
+			},
+			ExpectedIssues: []analysis.Issue{
+				{
+					Filename:    "MatchCallFromVariableValue",
+					StartOffset: 29,
+					EndOffset:   43,
+					Line:        1,
+					Column:      29,
+				},
+			},
+		},
 	}
 	testutil.TestAnalayzer(t, testcases)
 }
