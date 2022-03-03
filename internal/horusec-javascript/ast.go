@@ -32,12 +32,16 @@ func ParseFile(name string, src []byte) (*ast.File, error) {
 	if err != nil {
 		return nil, err
 	}
-	p := parser{}
+	p := parser{
+		name: name,
+	}
 
 	return p.parseCST(name, root), nil
 }
 
-type parser struct{}
+type parser struct {
+	name string // Name of file being parsed.
+}
 
 // parseCST parse a tree-sitter CST to a generic AST.
 func (p *parser) parseCST(name string, root *cst.Node) *ast.File {
@@ -189,7 +193,7 @@ func (p *parser) parseVarDecl(node *cst.Node) []ast.Decl {
 	}
 
 	cst.IterNamedChilds(node, func(node *cst.Node) {
-		assertNodeType(node, VariableDeclarator)
+		p.assertNodeType(node, VariableDeclarator)
 
 		name := node.ChildByFieldName("name")
 
@@ -218,7 +222,7 @@ func (p *parser) parseVarDecl(node *cst.Node) []ast.Decl {
 			}
 		}
 
-		assertNodeType(name, Identifier)
+		p.assertNodeType(name, Identifier)
 		varDecl.Names = append(varDecl.Names, ast.NewIdent(name))
 	})
 
@@ -238,7 +242,7 @@ func (p *parser) parseStmt(node *cst.Node) ast.Stmt {
 
 		cst.IterNamedChilds(node, func(node *cst.Node) {
 			name := node.ChildByFieldName("name")
-			assertNodeType(name, Identifier)
+			p.assertNodeType(name, Identifier)
 			lhs = append(lhs, ast.NewIdent(name))
 
 			if value := node.ChildByFieldName("value"); value != nil {
@@ -475,7 +479,7 @@ func (p *parser) parseExpr(node *cst.Node) ast.Expr {
 		}
 	case NewExpression:
 		parent := node.Parent()
-		assertNodeType(parent, VariableDeclarator)
+		p.assertNodeType(parent, VariableDeclarator)
 
 		var args []ast.Expr
 		cst.IterNamedChilds(node.ChildByFieldName("arguments"), func(node *cst.Node) {
@@ -483,7 +487,7 @@ func (p *parser) parseExpr(node *cst.Node) ast.Expr {
 		})
 
 		name := parent.ChildByFieldName("name")
-		assertNodeType(name, Identifier)
+		p.assertNodeType(name, Identifier)
 
 		return &ast.ObjectExpr{
 			Name:     ast.NewIdent(name),
@@ -522,7 +526,7 @@ func (p *parser) parseExpr(node *cst.Node) ast.Expr {
 		return p.parseExpr(node.NamedChild(0))
 	case AssignmentPattern:
 		left := node.ChildByFieldName("left")
-		assertNodeType(left, Identifier)
+		p.assertNodeType(left, Identifier)
 
 		return &ast.ObjectExpr{
 			Name:     ast.NewIdent(left),
@@ -588,7 +592,7 @@ func (p *parser) parseRequireCallExpr(node *cst.Node) ast.Decl {
 	// TODO: We need to handle cases like: `const { foo, bar } = require('baz');`
 	if fn := node.ChildByFieldName("function"); fn != nil && bytes.Equal(fn.Value(), []byte("require")) {
 		decl := node.Parent()
-		assertNodeType(decl, VariableDeclarator)
+		p.assertNodeType(decl, VariableDeclarator)
 		if args := node.ChildByFieldName("arguments"); args != nil {
 			if args.NamedChildCount() > 0 {
 				return &ast.ImportDecl{
@@ -696,8 +700,11 @@ func (p *parser) parseCallExpr(node *cst.Node) *ast.CallExpr {
 	}
 }
 
-func assertNodeType(node *cst.Node, typ string) {
+func (p *parser) assertNodeType(node *cst.Node, typ string) {
 	if node.Type() != typ {
-		panic(fmt.Sprintf("Expected <%s> node, got <%s>", typ, node.Type()))
+		start := node.StartPoint()
+		panic(fmt.Sprintf(
+			"Expected <%s> node, got <%s> at %s:%d:%d", typ, node.Type(), p.name, start.Row, start.Column,
+		))
 	}
 }
