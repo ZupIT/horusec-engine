@@ -5,6 +5,7 @@ file functions.js:
   func  f3 (a, b)
   func  f4 ()
   func  f5 (path)
+  func  f6 ()
 
 
 
@@ -13,29 +14,42 @@ file functions.js:
 # Name: f1
 # File: functions.js
 # Location: functions.js:19:0
+# Locals:
+#   0:	%t0
+#   1:	%t1
+#   2:	%t2
 func f1(a, b):
 0:                                                                         entry
+	%t0 = a + b
+	%t1 = f2(%t0)
+	%t2 = %t1 * "5"
+	return %t2
+1:                                                                   unreachable
 
 # Name: f2
 # File: functions.js
 # Location: functions.js:21:11
+# Locals:
+#   0:	%t0
 func f2(a):
 0:                                                                         entry
-	return a + "10"
+	%t0 = a + "10"
+	return %t0
 1:                                                                   unreachable
 
 # Name: f3
 # File: functions.js
 # Location: functions.js:23:0
 # Locals:
-#   0:	a
-#   1:	c
-#   2:	res
+#   0:	%t2
+#   1:	a
+#   2:	c
+#   3:	res
 func f3(a, b):
 0:                                                                         entry
 	a = "20"
 	c = a + b
-	console.log(c)
+	%t2 = console.log(c)
 	res = f2(c)
 	return res
 1:                                                                   unreachable
@@ -45,19 +59,43 @@ func f3(a, b):
 # Location: functions.js:31:0
 # Locals:
 #   0:	%t0
-#   1:	result
+#   1:	%t2
+#   2:	result
 func f4():
 0:                                                                         entry
 	sum = make closure sum 
 	sub = make closure sub 
 	%t0 = sum("10", "20")
 	result = doSomething(%t0)
-	console.log("result: ${result}")
+	%t2 = console.log("result: ${result}")
 
 # Name: f5
 # File: functions.js
 # Location: functions.js:42:0
+# Locals:
+#   0:	%t0
+#   1:	%t1
 func f5(path):
 0:                                                                         entry
-	fs.readFile(path, f5$1)
+	%t0 = make closure f5$1 
+	%t1 = fs.readFile(path, %t0)
+
+# Name: f6
+# File: functions.js
+# Location: functions.js:48:0
+# Locals:
+#   0:	%t0
+#   1:	%t1
+#   2:	%t3
+#   3:	%t4
+#   4:	value
+func f6():
+0:                                                                         entry
+	%t0 = f1("10", "20")
+	%t1 = f2("30")
+	value = %t0 + %t1
+	%t3 = value * "10"
+	%t4 = %t3 / "2"
+	return %t4
+1:                                                                   unreachable
 

@@ -204,7 +204,6 @@ type Call struct {
 //
 // Example printed form:
 // a + b
-// a + b - c
 //
 // The BinOp implements Value and Instruction interfaces.
 type BinOp struct {

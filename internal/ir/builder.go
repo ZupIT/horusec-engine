@@ -73,8 +73,12 @@ func (fn *Function) newBasicBlock(comment string) *BasicBlock {
 }
 
 // emit add a new instruction on current basic block of function.
-func (fn *Function) emit(instr Instruction) {
+//
+// If the instruction defines a Value, it is returned.
+func (fn *Function) emit(instr Instruction) Value {
 	fn.currentBlock.Instrs = append(fn.currentBlock.Instrs, instr)
+	v, _ := instr.(Value)
+	return v
 }
 
 // addNamedLocal creates a local variable, adds it to function fn and return it.
@@ -125,14 +129,14 @@ func (b *builder) stmt(fn *Function, s ast.Stmt) {
 	case *ast.BlockStmt:
 		b.stmtList(fn, stmt.List)
 	case *ast.ExprStmt:
-		b.expr(fn, stmt.Expr)
+		b.expr(fn, stmt.Expr, true /*expand*/)
 	case *ast.AssignStmt:
 		b.assignStmt(fn, stmt.LHS, stmt.RHS, stmt)
 	case *ast.ReturnStmt:
 		results := make([]Value, 0, len(stmt.Results))
 
 		for _, res := range stmt.Results {
-			results = append(results, exprValue(fn, res))
+			results = append(results, b.expr(fn, res, true /*expand*/))
 		}
 
 		fn.emit(&Return{Results: results, node: node{stmt}})
@@ -144,14 +148,61 @@ func (b *builder) stmt(fn *Function, s ast.Stmt) {
 	}
 }
 
-// expr convert an expression e to a IR form.
-func (b *builder) expr(fn *Function, e ast.Expr) {
+// expr lowers a single-result expression e to IR form and return the Value defined by the expression.
+//
+// The expand parameter informs if expr should expand the expression e to a temporary variable. If
+// expand is true and the expression e lowers to an IR Value that is also an Instruction, a temporary
+// variable will be created using the Value created from e as the variable value, and the returned
+// Value will be the created temporary variable. Otherwise the IR Value created from e is returned.
+//
+// Note that Var node is an exception to the rule informed above, because it is already a variable.
+func (b *builder) expr(fn *Function, e ast.Expr, expand bool) Value {
+	var v Value
+
 	switch expr := e.(type) {
+
+	// Value's that are *not* Instruction's (Var is an exception, see the doc above)
+	case *ast.BasicLit:
+		return &Const{
+			node:  node{e},
+			Value: expr.Value,
+		}
+	case *ast.Ident:
+		return &Var{
+			node:  node{e},
+			name:  expr.Name,
+			Value: nil,
+		}
+	case *ast.TemplateExpr:
+		values := make([]Value, 0, len(expr.Subs))
+		for _, v := range expr.Subs {
+			values = append(values, b.expr(fn, v, expand))
+		}
+		return &Template{
+			node:  node{expr},
+			Value: expr.Value,
+			Subs:  values,
+		}
+
+	// Value's that are also Instruction's.
+	case *ast.FuncLit:
+		// Create an anonymous function using the parent function name
+		// and the current the total of anonymouns functions as a name.
+		v = b.funcLit(fn, fmt.Sprintf("%s$%d", fn.Name(), len(fn.AnonFuncs)+1), expr)
 	case *ast.CallExpr:
-		fn.emit(callExpr(fn, expr))
+		v = b.callExpr(fn, expr)
+	case *ast.BinaryExpr:
+		v = b.binaryExpr(fn, expr)
 	default:
 		unsupportedNode(expr)
+		return nil
 	}
+
+	if expand {
+		return fn.addLocal(v, e)
+	}
+
+	return v
 }
 
 // assignStmt emits code to fn for a parallel assignment of rhss to lhss.
@@ -177,11 +228,11 @@ func (b *builder) assign(fn *Function, lhs, rhs ast.Expr, syntax *ast.AssignStmt
 	switch lhs := lhs.(type) {
 	case *ast.Ident:
 		if closure, isFuncLit := rhs.(*ast.FuncLit); isFuncLit {
-			fn.emit(funcLit(fn, lhs.Name, closure))
+			fn.emit(b.funcLit(fn, lhs.Name, closure))
 
 			return
 		}
-		fn.addNamedLocal(lhs.Name, exprValue(fn, rhs), syntax)
+		fn.addNamedLocal(lhs.Name, b.expr(fn, rhs, false /*expand*/), syntax)
 	default:
 		unsupportedNode(lhs)
 	}
@@ -191,6 +242,103 @@ func (b *builder) assign(fn *Function, lhs, rhs ast.Expr, syntax *ast.AssignStmt
 func (b *builder) stmtList(fn *Function, list []ast.Stmt) {
 	for _, s := range list {
 		b.stmt(fn, s)
+	}
+}
+
+// funcLit crate a new Closure to a given AST based function literal.
+func (b *builder) funcLit(parent *Function, name string, syntax *ast.FuncLit) *Closure {
+	fn := &Function{
+		name:   name,
+		syntax: syntax,
+		File:   parent.File,
+		parent: parent,
+		Blocks: make([]*BasicBlock, 0),
+		Locals: make(map[string]*Var),
+	}
+	fn.Build()
+
+	parent.AnonFuncs = append(parent.AnonFuncs, fn)
+
+	return &Closure{fn}
+}
+
+// binaryExpr create a new IR BinOp from the given binary expression expr.
+//
+// The operands of binary expression is resolved recursively.
+func (b *builder) binaryExpr(parent *Function, expr *ast.BinaryExpr) *BinOp {
+	return &BinOp{
+		node:  node{expr},
+		Op:    expr.Op,
+		Left:  b.expr(parent, expr.Left, true /* expand */),
+		Right: b.expr(parent, expr.Right, true /* expand */),
+	}
+}
+
+// callExpr create new Call to a given ast.CallExpr
+//
+// If CallExpr arguments use a variable declared inside parent function
+// call arguments will point to to this declared variable.
+//
+// nolint:gocyclo // Some checks is needed here.
+func (b *builder) callExpr(parent *Function, call *ast.CallExpr) *Call {
+	args := make([]Value, 0, len(call.Args))
+
+	for _, arg := range call.Args {
+		if ident, ok := arg.(*ast.Ident); ok {
+			// If identifier used on function call is declared inside the parent function
+			// we use this declared variable as argument to function call, otherwise if
+			// just parse the expression value.
+			if local := parent.lookup(ident.Name); local != nil {
+				args = append(args, local)
+				continue
+			}
+		}
+		args = append(args, b.expr(parent, arg, true /* expand */))
+	}
+
+	fn := new(Function)
+
+	switch call := call.Fun.(type) {
+	case *ast.Ident:
+		// TODO(matheus): This will not work if function is defined inside parent.
+		if f := parent.File.Func(call.Name); f != nil {
+			fn = f
+
+			break
+		}
+		fn.name = call.Name
+	case *ast.SelectorExpr:
+		expr, ok := call.Expr.(*ast.Ident)
+		if !ok {
+			// TODO(matheus): Add support to call expressions using selector expressions.
+			// e.g: a.b.c()
+			unsupportedNode(call.Expr)
+			break
+		}
+
+		var ident string
+
+		// Expr.Name could be an alias imported name, so need to check if this
+		// identifier is imported so we use your real name. Otherwise we just
+		// use the expression identifier name.
+		if importt := parent.File.ImportedPackage(expr.Name); importt != nil {
+			ident = importt.name
+		} else {
+			ident = expr.Name
+		}
+
+		fn.name = fmt.Sprintf("%s.%s", ident, call.Sel.Name)
+	default:
+		unsupportedNode(call)
+	}
+
+	return &Call{
+		node: node{
+			syntax: call,
+		},
+		Parent:   parent,
+		Function: fn,
+		Args:     args,
 	}
 }
 
@@ -236,7 +384,7 @@ func (b *builder) buildFuncParameter(fn *Function, expr ast.Expr) *Parameter {
 			// Since default paramenter values can not have more than
 			// one value, we check if the value really exists and use
 			// to create the parameter value.
-			v = exprValue(fn, expr.Elts[0])
+			v = b.expr(fn, expr.Elts[0], false /*expand*/)
 		}
 		return &Parameter{
 			parent: fn,

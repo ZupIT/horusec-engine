@@ -16,7 +16,7 @@
 
 import fs from 'fs';
 
-function f1(a, b) {}
+function f1(a, b) { return f2(a+b) * 5 }
 
 const f2 = (a) => { return a + 10; }
 
@@ -43,4 +43,9 @@ function f5(path) {
     fs.readFile(path, (err, data) => {
         console.log(data);
     });
+}
+
+function f6() {
+    const value = f1(10, 20) + f2(30);
+    return value * 10 / 2;
 }
