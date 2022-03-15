@@ -156,11 +156,12 @@ func (b *builder) stmt(fn *Function, s ast.Stmt) {
 // Value will be the created temporary variable. Otherwise the IR Value created from e is returned.
 //
 // Note that Var node is an exception to the rule informed above, because it is already a variable.
+//
+// nolint: gocyclo // cyclomatic complexity is necessary for now.
 func (b *builder) expr(fn *Function, e ast.Expr, expand bool) Value {
 	var v Value
 
 	switch expr := e.(type) {
-
 	// Value's that are *not* Instruction's (Var is an exception, see the doc above)
 	case *ast.BasicLit:
 		return &Const{
