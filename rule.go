@@ -21,9 +21,15 @@ type Rule interface {
 
 // Metadata holds information for the rule to match a useful advisory
 type Metadata struct {
-	ID          string
-	Name        string
-	Description string
-	Severity    string
-	Confidence  string
+	ID            string
+	Name          string
+	Description   string
+	Severity      string
+	Confidence    string
+	CWEs          []string
+	CVEs          []string
+	Mitigation    string
+	Reference     string
+	SafeExample   string
+	UnsafeExample string
 }
