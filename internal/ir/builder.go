@@ -23,7 +23,7 @@ import (
 
 // Build build all function members of file f.
 //
-// TODO(matheus): Decide how to deal with top level expressions on f.expresions.
+// TODO(matheus): Decide how to deal with top level expressions on f.expressions.
 func (f *File) Build() {
 	for _, member := range f.Members {
 		if fn, ok := member.(*Function); ok {
@@ -104,7 +104,7 @@ func (fn *Function) addLocal(value Value, syntax ast.Node) Value {
 	return fn.addNamedLocal(name, value, syntax)
 }
 
-// builder controls how a function is converted from AST to a IR.
+// builder controls how a function is converted from AST to an IR.
 //
 // Its methods contain all the logic for AST-to-IR conversion.
 type builder struct{}
@@ -121,7 +121,7 @@ func (fn *Function) finishBody() {
 	fn.currentBlock = nil
 }
 
-// stmt convert a statement s to a IR form.
+// stmt convert a statement s to an IR form.
 //
 // nolint:gocyclo // Its better centralize all stmt to IR conversion on a single function.
 func (b *builder) stmt(fn *Function, s ast.Stmt) {
@@ -142,7 +142,9 @@ func (b *builder) stmt(fn *Function, s ast.Stmt) {
 		fn.emit(&Return{Results: results, node: node{stmt}})
 		fn.currentBlock = fn.newBasicBlock("unreachable")
 	case *ast.BadNode:
-		// Do nothing with bad nodes.
+	// Do nothing with bad nodes.
+	case *ast.IfStmt:
+		b.ifStmt(fn, stmt)
 	default:
 		unsupportedNode(stmt)
 	}
@@ -187,7 +189,7 @@ func (b *builder) expr(fn *Function, e ast.Expr, expand bool) Value {
 	// Value's that are also Instruction's.
 	case *ast.FuncLit:
 		// Create an anonymous function using the parent function name
-		// and the current the total of anonymouns functions as a name.
+		// and the current the total of anonymous functions as a name.
 		v = b.funcLit(fn, fmt.Sprintf("%s$%d", fn.Name(), len(fn.AnonFuncs)+1), expr)
 	case *ast.CallExpr:
 		v = b.callExpr(fn, expr)
@@ -277,7 +279,7 @@ func (b *builder) binaryExpr(parent *Function, expr *ast.BinaryExpr) *BinOp {
 // callExpr create new Call to a given ast.CallExpr
 //
 // If CallExpr arguments use a variable declared inside parent function
-// call arguments will point to to this declared variable.
+// call arguments will point to this declared variable.
 //
 // nolint:gocyclo // Some checks is needed here.
 func (b *builder) callExpr(parent *Function, call *ast.CallExpr) *Call {
@@ -381,9 +383,9 @@ func (b *builder) buildFuncParameter(fn *Function, expr ast.Expr) *Parameter {
 	case *ast.ObjectExpr:
 		var v Value
 		if len(expr.Elts) > 0 {
-			// Since default paramenter values can not have more than
+			// Since default parameter values can not have more than
 			// one value, we check if the value really exists and use
-			// to create the parameter value.
+			// it to create the parameter value.
 			v = b.expr(fn, expr.Elts[0], false /*expand*/)
 		}
 		return &Parameter{
@@ -394,5 +396,15 @@ func (b *builder) buildFuncParameter(fn *Function, expr ast.Expr) *Parameter {
 	default:
 		unsupportedNode(expr)
 		return nil
+	}
+}
+
+// ifStmt
+func (b *builder) ifStmt(fn *Function, stmt *ast.IfStmt) {
+	b.expr(fn, stmt.Cond, true)
+	b.stmt(fn, stmt.Body)
+
+	if stmt.Else != nil {
+		b.stmt(fn, stmt.Else)
 	}
 }
