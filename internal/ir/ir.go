@@ -122,8 +122,9 @@ type Signature struct {
 // The Parameter implements Value interface.
 type Parameter struct {
 	node
-	name  string // Name of parameter.
-	Value Value  // Default value of parameter or nil.
+	name     string // Name of parameter.
+	Value    Value  // Default value of parameter or nil.
+	Receiver bool   // True if parameter is a receiver of a struct method.
 
 	parent *Function // Function that the this parameter belongs.
 }
@@ -231,6 +232,21 @@ type Return struct {
 	Results []Value
 }
 
+// Struct is an IR instruction that represents a struct or a class with your
+// fields and methods.
+//
+// Example printed form:
+// type   ExampleClass
+//   method(ExampleClass) exampleMethod(self)
+//
+// The Struct implements Value and Member interfaces.
+type Struct struct {
+	node
+	name    string      // Struct name.
+	Fields  []Value     // Struct attributes.
+	Methods []*Function // Struct methods.
+}
+
 // Closure instruction yields a closure value whose code is Fn.
 //
 // Example printed form:
@@ -310,6 +326,11 @@ func (m *ExternalMember) Name() string {
 
 	return m.name
 }
+
+func (*Struct) value()           {}
+func (*Struct) member()          {}
+func (s *Struct) Name() string   { return s.name }
+func (s *Struct) String() string { return fmt.Sprintf("type %s struct", s.Name()) }
 
 // Func returns the file-level function of the specified name or nil
 // if not found.

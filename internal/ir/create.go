@@ -57,6 +57,27 @@ func NewFile(f *ast.File) *File {
 			for _, g := range valueDecl(decl) {
 				file.Members[g.Name()] = g
 			}
+		case *ast.ClassDecl:
+			s := &Struct{
+				node: node{decl},
+				name: decl.Name.Name,
+			}
+
+			for _, v := range decl.Body.List {
+				switch d := v.(type) {
+				case *ast.FuncDecl:
+					s.Methods = append(s.Methods, file.NewFunction(d))
+				case *ast.ValueDecl:
+					values := valueDecl(d)
+					for _, value := range values {
+						s.Fields = append(s.Fields, value)
+					}
+				default:
+					unsupportedNode(decl)
+				}
+			}
+
+			file.Members[s.name] = s
 		default:
 			unsupportedNode(decl)
 		}

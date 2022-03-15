@@ -82,14 +82,24 @@ func (r *Rule) Run(path string) ([]engine.Finding, error) {
 	}
 
 	for _, member := range f.Members {
-		if fn, ok := member.(*ir.Function); ok {
-			r.Analyzer.Run(&analysis.Pass{
-				File:     f,
-				Function: fn,
-				Report:   report,
-			})
+		switch m := member.(type) {
+		case *ir.Struct:
+			for _, method := range m.Methods {
+				r.run(method, report)
+			}
+		case *ir.Function:
+			r.run(m, report)
 		}
 	}
 
 	return findings, nil
+}
+
+// run starts a rule analyzer to search for issues for a specific function in a file
+func (r *Rule) run(fn *ir.Function, report func(analysis.Issue)) {
+	r.Analyzer.Run(&analysis.Pass{
+		File:     fn.File,
+		Function: fn,
+		Report:   report,
+	})
 }
