@@ -144,10 +144,8 @@ func (fn *Function) newBasicBlock(comment string) *BasicBlock {
 // emit add a new instruction on current basic block of function.
 //
 // If the instruction defines a Value, it is returned.
-func (fn *Function) emit(instr Instruction) Value {
-	fn.currentBlock.Instrs = append(fn.currentBlock.Instrs, instr)
-	v, _ := instr.(Value)
-	return v
+func (fn *Function) emit(instr Instruction) {
+	fn.currentBlock.emit(instr)
 }
 
 // addNamedLocal creates a local variable, adds it to function fn and return it.
@@ -171,6 +169,12 @@ func (fn *Function) addNamedLocal(name string, value Value, syntax ast.Node) Val
 func (fn *Function) addLocal(value Value, syntax ast.Node) Value {
 	name := fmt.Sprintf("%%t%d", len(fn.Locals))
 	return fn.addNamedLocal(name, value, syntax)
+}
+
+// emit appends an instruction to the current basic block.
+// If the instruction defines a Value, it is returned.
+func (b *BasicBlock) emit(i Instruction) {
+	b.Instrs = append(b.Instrs, i)
 }
 
 // builder controls how a function is converted from AST to a IR.
@@ -210,6 +214,38 @@ func (b *builder) stmt(fn *Function, s ast.Stmt) {
 
 		fn.emit(&Return{Results: results, node: node{stmt}})
 		fn.currentBlock = fn.newBasicBlock("unreachable")
+	case *ast.IfStmt:
+		// Create if them and done blocks.
+		then := fn.newBasicBlock("if.then")
+		done := fn.newBasicBlock("if.done")
+
+		// If the if statement don't have an else branch, use the done block as else.
+		// Otherwise create new if else block.
+		els := done
+		if stmt.Else != nil {
+			els = fn.newBasicBlock("if.else")
+		}
+
+		// Emit if condition to function.
+		b.cond(fn, stmt.Cond, then, els)
+
+		// Set current block to if then block and them process the if body.
+		fn.currentBlock = then
+		b.stmt(fn, stmt.Body)
+
+		// Emit a jump to done block.
+		emitJump(fn, done)
+
+		// If the if statement has a else branch, set the current block to else branch,
+		// process the else branch statement and them emit a jump to done block.
+		if stmt.Else != nil {
+			fn.currentBlock = els
+			b.stmt(fn, stmt.Else)
+			emitJump(fn, done)
+		}
+
+		fn.currentBlock = done
+
 	case *ast.BadNode:
 		// Do nothing with bad nodes.
 	default:
@@ -330,6 +366,12 @@ func (b *builder) selectorExpr(fn *Function, expr ast.Expr) Value {
 		name:  name,
 		Value: nil,
 	}
+}
+
+// cond emits to fn code to evaluate boolean condition e and jump
+// to t(true) or f(false) depending on its value.
+func (b *builder) cond(fn *Function, e ast.Expr, t, f *BasicBlock) {
+	emitIf(fn, b.expr(fn, e, true /*expand */), t, f)
 }
 
 // assignStmt emits code to fn for a parallel assignment of rhss to lhss.
@@ -563,4 +605,31 @@ func (b *builder) buildFuncParameter(fn *Function, expr ast.Expr) *Parameter {
 		unsupportedNode(expr)
 		return nil
 	}
+}
+
+// addEdge adds a control-flow graph edge from f to t.
+func addEdge(f, t *BasicBlock) {
+	f.Succs = append(f.Succs, t)
+	t.Preds = append(t.Preds, f)
+}
+
+// emitJump emits to fn a jump to target, and updates the control-flow graph.
+func emitJump(fn *Function, target *BasicBlock) {
+	b := fn.currentBlock
+	b.emit(&Jump{b})
+	addEdge(b, target)
+	fn.currentBlock = nil
+}
+
+// emitIf emits to fn a conditional jump to tblock or fblock based on
+// cond, and updates the control-flow graph.
+func emitIf(fn *Function, cond Value, tblock, fblock *BasicBlock) {
+	b := fn.currentBlock
+	b.emit(&If{
+		Cond:  cond,
+		block: b,
+	})
+	addEdge(b, tblock)
+	addEdge(b, fblock)
+	fn.currentBlock = nil
 }
