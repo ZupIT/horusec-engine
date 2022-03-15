@@ -300,7 +300,7 @@ func (p *parser) parseStmt(node *cst.Node) ast.Stmt {
 		}
 
 		return stmt
-	case ElseClause, StatementBlock:
+	case ElseClause:
 		// Here we just need to get the first named child that is a statement.
 		if child := node.NamedChild(0); child != nil {
 			// We can have an else branch without body.
@@ -308,6 +308,16 @@ func (p *parser) parseStmt(node *cst.Node) ast.Stmt {
 		}
 
 		return nil
+	case StatementBlock:
+		block := &ast.BlockStmt{
+			Position: ast.NewPosition(node),
+			List:     make([]ast.Stmt, 0, node.NamedChildCount()),
+		}
+		cst.IterNamedChilds(node, func(node *cst.Node) {
+			block.List = append(block.List, p.parseStmt(node))
+		})
+
+		return block
 	case TryStatement:
 		stmt := &ast.TryStmt{
 			Position: ast.NewPosition(node),

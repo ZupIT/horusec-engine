@@ -14,6 +14,19 @@
  * limitations under the License.
  */
 
+function IfStatement(a, b) {
+    if (a >= 10) {
+        a = b * 2
+    } else if(a <= 5) {
+        a = b + a;
+    } else {
+        a = a + b
+        const c = a * 10;
+        console.log(c);
+    }
+    return a;
+}
+
 function TryStatement() {
     try {
         const value = 'test'
