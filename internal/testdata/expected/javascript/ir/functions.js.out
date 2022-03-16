@@ -1,11 +1,14 @@
 file functions.js:
   import  fs
+  var   a 
   func  f1 (a, b)
   func  f2 (a)
   func  f3 (a, b)
   func  f4 ()
   func  f5 (path)
   func  f6 ()
+  func  f7 (b)
+  func  f8 (a)
 
 
 
@@ -98,4 +101,34 @@ func f6():
 	%t4 = %t3 / "2"
 	return %t4
 1:                                                                   unreachable
+
+# Name: f7
+# File: functions.js
+# Location: functions.js:55:0
+# Locals:
+#   0:	c
+#   1:	d
+#   2:	e
+#   3:	f
+#   4:	g
+#   5:	h
+func f7(b):
+0:                                                                         entry
+	c = "y"
+	d = "y"
+	e = "y"
+	f = "x"
+	g = "x"
+	h = b
+
+# Name: f8
+# File: functions.js
+# Location: functions.js:64:0
+# Locals:
+#   0:	b
+#   1:	c
+func f8(a):
+0:                                                                         entry
+	b = a
+	c = a
 

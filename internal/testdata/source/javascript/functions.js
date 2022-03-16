@@ -49,3 +49,19 @@ function f6() {
     const value = f1(10, 20) + f2(30);
     return value * 10 / 2;
 }
+
+const a = "x"
+
+function f7(b) {
+	const c = "y"
+	const d = c
+	const e = d
+	const f = a
+	const g = f
+	const h = b
+}
+
+function f8(a) {
+	const b = a
+	const c = b
+}

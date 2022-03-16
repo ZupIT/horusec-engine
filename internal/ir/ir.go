@@ -281,10 +281,17 @@ func (*Global) member()          {}
 func (g *Global) Name() string   { return g.name }
 func (g *Global) String() string { return g.Name() }
 
-func (*Var) value()           {}
-func (*Var) instr()           {}
-func (v *Var) Name() string   { return v.name }
-func (v *Var) String() string { return v.Value.String() }
+func (*Var) value()         {}
+func (*Var) instr()         {}
+func (v *Var) Name() string { return v.name }
+func (v *Var) String() string {
+	// since we can return a nil for unsupported nodes this is necessary.
+	if v.Value == nil {
+		return "nil"
+	}
+
+	return v.Value.String()
+}
 
 func (*Parameter) value()           {}
 func (p *Parameter) Name() string   { return p.name }

@@ -252,15 +252,73 @@ func (b *builder) assignStmt(fn *Function, lhss, rhss []ast.Expr, syntax *ast.As
 func (b *builder) assign(fn *Function, lhs, rhs ast.Expr, syntax *ast.AssignStmt) {
 	switch lhs := lhs.(type) {
 	case *ast.Ident:
-		if closure, isFuncLit := rhs.(*ast.FuncLit); isFuncLit {
-			fn.emit(b.funcLit(fn, lhs.Name, closure))
-
-			return
-		}
-		fn.addNamedLocal(lhs.Name, b.expr(fn, rhs, false /*expand*/), syntax)
+		b.assignValue(fn, lhs, rhs, syntax)
 	default:
 		unsupportedNode(lhs)
 	}
+}
+
+// assignValue create a new Value according to the Value yielded from rhs expression.
+//
+// If the rhs expression is a *ast.FuncLit a new Closure Instruction will be created and emitted
+// to fn. If the rhs expression is an identifier, the identifier value will be resolved to set
+// the identifier value as the value of lhs identifier. Otherwise, a new named local variable
+// will be created using the Value created from rhs expression.
+func (b *builder) assignValue(fn *Function, lhs *ast.Ident, rhs ast.Expr, syntax *ast.AssignStmt) {
+	switch rhs := rhs.(type) {
+	case *ast.FuncLit:
+		fn.emit(b.funcLit(fn, lhs.Name, rhs))
+	case *ast.Ident:
+		b.identAssign(fn, lhs, rhs, syntax)
+	default:
+		fn.addNamedLocal(lhs.Name, b.expr(fn, rhs, false /*expand*/), syntax)
+	}
+}
+
+// identAssign responsible for handling rhs values that are identifiers. The values of these identifiers can be local
+// variables of a function, global variables or parameters of the function. Values within the function's context are
+// always prioritized over external values. Below is an example of code and IR for each of the scenarios listed.
+//
+// source code:
+//
+// const a = "x"
+//
+// function f1(b) {
+//   const c = "x"
+//   const d = c
+//   const e = b
+//   const f = a
+// }
+//
+// IR representation:
+//
+// c = "y"
+// d = "y"
+// e = b
+// f = "x"
+//
+func (b *builder) identAssign(fn *Function, lhs, rhs *ast.Ident, syntax *ast.AssignStmt) {
+	if local := fn.lookup(rhs.Name); local != nil {
+		fn.addNamedLocal(lhs.Name, local.Value, syntax)
+
+		return
+	}
+
+	for _, param := range fn.Signature.Params {
+		if rhs.Name == param.name {
+			fn.addNamedLocal(lhs.Name, param, syntax)
+
+			return
+		}
+	}
+
+	if global, ok := fn.File.Members[rhs.Name].(*Global); ok {
+		fn.addNamedLocal(lhs.Name, b.expr(fn, global.Value, false /*expand*/), syntax)
+
+		return
+	}
+
+	fn.addNamedLocal(lhs.Name, nil, syntax)
 }
 
 // stmtList emits to fn code for all statements in list.
