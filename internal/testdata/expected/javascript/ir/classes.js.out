@@ -1,0 +1,9 @@
+file classes.js:
+  type   C1
+  type   C2
+    method(C2) constructor(self, a, b)
+
+
+
+============================
+

@@ -108,6 +108,11 @@ func WriteFile(buf *bytes.Buffer, f *File) {
 			fmt.Fprintf(buf, "  func  %-*s %s\n", maxname, name, mem.Signature)
 		case *Global:
 			fmt.Fprintf(buf, "  var   %-*s\n", maxname, name)
+		case *Struct:
+			fmt.Fprintf(buf, "  type   %-*s\n", maxname, name)
+			for _, method := range mem.Methods {
+				fmt.Fprintf(buf, "    method(%s) %s%s\n", mem.name, method.name, method.Signature)
+			}
 		default:
 			panic(fmt.Sprintf("ir.WriteFile: unhandled member type: %T", mem))
 		}

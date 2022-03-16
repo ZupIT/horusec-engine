@@ -26,9 +26,33 @@ import (
 // TODO(matheus): Decide how to deal with top level expressions on f.expresions.
 func (f *File) Build() {
 	for _, member := range f.Members {
-		if fn, ok := member.(*Function); ok {
-			fn.Build()
+		switch m := member.(type) {
+		case *Function:
+			m.Build()
+		case *Struct:
+			m.Build()
 		}
+	}
+}
+
+// Build builds all function members of a struct s.
+//
+// For every method of a struct a receiver parameter is added. This parameter
+// is named self and added as the first index of method.Signature.Params slice
+func (s *Struct) Build() {
+	for _, method := range s.Methods {
+		method.Build()
+
+		// Since this parameter don't exist in source code, the syntax for this parameter is nil.
+		p := &Parameter{
+			node:     node{nil},
+			name:     "self", // TODO: this name should be normalized
+			Value:    s,
+			Receiver: true,
+			parent:   method,
+		}
+
+		method.Signature.Params = append([]*Parameter{p}, method.Signature.Params...)
 	}
 }
 
