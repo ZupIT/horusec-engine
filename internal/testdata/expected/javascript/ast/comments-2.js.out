@@ -1,0 +1,7 @@
+     0  *ast.File {
+     1  .  Position: ast.Position {}
+     2  .  Name: *ast.Ident {
+     3  .  .  Name: "comments-2.js"
+     4  .  .  Position: ast.Position {}
+     5  .  }
+     6  }

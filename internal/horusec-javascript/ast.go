@@ -52,9 +52,20 @@ func (p *parser) parseCST(name string, root *cst.Node) *ast.File {
 		},
 	}
 
+	if p.isNosecFile(root) {
+		return file
+	}
+
+	ignoreNextNode := false
+
 	// Here we just traverse the top level child nodes and let
 	// the underlying parsing methods travese the sub nodes.
 	cst.IterNamedChilds(root, func(node *cst.Node) {
+		if ignoreNextNode {
+			ignoreNextNode = false
+			return
+		}
+
 		switch node.Type() {
 		// Top-level declarations
 		case VariableDeclaration, LexicalDeclaration:
@@ -72,13 +83,23 @@ func (p *parser) parseCST(name string, root *cst.Node) *ast.File {
 			file.Exprs = append(file.Exprs, p.parseExpr(node))
 
 		case Comment:
-			// TODO(matheus): Handle comments.
+			ignoreNextNode = ast.IsNosec(node.Value())
 		default:
 			file.BadNodes = append(file.BadNodes, ast.NewUnsupportedNode(node))
 		}
 	})
 
 	return file
+}
+
+// isNosecFile return true is the entire source file should be ignored.
+func (p *parser) isNosecFile(root *cst.Node) bool {
+	return root.NamedChildCount() > 0 && p.isNosec(root.NamedChild(0))
+}
+
+// isNosec return true is the given node is a comment with nosec directive.
+func (p *parser) isNosec(node *cst.Node) bool {
+	return node.Type() == Comment && ast.IsNosec(node.Value())
 }
 
 func (p *parser) parseClassDecl(node *cst.Node) ast.Decl {
@@ -99,7 +120,13 @@ func (p *parser) parseClassBody(body *cst.Node) *ast.BodyDecl {
 		Position: ast.NewPosition(body),
 	}
 
+	ignoreNextNode := false
 	cst.IterNamedChilds(body, func(node *cst.Node) {
+		if ignoreNextNode {
+			ignoreNextNode = false
+			return
+		}
+
 		switch node.Type() {
 		case PublicFieldDefinition:
 			valueDecl := ast.ValueDecl{
@@ -112,6 +139,8 @@ func (p *parser) parseClassBody(body *cst.Node) *ast.BodyDecl {
 			bodyDecl.List = append(bodyDecl.List, &valueDecl)
 		case MethodDefinition:
 			bodyDecl.List = append(bodyDecl.List, p.parseFuncDecl(node))
+		case Comment:
+			ignoreNextNode = ast.IsNosec(node.Value())
 		default:
 			panic(fmt.Sprintf("unexpected class_definition child node: %s", node.Type()))
 		}
@@ -145,7 +174,18 @@ func (p *parser) parseArrowFunc(ident *ast.Ident, node *cst.Node) ast.Decl {
 func (p *parser) parseFuncBody(node *cst.Node) *ast.BlockStmt {
 	stmts := make([]ast.Stmt, 0, node.NamedChildCount())
 
+	ignoreNextNode := false
 	cst.IterNamedChilds(node, func(node *cst.Node) {
+		if ignoreNextNode {
+			ignoreNextNode = false
+			return
+		}
+
+		if p.isNosec(node) {
+			ignoreNextNode = true
+			return
+		}
+
 		stmts = append(stmts, p.parseStmt(node))
 	})
 
@@ -443,6 +483,8 @@ func (p *parser) parseStmt(node *cst.Node) ast.Stmt {
 		// Since export statements will not be very useful information in our ast for now,
 		// we will ignore this statement.
 		return nil
+	case Comment:
+		return ast.NewComment(node)
 	default:
 		return ast.NewUnsupportedNode(node)
 	}
@@ -586,6 +628,8 @@ func (p *parser) parseExpr(node *cst.Node) ast.Expr {
 		return &ast.IncExpr{
 			Arg: ast.NewIdent(node.ChildByFieldName("argument")),
 		}
+	case Comment:
+		return ast.NewComment(node)
 	default:
 		return ast.NewUnsupportedNode(node)
 	}
