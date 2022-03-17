@@ -1,0 +1,108 @@
+     0  *ast.File {
+     1  .  Position: ast.Position {}
+     2  .  Name: *ast.Ident {
+     3  .  .  Name: "comments.js"
+     4  .  .  Position: ast.Position {}
+     5  .  }
+     6  .  Decls: []ast.Decl (len = 2) {
+     7  .  .  0: *ast.FuncDecl {
+     8  .  .  .  Position: ast.Position {}
+     9  .  .  .  Name: *ast.Ident {
+    10  .  .  .  .  Name: "f3"
+    11  .  .  .  .  Position: ast.Position {}
+    12  .  .  .  }
+    13  .  .  .  Type: *ast.FuncType {
+    14  .  .  .  .  Position: ast.Position {}
+    15  .  .  .  .  Params: *ast.FieldList {
+    16  .  .  .  .  .  Position: ast.Position {}
+    17  .  .  .  .  }
+    18  .  .  .  }
+    19  .  .  .  Body: *ast.BlockStmt {
+    20  .  .  .  .  Position: ast.Position {}
+    21  .  .  .  .  List: []ast.Stmt (len = 2) {
+    22  .  .  .  .  .  0: *ast.ExprStmt {
+    23  .  .  .  .  .  .  Position: ast.Position {}
+    24  .  .  .  .  .  .  Expr: *ast.CallExpr {
+    25  .  .  .  .  .  .  .  Position: ast.Position {}
+    26  .  .  .  .  .  .  .  Fun: *ast.SelectorExpr {
+    27  .  .  .  .  .  .  .  .  Position: ast.Position {}
+    28  .  .  .  .  .  .  .  .  Expr: *ast.Ident {
+    29  .  .  .  .  .  .  .  .  .  Name: "console"
+    30  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+    31  .  .  .  .  .  .  .  .  }
+    32  .  .  .  .  .  .  .  .  Sel: *ast.Ident {
+    33  .  .  .  .  .  .  .  .  .  Name: "log"
+    34  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+    35  .  .  .  .  .  .  .  .  }
+    36  .  .  .  .  .  .  .  }
+    37  .  .  .  .  .  .  .  Args: []ast.Expr (len = 1) {
+    38  .  .  .  .  .  .  .  .  0: *ast.BasicLit {
+    39  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+    40  .  .  .  .  .  .  .  .  .  Kind: "string"
+    41  .  .  .  .  .  .  .  .  .  Value: "f3-2"
+    42  .  .  .  .  .  .  .  .  }
+    43  .  .  .  .  .  .  .  }
+    44  .  .  .  .  .  .  }
+    45  .  .  .  .  .  }
+    46  .  .  .  .  .  1: *ast.ExprStmt {
+    47  .  .  .  .  .  .  Position: ast.Position {}
+    48  .  .  .  .  .  .  Expr: *ast.CallExpr {
+    49  .  .  .  .  .  .  .  Position: ast.Position {}
+    50  .  .  .  .  .  .  .  Fun: *ast.SelectorExpr {
+    51  .  .  .  .  .  .  .  .  Position: ast.Position {}
+    52  .  .  .  .  .  .  .  .  Expr: *ast.Ident {
+    53  .  .  .  .  .  .  .  .  .  Name: "console"
+    54  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+    55  .  .  .  .  .  .  .  .  }
+    56  .  .  .  .  .  .  .  .  Sel: *ast.Ident {
+    57  .  .  .  .  .  .  .  .  .  Name: "log"
+    58  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+    59  .  .  .  .  .  .  .  .  }
+    60  .  .  .  .  .  .  .  }
+    61  .  .  .  .  .  .  .  Args: []ast.Expr (len = 2) {
+    62  .  .  .  .  .  .  .  .  0: *ast.BasicLit {
+    63  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+    64  .  .  .  .  .  .  .  .  .  Kind: "string"
+    65  .  .  .  .  .  .  .  .  .  Value: "f3-3"
+    66  .  .  .  .  .  .  .  .  }
+    67  .  .  .  .  .  .  .  .  1: *ast.Comment {
+    68  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+    69  .  .  .  .  .  .  .  .  .  Text: `/* #nosec */`
+    70  .  .  .  .  .  .  .  .  }
+    71  .  .  .  .  .  .  .  }
+    72  .  .  .  .  .  .  }
+    73  .  .  .  .  .  }
+    74  .  .  .  .  }
+    75  .  .  .  }
+    76  .  .  }
+    77  .  .  1: *ast.ClassDecl {
+    78  .  .  .  Position: ast.Position {}
+    79  .  .  .  Name: *ast.Ident {
+    80  .  .  .  .  Name: "Foo"
+    81  .  .  .  .  Position: ast.Position {}
+    82  .  .  .  }
+    83  .  .  .  Body: *ast.BodyDecl {
+    84  .  .  .  .  Position: ast.Position {}
+    85  .  .  .  .  List: []ast.Decl (len = 1) {
+    86  .  .  .  .  .  0: *ast.FuncDecl {
+    87  .  .  .  .  .  .  Position: ast.Position {}
+    88  .  .  .  .  .  .  Name: *ast.Ident {
+    89  .  .  .  .  .  .  .  Name: "bar"
+    90  .  .  .  .  .  .  .  Position: ast.Position {}
+    91  .  .  .  .  .  .  }
+    92  .  .  .  .  .  .  Type: *ast.FuncType {
+    93  .  .  .  .  .  .  .  Position: ast.Position {}
+    94  .  .  .  .  .  .  .  Params: *ast.FieldList {
+    95  .  .  .  .  .  .  .  .  Position: ast.Position {}
+    96  .  .  .  .  .  .  .  }
+    97  .  .  .  .  .  .  }
+    98  .  .  .  .  .  .  Body: *ast.BlockStmt {
+    99  .  .  .  .  .  .  .  Position: ast.Position {}
+   100  .  .  .  .  .  .  .  List: []ast.Stmt (len = 0) {}
+   101  .  .  .  .  .  .  }
+   102  .  .  .  .  .  }
+   103  .  .  .  .  }
+   104  .  .  .  }
+   105  .  .  }
+   106  .  }
+   107  }

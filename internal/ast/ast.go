@@ -15,10 +15,14 @@
 package ast
 
 import (
+	"bytes"
 	"fmt"
 
 	"github.com/ZupIT/horusec-engine/internal/cst"
 )
+
+// nosec is the directive to ignore a block of code.
+var nosec = []byte("#nosec")
 
 // Pos represents a start or end position of a node on source code.
 type Pos struct {
@@ -105,6 +109,14 @@ type Stmt interface {
 type BadNode struct {
 	Position
 	Comment string // Optional comment for debugging.
+}
+
+// Comment node represents a single //-style or /*-style comment.
+//
+// Comment implements Expr and Stmt.
+type Comment struct {
+	Position
+	Text []byte // Block of comment with // or /*.
 }
 
 // ----------------------------------------------------------------------------
@@ -217,6 +229,7 @@ func (*FuncLit) expr()      {}
 func (*TemplateExpr) expr() {}
 func (*IncExpr) expr()      {}
 func (*BadNode) expr()      {}
+func (*Comment) expr()      {}
 
 // ----------------------------------------------------------------------------
 // Statements
@@ -352,6 +365,7 @@ func (*ContinueStatement) stmt() {}
 func (*LabeledStatement) stmt()  {}
 func (*ForInStatement) stmt()    {}
 func (*BadNode) stmt()           {}
+func (*Comment) stmt()           {}
 
 // ----------------------------------------------------------------------------
 // Declarations
@@ -425,4 +439,17 @@ func NewIdent(node *cst.Node) *Ident {
 		Name:     string(cst.SanitizeNodeValue(node.Value())),
 		Position: NewPosition(node),
 	}
+}
+
+// NewComment create a new Comment node to the given tree-sitter node.
+func NewComment(node *cst.Node) *Comment {
+	return &Comment{
+		Position: NewPosition(node),
+		Text:     node.Value(),
+	}
+}
+
+// IsNosec return true if the given slice of bytes contains nosec directive.
+func IsNosec(s []byte) bool {
+	return bytes.Contains(s, nosec)
 }
