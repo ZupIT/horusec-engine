@@ -111,14 +111,6 @@ type BadNode struct {
 	Comment string // Optional comment for debugging.
 }
 
-// Comment node represents a single //-style or /*-style comment.
-//
-// Comment implements Expr and Stmt.
-type Comment struct {
-	Position
-	Text []byte // Block of comment with // or /*.
-}
-
 // ----------------------------------------------------------------------------
 // Expressions
 //
@@ -229,7 +221,6 @@ func (*FuncLit) expr()      {}
 func (*TemplateExpr) expr() {}
 func (*IncExpr) expr()      {}
 func (*BadNode) expr()      {}
-func (*Comment) expr()      {}
 
 // ----------------------------------------------------------------------------
 // Statements
@@ -365,7 +356,6 @@ func (*ContinueStatement) stmt() {}
 func (*LabeledStatement) stmt()  {}
 func (*ForInStatement) stmt()    {}
 func (*BadNode) stmt()           {}
-func (*Comment) stmt()           {}
 
 // ----------------------------------------------------------------------------
 // Declarations
@@ -438,14 +428,6 @@ func NewIdent(node *cst.Node) *Ident {
 	return &Ident{
 		Name:     string(cst.SanitizeNodeValue(node.Value())),
 		Position: NewPosition(node),
-	}
-}
-
-// NewComment create a new Comment node to the given tree-sitter node.
-func NewComment(node *cst.Node) *Comment {
-	return &Comment{
-		Position: NewPosition(node),
-		Text:     node.Value(),
 	}
 }
 

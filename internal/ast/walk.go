@@ -50,7 +50,7 @@ func Walk(v Visitor, node Node) {
 	// of the corresponding node types in ast.go)
 	switch n := node.(type) {
 	// Expressions
-	case *Ident, *BasicLit, *BadNode, *Comment:
+	case *Ident, *BasicLit, *BadNode:
 		// Nothing to do.
 	case *Field:
 		if n.Name != nil {

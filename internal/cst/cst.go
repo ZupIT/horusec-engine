@@ -210,10 +210,26 @@ func SanitizeNodeValue(b []byte) []byte {
 	return b
 }
 
-// IterNamedChilds iterate over named childs from node
-// calling fn using each named child node from iteration.
+// IterNamedChilds iterate over named childs from node calling fn using each named
+// child node from iteration.
 func IterNamedChilds(node *Node, fn func(node *Node)) {
+	iterNamedChilds(node, "", fn)
+}
+
+// IterNamedChilds iterate over named childs from node calling fn using each named
+// child node from iteration ignoring nodes that have a type from ignore.
+func IterNamedChildsIgnoringNode(node *Node, ignore string, fn func(node *Node)) {
+	iterNamedChilds(node, ignore, fn)
+}
+
+// iterNamedChilds iterate over named childs from node calling fn using each named
+// child node from iteration.
+func iterNamedChilds(node *Node, ignore string, fn func(node *Node)) {
 	for idx := 0; idx < node.NamedChildCount(); idx++ {
-		fn(node.NamedChild(idx))
+		n := node.NamedChild(idx)
+		if ignore != "" && n.Type() == ignore {
+			continue
+		}
+		fn(n)
 	}
 }
