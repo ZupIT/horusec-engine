@@ -71,6 +71,7 @@ type File struct {
 
 	expressions []ast.Expr                 // Top level file expressions.
 	imported    map[string]*ExternalMember // All importable packages, keyed by import path.
+	syntax      ast.Node                   // AST representation of a file, contains all syntax nodes of the file
 }
 
 // ExternalMember represents a member that is declared outside the file that is being used.

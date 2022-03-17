@@ -4,27 +4,215 @@
      3  .  .  Name: "expressions.js"
      4  .  .  Position: ast.Position {}
      5  .  }
-     6  .  Exprs: []ast.Expr (len = 1) {
-     7  .  .  0: *ast.CallExpr {
+     6  .  Decls: []ast.Decl (len = 2) {
+     7  .  .  0: *ast.ImportDecl {
      8  .  .  .  Position: ast.Position {}
-     9  .  .  .  Fun: *ast.SelectorExpr {
-    10  .  .  .  .  Position: ast.Position {}
-    11  .  .  .  .  Expr: *ast.Ident {
-    12  .  .  .  .  .  Name: "console"
-    13  .  .  .  .  .  Position: ast.Position {}
-    14  .  .  .  .  }
-    15  .  .  .  .  Sel: *ast.Ident {
-    16  .  .  .  .  .  Name: "log"
-    17  .  .  .  .  .  Position: ast.Position {}
-    18  .  .  .  .  }
-    19  .  .  .  }
-    20  .  .  .  Args: []ast.Expr (len = 1) {
-    21  .  .  .  .  0: *ast.BasicLit {
-    22  .  .  .  .  .  Position: ast.Position {}
-    23  .  .  .  .  .  Kind: "string"
-    24  .  .  .  .  .  Value: "testing"
-    25  .  .  .  .  }
-    26  .  .  .  }
-    27  .  .  }
-    28  .  }
-    29  }
+     9  .  .  .  Name: *ast.Ident {
+    10  .  .  .  .  Name: "express"
+    11  .  .  .  .  Position: ast.Position {}
+    12  .  .  .  }
+    13  .  .  .  Path: *ast.Ident {
+    14  .  .  .  .  Name: "express"
+    15  .  .  .  .  Position: ast.Position {}
+    16  .  .  .  }
+    17  .  .  }
+    18  .  .  1: *ast.ValueDecl {
+    19  .  .  .  Position: ast.Position {}
+    20  .  .  .  Names: []*ast.Ident (len = 1) {
+    21  .  .  .  .  0: *ast.Ident {
+    22  .  .  .  .  .  Name: "app"
+    23  .  .  .  .  .  Position: ast.Position {}
+    24  .  .  .  .  }
+    25  .  .  .  }
+    26  .  .  .  Values: []ast.Expr (len = 1) {
+    27  .  .  .  .  0: *ast.CallExpr {
+    28  .  .  .  .  .  Position: ast.Position {}
+    29  .  .  .  .  .  Fun: *ast.Ident {
+    30  .  .  .  .  .  .  Name: "express"
+    31  .  .  .  .  .  .  Position: ast.Position {}
+    32  .  .  .  .  .  }
+    33  .  .  .  .  .  Args: []ast.Expr (len = 0) {}
+    34  .  .  .  .  }
+    35  .  .  .  }
+    36  .  .  }
+    37  .  }
+    38  .  Exprs: []ast.Expr (len = 3) {
+    39  .  .  0: *ast.CallExpr {
+    40  .  .  .  Position: ast.Position {}
+    41  .  .  .  Fun: *ast.SelectorExpr {
+    42  .  .  .  .  Position: ast.Position {}
+    43  .  .  .  .  Expr: *ast.Ident {
+    44  .  .  .  .  .  Name: "console"
+    45  .  .  .  .  .  Position: ast.Position {}
+    46  .  .  .  .  }
+    47  .  .  .  .  Sel: *ast.Ident {
+    48  .  .  .  .  .  Name: "log"
+    49  .  .  .  .  .  Position: ast.Position {}
+    50  .  .  .  .  }
+    51  .  .  .  }
+    52  .  .  .  Args: []ast.Expr (len = 1) {
+    53  .  .  .  .  0: *ast.BasicLit {
+    54  .  .  .  .  .  Position: ast.Position {}
+    55  .  .  .  .  .  Kind: "string"
+    56  .  .  .  .  .  Value: "testing"
+    57  .  .  .  .  }
+    58  .  .  .  }
+    59  .  .  }
+    60  .  .  1: *ast.CallExpr {
+    61  .  .  .  Position: ast.Position {}
+    62  .  .  .  Fun: *ast.SelectorExpr {
+    63  .  .  .  .  Position: ast.Position {}
+    64  .  .  .  .  Expr: *ast.Ident {
+    65  .  .  .  .  .  Name: "app"
+    66  .  .  .  .  .  Position: ast.Position {}
+    67  .  .  .  .  }
+    68  .  .  .  .  Sel: *ast.Ident {
+    69  .  .  .  .  .  Name: "get"
+    70  .  .  .  .  .  Position: ast.Position {}
+    71  .  .  .  .  }
+    72  .  .  .  }
+    73  .  .  .  Args: []ast.Expr (len = 2) {
+    74  .  .  .  .  0: *ast.BasicLit {
+    75  .  .  .  .  .  Position: ast.Position {}
+    76  .  .  .  .  .  Kind: "string"
+    77  .  .  .  .  .  Value: "/"
+    78  .  .  .  .  }
+    79  .  .  .  .  1: *ast.FuncLit {
+    80  .  .  .  .  .  Position: ast.Position {}
+    81  .  .  .  .  .  Type: *ast.FuncType {
+    82  .  .  .  .  .  .  Position: ast.Position {}
+    83  .  .  .  .  .  .  Params: *ast.FieldList {
+    84  .  .  .  .  .  .  .  Position: ast.Position {}
+    85  .  .  .  .  .  .  .  List: []*ast.Field (len = 2) {
+    86  .  .  .  .  .  .  .  .  0: *ast.Field {
+    87  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+    88  .  .  .  .  .  .  .  .  .  Name: *ast.Ident {
+    89  .  .  .  .  .  .  .  .  .  .  Name: "req"
+    90  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+    91  .  .  .  .  .  .  .  .  .  }
+    92  .  .  .  .  .  .  .  .  }
+    93  .  .  .  .  .  .  .  .  1: *ast.Field {
+    94  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+    95  .  .  .  .  .  .  .  .  .  Name: *ast.Ident {
+    96  .  .  .  .  .  .  .  .  .  .  Name: "res"
+    97  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+    98  .  .  .  .  .  .  .  .  .  }
+    99  .  .  .  .  .  .  .  .  }
+   100  .  .  .  .  .  .  .  }
+   101  .  .  .  .  .  .  }
+   102  .  .  .  .  .  }
+   103  .  .  .  .  .  Body: *ast.BlockStmt {
+   104  .  .  .  .  .  .  Position: ast.Position {}
+   105  .  .  .  .  .  .  List: []ast.Stmt (len = 1) {
+   106  .  .  .  .  .  .  .  0: *ast.ExprStmt {
+   107  .  .  .  .  .  .  .  .  Position: ast.Position {}
+   108  .  .  .  .  .  .  .  .  Expr: *ast.CallExpr {
+   109  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+   110  .  .  .  .  .  .  .  .  .  Fun: *ast.SelectorExpr {
+   111  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+   112  .  .  .  .  .  .  .  .  .  .  Expr: *ast.Ident {
+   113  .  .  .  .  .  .  .  .  .  .  .  Name: "console"
+   114  .  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+   115  .  .  .  .  .  .  .  .  .  .  }
+   116  .  .  .  .  .  .  .  .  .  .  Sel: *ast.Ident {
+   117  .  .  .  .  .  .  .  .  .  .  .  Name: "log"
+   118  .  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+   119  .  .  .  .  .  .  .  .  .  .  }
+   120  .  .  .  .  .  .  .  .  .  }
+   121  .  .  .  .  .  .  .  .  .  Args: []ast.Expr (len = 2) {
+   122  .  .  .  .  .  .  .  .  .  .  0: *ast.Ident {
+   123  .  .  .  .  .  .  .  .  .  .  .  Name: "req"
+   124  .  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+   125  .  .  .  .  .  .  .  .  .  .  }
+   126  .  .  .  .  .  .  .  .  .  .  1: *ast.Ident {
+   127  .  .  .  .  .  .  .  .  .  .  .  Name: "res"
+   128  .  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+   129  .  .  .  .  .  .  .  .  .  .  }
+   130  .  .  .  .  .  .  .  .  .  }
+   131  .  .  .  .  .  .  .  .  }
+   132  .  .  .  .  .  .  .  }
+   133  .  .  .  .  .  .  }
+   134  .  .  .  .  .  }
+   135  .  .  .  .  }
+   136  .  .  .  }
+   137  .  .  }
+   138  .  .  2: *ast.CallExpr {
+   139  .  .  .  Position: ast.Position {}
+   140  .  .  .  Fun: *ast.SelectorExpr {
+   141  .  .  .  .  Position: ast.Position {}
+   142  .  .  .  .  Expr: *ast.Ident {
+   143  .  .  .  .  .  Name: "app"
+   144  .  .  .  .  .  Position: ast.Position {}
+   145  .  .  .  .  }
+   146  .  .  .  .  Sel: *ast.Ident {
+   147  .  .  .  .  .  Name: "set"
+   148  .  .  .  .  .  Position: ast.Position {}
+   149  .  .  .  .  }
+   150  .  .  .  }
+   151  .  .  .  Args: []ast.Expr (len = 2) {
+   152  .  .  .  .  0: *ast.BasicLit {
+   153  .  .  .  .  .  Position: ast.Position {}
+   154  .  .  .  .  .  Kind: "string"
+   155  .  .  .  .  .  Value: "/"
+   156  .  .  .  .  }
+   157  .  .  .  .  1: *ast.FuncLit {
+   158  .  .  .  .  .  Position: ast.Position {}
+   159  .  .  .  .  .  Type: *ast.FuncType {
+   160  .  .  .  .  .  .  Position: ast.Position {}
+   161  .  .  .  .  .  .  Params: *ast.FieldList {
+   162  .  .  .  .  .  .  .  Position: ast.Position {}
+   163  .  .  .  .  .  .  .  List: []*ast.Field (len = 2) {
+   164  .  .  .  .  .  .  .  .  0: *ast.Field {
+   165  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+   166  .  .  .  .  .  .  .  .  .  Name: *ast.Ident {
+   167  .  .  .  .  .  .  .  .  .  .  Name: "req"
+   168  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+   169  .  .  .  .  .  .  .  .  .  }
+   170  .  .  .  .  .  .  .  .  }
+   171  .  .  .  .  .  .  .  .  1: *ast.Field {
+   172  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+   173  .  .  .  .  .  .  .  .  .  Name: *ast.Ident {
+   174  .  .  .  .  .  .  .  .  .  .  Name: "res"
+   175  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+   176  .  .  .  .  .  .  .  .  .  }
+   177  .  .  .  .  .  .  .  .  }
+   178  .  .  .  .  .  .  .  }
+   179  .  .  .  .  .  .  }
+   180  .  .  .  .  .  }
+   181  .  .  .  .  .  Body: *ast.BlockStmt {
+   182  .  .  .  .  .  .  Position: ast.Position {}
+   183  .  .  .  .  .  .  List: []ast.Stmt (len = 1) {
+   184  .  .  .  .  .  .  .  0: *ast.ExprStmt {
+   185  .  .  .  .  .  .  .  .  Position: ast.Position {}
+   186  .  .  .  .  .  .  .  .  Expr: *ast.CallExpr {
+   187  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+   188  .  .  .  .  .  .  .  .  .  Fun: *ast.SelectorExpr {
+   189  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+   190  .  .  .  .  .  .  .  .  .  .  Expr: *ast.Ident {
+   191  .  .  .  .  .  .  .  .  .  .  .  Name: "console"
+   192  .  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+   193  .  .  .  .  .  .  .  .  .  .  }
+   194  .  .  .  .  .  .  .  .  .  .  Sel: *ast.Ident {
+   195  .  .  .  .  .  .  .  .  .  .  .  Name: "log"
+   196  .  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+   197  .  .  .  .  .  .  .  .  .  .  }
+   198  .  .  .  .  .  .  .  .  .  }
+   199  .  .  .  .  .  .  .  .  .  Args: []ast.Expr (len = 2) {
+   200  .  .  .  .  .  .  .  .  .  .  0: *ast.Ident {
+   201  .  .  .  .  .  .  .  .  .  .  .  Name: "req"
+   202  .  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+   203  .  .  .  .  .  .  .  .  .  .  }
+   204  .  .  .  .  .  .  .  .  .  .  1: *ast.Ident {
+   205  .  .  .  .  .  .  .  .  .  .  .  Name: "res"
+   206  .  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+   207  .  .  .  .  .  .  .  .  .  .  }
+   208  .  .  .  .  .  .  .  .  .  }
+   209  .  .  .  .  .  .  .  .  }
+   210  .  .  .  .  .  .  .  }
+   211  .  .  .  .  .  .  }
+   212  .  .  .  .  .  }
+   213  .  .  .  .  }
+   214  .  .  .  }
+   215  .  .  }
+   216  .  }
+   217  }

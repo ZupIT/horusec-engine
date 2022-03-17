@@ -35,12 +35,13 @@ func NewFile(f *ast.File) *File {
 		imported:    make(map[string]*ExternalMember),
 		name:        f.Name.Name,
 		expressions: f.Exprs,
+		syntax:      f,
 	}
 
 	for _, decl := range f.Decls {
 		switch decl := decl.(type) {
 		case *ast.FuncDecl:
-			fn := file.NewFunction(decl)
+			fn := file.NewFunction(decl.Name.Name, decl)
 			if _, exists := file.Members[fn.Name()]; exists {
 				panic(fmt.Sprintf("ir.NewFile: already existed function member: %s", fn.Name()))
 			}
@@ -66,7 +67,7 @@ func NewFile(f *ast.File) *File {
 			for _, v := range decl.Body.List {
 				switch d := v.(type) {
 				case *ast.FuncDecl:
-					s.Methods = append(s.Methods, file.NewFunction(d))
+					s.Methods = append(s.Methods, file.NewFunction(d.Name.Name, d))
 				case *ast.ValueDecl:
 					values := valueDecl(d)
 					for _, value := range values {
@@ -90,14 +91,15 @@ func NewFile(f *ast.File) *File {
 //
 // The real work of building the IR form for a function is not done
 // until a call to Function.Build().
-func (f *File) NewFunction(decl *ast.FuncDecl) *Function {
+func (f *File) NewFunction(name string, syntax ast.Node) *Function {
 	fn := &Function{
-		name:      decl.Name.Name,
-		syntax:    decl,
+		name:      name,
+		syntax:    syntax,
 		File:      f,
 		Blocks:    make([]*BasicBlock, 0),
 		Locals:    make(map[string]*Var),
 		AnonFuncs: make([]*Function, 0),
+		Signature: new(Signature),
 		parent:    nil,
 	}
 
