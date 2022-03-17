@@ -65,3 +65,14 @@ function f8(a) {
 	const b = a
 	const c = b
 }
+
+function f9(a) {
+    a.b().c(10)
+    a.b.c()
+
+    const a = a.b(10).c.d(20)
+
+    const b = a.b.c.d.e
+
+    a.b = c()
+}
