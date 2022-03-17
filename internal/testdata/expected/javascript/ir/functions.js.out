@@ -19,10 +19,6 @@ file functions.js:
 # Name: f1
 # File: functions.js
 # Location: functions.js:19:0
-# Locals:
-#   0:	%t0
-#   1:	%t1
-#   2:	%t2
 func f1(a, b):
 0:                                                                         entry
 	%t0 = a + b
@@ -35,22 +31,18 @@ func f1(a, b):
 # File: functions.js
 # Location: functions.js:80:0
 # Locals:
-#   0:	%t1
-#   1:	%t3
-#   2:	x
-#   3:	y
+#   0:	x
+#   1:	y
 func f10():
 0:                                                                         entry
-	x = Math.random()
-	%t1 = console.log(x)
-	y = "z"
-	%t3 = console.log(y)
+	%t0 = Math.random()
+	%t1 = console.log(%t0)
+	%t2 = "z"
+	%t3 = console.log(%t2)
 
 # Name: f2
 # File: functions.js
 # Location: functions.js:21:11
-# Locals:
-#   0:	%t0
 func f2(a):
 0:                                                                         entry
 	%t0 = a + "10"
@@ -61,40 +53,34 @@ func f2(a):
 # File: functions.js
 # Location: functions.js:23:0
 # Locals:
-#   0:	%t2
-#   1:	a
-#   2:	c
-#   3:	res
+#   0:	a
+#   1:	c
+#   2:	res
 func f3(a, b):
 0:                                                                         entry
-	a = "20"
-	c = a + b
-	%t2 = console.log(c)
-	res = f2(c)
-	return res
+	%t0 = "20"
+	%t1 = %t0 + b
+	%t2 = console.log(%t1)
+	%t3 = f2(%t1)
+	return %t3
 1:                                                                   unreachable
 
 # Name: f4
 # File: functions.js
 # Location: functions.js:31:0
 # Locals:
-#   0:	%t0
-#   1:	%t2
-#   2:	result
+#   0:	result
 func f4():
 0:                                                                         entry
 	sum = make closure sum 
 	sub = make closure sub 
 	%t0 = sum("10", "20")
-	result = doSomething(%t0)
+	%t1 = doSomething(%t0)
 	%t2 = console.log("result: ${result}")
 
 # Name: f5
 # File: functions.js
 # Location: functions.js:42:0
-# Locals:
-#   0:	%t0
-#   1:	%t1
 func f5(path):
 0:                                                                         entry
 	%t0 = make closure f5$1 
@@ -104,17 +90,13 @@ func f5(path):
 # File: functions.js
 # Location: functions.js:48:0
 # Locals:
-#   0:	%t0
-#   1:	%t1
-#   2:	%t3
-#   3:	%t4
-#   4:	value
+#   0:	value
 func f6():
 0:                                                                         entry
 	%t0 = f1("10", "20")
 	%t1 = f2("30")
-	value = %t0 + %t1
-	%t3 = value * "10"
+	%t2 = %t0 + %t1
+	%t3 = %t2 * "10"
 	%t4 = %t3 / "2"
 	return %t4
 1:                                                                   unreachable
@@ -131,12 +113,12 @@ func f6():
 #   5:	h
 func f7(b):
 0:                                                                         entry
-	c = "y"
-	d = "y"
-	e = "y"
-	f = "x"
-	g = "x"
-	h = b
+	%t0 = "y"
+	%t1 = "y"
+	%t2 = "y"
+	%t3 = "x"
+	%t4 = "x"
+	%t5 = b
 
 # Name: f8
 # File: functions.js
@@ -146,27 +128,23 @@ func f7(b):
 #   1:	c
 func f8(a):
 0:                                                                         entry
-	b = a
-	c = a
+	%t0 = a
+	%t1 = a
 
 # Name: f9
 # File: functions.js
 # Location: functions.js:69:0
 # Locals:
-#   0:	%t0
-#   1:	%t1
-#   2:	%t2
-#   3:	%t3
-#   4:	a
-#   5:	a.b
-#   6:	b
+#   0:	a
+#   1:	a.b
+#   2:	b
 func f9(a):
 0:                                                                         entry
 	%t0 = a.b()
 	%t1 = %t0.c("10")
 	%t2 = a.b.c()
 	%t3 = a.b("10")
-	a = %t3.c.d("20")
-	b = nil
-	a.b = c()
+	%t4 = %t3.c.d("20")
+	%t5 = nil
+	%t6 = c()
 

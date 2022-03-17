@@ -97,9 +97,11 @@ func (f *File) NewFunction(name string, syntax ast.Node) *Function {
 		syntax:    syntax,
 		File:      f,
 		Blocks:    make([]*BasicBlock, 0),
-		Locals:    make(map[string]*Var),
+		Locals:    make([]*Var, 0),
 		AnonFuncs: make([]*Function, 0),
 		Signature: new(Signature),
+		phis:      make(map[string]*Phi),
+		nLocals:   0,
 		parent:    nil,
 	}
 

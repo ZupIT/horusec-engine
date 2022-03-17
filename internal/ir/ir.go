@@ -92,22 +92,25 @@ type BasicBlock struct {
 	Instrs  []Instruction // Instructions in order.
 	Preds   []*BasicBlock // Predecessors blocks.
 	Succs   []*BasicBlock // Successors blocks.
+
+	locals map[string]*Var // Local variables declared on this block.
 }
 
 // Function represents a function or method with the parameters and signature.
 //
-// The Global implements Member interface.
+// The Function implements Member interface.
 type Function struct {
-	name      string          // Function name.
-	File      *File           // File that this function belongs.
-	Signature *Signature      // Function signature.
-	Locals    map[string]*Var // Local variables of this function.
-	Blocks    []*BasicBlock   // Basic blocks of the function; nil => external function.
-	AnonFuncs []*Function     // Anonymous functions directly beneath this one.
+	name      string        // Function name.
+	File      *File         // File that this function belongs.
+	Signature *Signature    // Function signature.
+	Blocks    []*BasicBlock // Basic blocks of the function; nil => external function.
+	AnonFuncs []*Function   // Anonymous functions directly beneath this one.
+	Locals    []*Var        // Local variables declared on this function.
 
-	parent *Function // enclosing function if anonymous; nil if global.
-
-	syntax ast.Node // AST node that represents the Function.
+	parent  *Function       // enclosing function if anonymous; nil if global.
+	syntax  ast.Node        // AST node that represents the Function.
+	nLocals int             // Number of local variables declared on this function.
+	phis    map[string]*Phi // Phi values already computed to variable names.
 
 	// The following fields are set transiently during building,
 	// then cleared.
@@ -162,8 +165,11 @@ type Global struct {
 // The Var implements Value and Instruction interfaces.
 type Var struct {
 	node
-	name  string // Name of variable.
+	Label string // Name of variable on source code.
 	Value Value  // Value of variable
+
+	name  string      // Name of variable.
+	block *BasicBlock // Basic block where this variable was defined.
 }
 
 // Template represents a template string.
@@ -176,6 +182,18 @@ type Template struct {
 	node
 	Value string  // Template string.
 	Subs  []Value // Substitution values.
+}
+
+// Phi instruction represents an SSA φ-node, which combines values
+// that differ across incoming control-flow edges and yields a new
+// value.  Within a block, all φ-nodes must appear before all non-φ
+// nodes.
+//
+// Example printed form:
+// 	t2 = phi [0: t0, 1: t1]
+type Phi struct {
+	Comment string // Optional label; no semantic significance.
+	Edges   []*Var // Variables that differ across control-flow edges.
 }
 
 // Call instruction represents a function or method call.
@@ -355,6 +373,10 @@ func (*If) instr() {}
 
 func (*Jump) instr() {}
 
+func (*Phi) instr()       {}
+func (*Phi) value()       {}
+func (*Phi) Name() string { return "" }
+
 func (*Function) member()         {}
 func (fn *Function) Name() string { return fn.name }
 
@@ -408,7 +430,61 @@ func (f *File) ImportedPackage(name string) *ExternalMember {
 	return f.imported[name]
 }
 
-// lookup return the declared variable with the given name.
-func (fn *Function) lookup(name string) *Var {
-	return fn.Locals[name]
+// lookup return the declared variable in function with the given name.
+//
+// If variable is not declared on the current block of fn, lookup will
+// recursively search on predecessors blocks of fn.currentBlock and will
+// return a φ(phi)-node with the possible values to the given variable name.
+//
+// If fn.currentBlock has a single predecessor we just search on this block
+// and return the variable if exists.
+//
+// nolint:funlen // The function is simple enought to not split
+func (fn *Function) lookup(name string) Value {
+	// Check if variable exists in the current basic block,
+	// if exists we return a pointer to this variable.
+	if v, exists := fn.currentBlock.locals[name]; exists {
+		return v
+	}
+
+	// Check if the phi value was already computed, if yes, just returned it.
+	if phi, exists := fn.phis[name]; exists {
+		return phi
+	}
+
+	edges := make([]*Var, 0)
+
+	// Try to compute the phi values recursively in all basic block predecessors and cache it.
+	fn.recursivelyLoopkup(name, fn.currentBlock, &edges)
+
+	if len(edges) == 0 {
+		// We don't find any variable at any block with the given name, so return nil.
+		return nil
+	} else if len(edges) == 1 {
+		// This meaans that the the code has just one variable declaration with the given
+		// name, so we don't need create a phi value for this case, just return the declared
+		// variable.
+		return edges[0]
+	}
+
+	phi := &Phi{
+		Comment: name,
+		Edges:   edges,
+	}
+
+	fn.phis[name] = phi
+
+	return fn.addLocal(phi, nil)
+}
+
+// recursivelyLoopkup recursively search for a variable with the given name on predecessors
+// blocks of the given basic block and return all founded variables.
+func (fn *Function) recursivelyLoopkup(name string, block *BasicBlock, values *[]*Var) {
+	for _, block := range block.Preds {
+		if v, exists := block.locals[name]; exists {
+			*values = append(*values, v)
+			continue
+		}
+		fn.recursivelyLoopkup(name, block, values)
+	}
 }
