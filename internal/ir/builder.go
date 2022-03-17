@@ -21,9 +21,7 @@ import (
 	"github.com/ZupIT/horusec-engine/internal/ast"
 )
 
-// Build build all function members of file f.
-//
-// TODO(matheus): Decide how to deal with top level expressions on f.expresions.
+// Build builds all function members of file f.
 func (f *File) Build() {
 	for _, member := range f.Members {
 		switch m := member.(type) {
@@ -33,6 +31,53 @@ func (f *File) Build() {
 			m.Build()
 		}
 	}
+
+	if len(f.expressions) > 0 {
+		f.buildExpressions()
+	}
+}
+
+// buildExpressions creates a new function with all expressions parsed in it
+//
+// To build the expressions a temporary function will be created, to keep the same name pattern with the temporary
+// variables the name will be in the same pattern (%fn0). As we are creating a function without a function AST.Node,
+// it is not possible to use the function.Build function as usual, so we just create the entry basic block and finish
+// the body at the end. To parse the expressions we will call the build.expr function for each expression in the file,
+// as it is a function pointer it is not necessary to use the return value of builder.expr. Finally, we just added the
+// function containing all the parsed expressions in the members of the file. This function should only be executed if
+// the current file contains expressions, or an unnecessary temporary func will be created.
+//
+// Following is an example of code and the IR generated
+//
+// const express = require('express')
+//
+// Source Code:
+//
+// const app = express()
+//
+// app.get('/', (req, res) => {
+//     console.log(req, res)
+// });
+//
+// IR:
+//
+// func %fn2():
+// 0:                                        entry
+//       %t0 = make closure %fn2$1
+//       %t1 = app.get("/", %t0)
+//       %t2 = console.log("test")
+func (f *File) buildExpressions() {
+	var b builder
+
+	fn := f.NewFunction(fmt.Sprintf("%%fn%d", len(f.Members)), f.syntax)
+	fn.currentBlock = fn.newBasicBlock("entry")
+
+	for _, expr := range f.expressions {
+		b.expr(fn, expr, true)
+	}
+
+	fn.finishBody()
+	f.Members[fn.name] = fn
 }
 
 // Build builds all function members of a struct s.
