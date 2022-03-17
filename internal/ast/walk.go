@@ -14,7 +14,9 @@
 
 package ast
 
-import "fmt"
+import (
+	"fmt"
+)
 
 // A Visitor's Visit method is invoked for each node encountered by Walk.
 // If the result visitor w is not nil, Walk visits each of the children
@@ -48,7 +50,7 @@ func Walk(v Visitor, node Node) {
 	// of the corresponding node types in ast.go)
 	switch n := node.(type) {
 	// Expressions
-	case *Ident, *BasicLit:
+	case *Ident, *BasicLit, *BadNode:
 		// Nothing to do.
 	case *Field:
 		if n.Name != nil {
@@ -131,6 +133,13 @@ func Walk(v Visitor, node Node) {
 
 		if n.Finalizer != nil {
 			Walk(v, n.Finalizer)
+		}
+	case *CatchClause:
+		if n.Parameter != nil {
+			Walk(v, n.Parameter)
+		}
+		if n.Body != nil {
+			Walk(v, n.Body)
 		}
 	case *SwitchStatement:
 		if n.Value != nil {
