@@ -21,6 +21,9 @@ import (
 	"sort"
 )
 
+// invalidBasicBlock represents an invalid basic block number to jump.
+const invalidBasicBlock = -1
+
 func (f *File) String() string {
 	return "file " + f.name
 }
@@ -67,6 +70,25 @@ func (r *Return) String() string {
 	}
 
 	return buf.String()
+}
+
+func (s *If) String() string {
+	// Be robust against malformed CFG.
+	tblock, fblock := invalidBasicBlock, invalidBasicBlock
+	if s.block != nil && len(s.block.Succs) == 2 {
+		tblock = s.block.Succs[0].Index
+		fblock = s.block.Succs[1].Index
+	}
+	return fmt.Sprintf("if %s goto %d else %d", s.Cond.Name(), tblock, fblock)
+}
+
+func (s *Jump) String() string {
+	// Be robust against malformed CFG.
+	block := invalidBasicBlock
+	if s.block != nil && len(s.block.Succs) == 1 {
+		block = s.block.Succs[0].Index
+	}
+	return fmt.Sprintf("jump %d", block)
 }
 
 // WriteTo writes to w a human-readable summary of file.

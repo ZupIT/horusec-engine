@@ -90,6 +90,8 @@ type BasicBlock struct {
 	Index   int           // Index of this block on Function that this block belongs.
 	Comment string        // Optional label; no semantic significance
 	Instrs  []Instruction // Instructions in order.
+	Preds   []*BasicBlock // Predecessors blocks.
+	Succs   []*BasicBlock // Successors blocks.
 }
 
 // Function represents a function or method with the parameters and signature.
@@ -262,6 +264,35 @@ type Closure struct {
 	Fn *Function // Closure function.
 }
 
+// If instruction transfers control to one of the two successors of
+// its owning block, depending on the boolean Cond: the first if true,
+// the second if false.
+//
+// An If instruction must be the last instruction of its containing
+// BasicBlock.
+//
+// Example printed form (Consider 1 as if.them block and 3 as if.done block)
+// 	if a > b goto 1 else 3
+//
+// The If implements Instruction interface.
+type If struct {
+	block *BasicBlock
+	Cond  Value
+}
+
+// Jump instruction transfers control to the sole successor of its
+// owning block.
+//
+// A Jump must be the last instruction of its containing BasicBlock.
+//
+// Example printed form (Consider 5 as a if.done block):
+// 	jump 5
+//
+// The Jump implements Instruction interface.
+type Jump struct {
+	block *BasicBlock
+}
+
 // node is a mix-in embedded by all IR nodes to provide source code information.
 //
 // Since node is embedded by all IR nodes (Value's and Instruction's), these nodes
@@ -319,6 +350,10 @@ func (*Closure) instr()           {}
 func (*Closure) value()           {}
 func (c *Closure) Name() string   { return c.Fn.Name() }
 func (c *Closure) String() string { return fmt.Sprintf("make closure %s ", c.Name()) }
+
+func (*If) instr() {}
+
+func (*Jump) instr() {}
 
 func (*Function) member()         {}
 func (fn *Function) Name() string { return fn.name }
