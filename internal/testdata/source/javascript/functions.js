@@ -76,3 +76,10 @@ function f9(a) {
 
     a.b = c()
 }
+
+function f10(){
+	var x = Math.random()
+	console.log(x)
+	var y = "z"
+	console.log(y)
+}

@@ -276,7 +276,7 @@ func (p *parser) parseVarDecl(node *cst.Node) []ast.Decl {
 
 func (p *parser) parseStmt(node *cst.Node) ast.Stmt {
 	switch node.Type() {
-	case LexicalDeclaration:
+	case LexicalDeclaration, VariableDeclaration:
 		lhs := make([]ast.Expr, 0, node.NamedChildCount())
 		rhs := make([]ast.Expr, 0, node.NamedChildCount())
 
