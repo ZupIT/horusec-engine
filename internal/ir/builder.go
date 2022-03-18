@@ -253,6 +253,21 @@ func (b *builder) expr(fn *Function, e ast.Expr, expand bool) Value {
 			Value: expr.Value,
 			Subs:  values,
 		}
+	case *ast.SelectorExpr:
+		// TODO(matheus): If the variable value is an ast.SelectorExpr a new variable is
+		// create, but when printing this variable, their value will nil, because here we
+		// are creating a variable without a value. Maybe we should create a new IR Value
+		// that represents values that are references to other variables.
+		//
+		// E.g:
+		// const a = b.c.d
+		//
+		// IR:
+		// a = nil
+		//
+		// Expected IR:
+		// a = b.c.d
+		return b.selectorExpr(fn, expr)
 
 	// Value's that are also Instruction's.
 	case *ast.FuncLit:
@@ -273,6 +288,48 @@ func (b *builder) expr(fn *Function, e ast.Expr, expand bool) Value {
 	}
 
 	return v
+}
+
+// selectorExpr return the Value of a selector expression.
+//
+// The value returned will be a selector expression entire resolve. If the selector
+// expression contains call expressions, these expressions will be separated and temp
+// variables will be created to store these call expressions and these local variables
+// will be used on the resolve selector expression string.
+//
+// Example:
+// Source: a.b.c()
+// Return: Var{name: a.b.c()}
+// Source: a.b().c.d()
+// Return: Var{name: %t0.c.d()} // Where %t0 store the a.b() call expression.
+//
+// The expr value is expected to be an *ast.SelectorExpr. Since the selector expression
+// can contains other selector expressions, its necessary to expected an ast.Expr to
+// resolve recursivily *ast.SelectorExpr.
+func (b *builder) selectorExpr(fn *Function, expr ast.Expr) Value {
+	var name string
+
+	switch e := expr.(type) {
+	case *ast.Ident:
+		// e.Name could be an alias imported name, so we need to check if this
+		// identifier is imported so we use your real name. Otherwise we just
+		// use the expression identifier name.
+		if importt := fn.File.ImportedPackage(e.Name); importt != nil {
+			name = importt.Path
+		} else {
+			name = e.Name
+		}
+	case *ast.SelectorExpr:
+		name = fmt.Sprintf("%s.%s", b.selectorExpr(fn, e.Expr).Name(), e.Sel.Name)
+	default:
+		return b.expr(fn, e, true /*expand */)
+	}
+
+	return &Var{
+		node:  node{expr},
+		name:  name,
+		Value: nil,
+	}
 }
 
 // assignStmt emits code to fn for a parallel assignment of rhss to lhss.
@@ -298,6 +355,8 @@ func (b *builder) assign(fn *Function, lhs, rhs ast.Expr, syntax *ast.AssignStmt
 	switch lhs := lhs.(type) {
 	case *ast.Ident:
 		b.assignValue(fn, lhs, rhs, syntax)
+	case *ast.SelectorExpr:
+		fn.addNamedLocal(b.selectorExpr(fn, lhs).Name(), b.expr(fn, rhs, false /*expand*/), syntax)
 	default:
 		unsupportedNode(lhs)
 	}
@@ -436,26 +495,7 @@ func (b *builder) callExpr(parent *Function, call *ast.CallExpr) *Call {
 		}
 		fn.name = call.Name
 	case *ast.SelectorExpr:
-		expr, ok := call.Expr.(*ast.Ident)
-		if !ok {
-			// TODO(matheus): Add support to call expressions using selector expressions.
-			// e.g: a.b.c()
-			unsupportedNode(call.Expr)
-			break
-		}
-
-		var ident string
-
-		// Expr.Name could be an alias imported name, so need to check if this
-		// identifier is imported so we use your real name. Otherwise we just
-		// use the expression identifier name.
-		if importt := parent.File.ImportedPackage(expr.Name); importt != nil {
-			ident = importt.name
-		} else {
-			ident = expr.Name
-		}
-
-		fn.name = fmt.Sprintf("%s.%s", ident, call.Sel.Name)
+		fn.name = b.selectorExpr(parent, call).Name()
 	default:
 		unsupportedNode(call)
 	}
