@@ -1,15 +1,16 @@
 file functions.js:
-  import  fs
-  var   a 
-  func  f1 (a, b)
-  func  f2 (a)
-  func  f3 (a, b)
-  func  f4 ()
-  func  f5 (path)
-  func  f6 ()
-  func  f7 (b)
-  func  f8 (a)
-  func  f9 (a)
+  import  fs 
+  var   a  
+  func  f1  (a, b)
+  func  f10 ()
+  func  f2  (a)
+  func  f3  (a, b)
+  func  f4  ()
+  func  f5  (path)
+  func  f6  ()
+  func  f7  (b)
+  func  f8  (a)
+  func  f9  (a)
 
 
 
@@ -29,6 +30,21 @@ func f1(a, b):
 	%t2 = %t1 * "5"
 	return %t2
 1:                                                                   unreachable
+
+# Name: f10
+# File: functions.js
+# Location: functions.js:80:0
+# Locals:
+#   0:	%t1
+#   1:	%t3
+#   2:	x
+#   3:	y
+func f10():
+0:                                                                         entry
+	x = Math.random()
+	%t1 = console.log(x)
+	y = "z"
+	%t3 = console.log(y)
 
 # Name: f2
 # File: functions.js
