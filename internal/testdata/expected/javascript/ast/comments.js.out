@@ -59,50 +59,46 @@
     58  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
     59  .  .  .  .  .  .  .  .  }
     60  .  .  .  .  .  .  .  }
-    61  .  .  .  .  .  .  .  Args: []ast.Expr (len = 2) {
+    61  .  .  .  .  .  .  .  Args: []ast.Expr (len = 1) {
     62  .  .  .  .  .  .  .  .  0: *ast.BasicLit {
     63  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
     64  .  .  .  .  .  .  .  .  .  Kind: "string"
     65  .  .  .  .  .  .  .  .  .  Value: "f3-3"
     66  .  .  .  .  .  .  .  .  }
-    67  .  .  .  .  .  .  .  .  1: *ast.Comment {
-    68  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
-    69  .  .  .  .  .  .  .  .  .  Text: `/* #nosec */`
-    70  .  .  .  .  .  .  .  .  }
-    71  .  .  .  .  .  .  .  }
-    72  .  .  .  .  .  .  }
-    73  .  .  .  .  .  }
-    74  .  .  .  .  }
-    75  .  .  .  }
-    76  .  .  }
-    77  .  .  1: *ast.ClassDecl {
-    78  .  .  .  Position: ast.Position {}
-    79  .  .  .  Name: *ast.Ident {
-    80  .  .  .  .  Name: "Foo"
-    81  .  .  .  .  Position: ast.Position {}
-    82  .  .  .  }
-    83  .  .  .  Body: *ast.BodyDecl {
-    84  .  .  .  .  Position: ast.Position {}
-    85  .  .  .  .  List: []ast.Decl (len = 1) {
-    86  .  .  .  .  .  0: *ast.FuncDecl {
-    87  .  .  .  .  .  .  Position: ast.Position {}
-    88  .  .  .  .  .  .  Name: *ast.Ident {
-    89  .  .  .  .  .  .  .  Name: "bar"
-    90  .  .  .  .  .  .  .  Position: ast.Position {}
-    91  .  .  .  .  .  .  }
-    92  .  .  .  .  .  .  Type: *ast.FuncType {
-    93  .  .  .  .  .  .  .  Position: ast.Position {}
-    94  .  .  .  .  .  .  .  Params: *ast.FieldList {
-    95  .  .  .  .  .  .  .  .  Position: ast.Position {}
-    96  .  .  .  .  .  .  .  }
+    67  .  .  .  .  .  .  .  }
+    68  .  .  .  .  .  .  }
+    69  .  .  .  .  .  }
+    70  .  .  .  .  }
+    71  .  .  .  }
+    72  .  .  }
+    73  .  .  1: *ast.ClassDecl {
+    74  .  .  .  Position: ast.Position {}
+    75  .  .  .  Name: *ast.Ident {
+    76  .  .  .  .  Name: "Foo"
+    77  .  .  .  .  Position: ast.Position {}
+    78  .  .  .  }
+    79  .  .  .  Body: *ast.BodyDecl {
+    80  .  .  .  .  Position: ast.Position {}
+    81  .  .  .  .  List: []ast.Decl (len = 1) {
+    82  .  .  .  .  .  0: *ast.FuncDecl {
+    83  .  .  .  .  .  .  Position: ast.Position {}
+    84  .  .  .  .  .  .  Name: *ast.Ident {
+    85  .  .  .  .  .  .  .  Name: "bar"
+    86  .  .  .  .  .  .  .  Position: ast.Position {}
+    87  .  .  .  .  .  .  }
+    88  .  .  .  .  .  .  Type: *ast.FuncType {
+    89  .  .  .  .  .  .  .  Position: ast.Position {}
+    90  .  .  .  .  .  .  .  Params: *ast.FieldList {
+    91  .  .  .  .  .  .  .  .  Position: ast.Position {}
+    92  .  .  .  .  .  .  .  }
+    93  .  .  .  .  .  .  }
+    94  .  .  .  .  .  .  Body: *ast.BlockStmt {
+    95  .  .  .  .  .  .  .  Position: ast.Position {}
+    96  .  .  .  .  .  .  .  List: []ast.Stmt (len = 0) {}
     97  .  .  .  .  .  .  }
-    98  .  .  .  .  .  .  Body: *ast.BlockStmt {
-    99  .  .  .  .  .  .  .  Position: ast.Position {}
-   100  .  .  .  .  .  .  .  List: []ast.Stmt (len = 0) {}
-   101  .  .  .  .  .  .  }
-   102  .  .  .  .  .  }
-   103  .  .  .  .  }
-   104  .  .  .  }
-   105  .  .  }
-   106  .  }
-   107  }
+    98  .  .  .  .  .  }
+    99  .  .  .  .  }
+   100  .  .  .  }
+   101  .  .  }
+   102  .  }
+   103  }

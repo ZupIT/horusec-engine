@@ -1,0 +1,20 @@
+file comments.js:
+  type   Foo
+    method(Foo) bar(self)
+  func  f3  ()
+
+
+
+============================
+
+# Name: f3
+# File: comments.js
+# Location: comments.js:29:0
+# Locals:
+#   0:	%t0
+#   1:	%t1
+func f3():
+0:                                                                         entry
+	%t0 = console.log("f3-2")
+	%t1 = console.log("f3-3")
+

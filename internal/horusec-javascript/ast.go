@@ -197,7 +197,7 @@ func (p *parser) parseFuncBody(node *cst.Node) *ast.BlockStmt {
 func (p *parser) parseParameters(node *cst.Node) *ast.FieldList {
 	var parameters []*ast.Field
 
-	cst.IterNamedChilds(node, func(node *cst.Node) {
+	p.iterNamedChilds(node, func(node *cst.Node) {
 		parameters = append(parameters, &ast.Field{
 			Name:     p.parseExpr(node),
 			Position: ast.NewPosition(node),
@@ -232,7 +232,7 @@ func (p *parser) parseVarDecl(node *cst.Node) []ast.Decl {
 		Position: ast.NewPosition(node),
 	}
 
-	cst.IterNamedChilds(node, func(node *cst.Node) {
+	p.iterNamedChilds(node, func(node *cst.Node) {
 		p.assertNodeType(node, VariableDeclarator)
 
 		name := node.ChildByFieldName("name")
@@ -280,7 +280,7 @@ func (p *parser) parseStmt(node *cst.Node) ast.Stmt {
 		lhs := make([]ast.Expr, 0, node.NamedChildCount())
 		rhs := make([]ast.Expr, 0, node.NamedChildCount())
 
-		cst.IterNamedChilds(node, func(node *cst.Node) {
+		p.iterNamedChilds(node, func(node *cst.Node) {
 			name := node.ChildByFieldName("name")
 			p.assertNodeType(name, Identifier)
 			lhs = append(lhs, ast.NewIdent(name))
@@ -353,7 +353,7 @@ func (p *parser) parseStmt(node *cst.Node) ast.Stmt {
 			Position: ast.NewPosition(node),
 			List:     make([]ast.Stmt, 0, node.NamedChildCount()),
 		}
-		cst.IterNamedChilds(node, func(node *cst.Node) {
+		p.iterNamedChilds(node, func(node *cst.Node) {
 			block.List = append(block.List, p.parseStmt(node))
 		})
 
@@ -419,7 +419,7 @@ func (p *parser) parseStmt(node *cst.Node) ast.Stmt {
 
 		body := make([]ast.Stmt, 0, node.NamedChildCount())
 
-		cst.IterNamedChilds(node, func(node *cst.Node) {
+		p.iterNamedChilds(node, func(node *cst.Node) {
 			body = append(body, p.parseStmt(node))
 		})
 
@@ -483,8 +483,6 @@ func (p *parser) parseStmt(node *cst.Node) ast.Stmt {
 		// Since export statements will not be very useful information in our ast for now,
 		// we will ignore this statement.
 		return nil
-	case Comment:
-		return ast.NewComment(node)
 	default:
 		return ast.NewUnsupportedNode(node)
 	}
@@ -534,7 +532,7 @@ func (p *parser) parseExpr(node *cst.Node) ast.Expr {
 		p.assertNodeType(parent, VariableDeclarator)
 
 		var args []ast.Expr
-		cst.IterNamedChilds(node.ChildByFieldName("arguments"), func(node *cst.Node) {
+		p.iterNamedChilds(node.ChildByFieldName("arguments"), func(node *cst.Node) {
 			args = append(args, p.parseExpr(node))
 		})
 
@@ -549,7 +547,7 @@ func (p *parser) parseExpr(node *cst.Node) ast.Expr {
 		}
 	case Object:
 		var obj ast.ObjectExpr
-		cst.IterNamedChilds(node, func(pair *cst.Node) {
+		p.iterNamedChilds(node, func(pair *cst.Node) {
 			obj.Elts = append(obj.Elts, p.parseExpr(pair))
 		})
 
@@ -562,7 +560,7 @@ func (p *parser) parseExpr(node *cst.Node) ast.Expr {
 		}
 	case Array:
 		var obj ast.ObjectExpr
-		cst.IterNamedChilds(node, func(node *cst.Node) {
+		p.iterNamedChilds(node, func(node *cst.Node) {
 			obj.Elts = append(obj.Elts, p.parseExpr(node))
 		})
 
@@ -611,7 +609,7 @@ func (p *parser) parseExpr(node *cst.Node) ast.Expr {
 		}
 	case TemplateString:
 		var exprs []ast.Expr
-		cst.IterNamedChilds(node, func(node *cst.Node) {
+		p.iterNamedChilds(node, func(node *cst.Node) {
 			exprs = append(exprs, p.parseExpr(node.NamedChild(0)))
 		})
 
@@ -628,8 +626,6 @@ func (p *parser) parseExpr(node *cst.Node) ast.Expr {
 		return &ast.IncExpr{
 			Arg: ast.NewIdent(node.ChildByFieldName("argument")),
 		}
-	case Comment:
-		return ast.NewComment(node)
 	default:
 		return ast.NewUnsupportedNode(node)
 	}
@@ -701,7 +697,7 @@ func (p *parser) parseImportStmt(node *cst.Node) []ast.Decl {
 		// Handle `import { name } from 'module-name'`
 		// and `import { name as alias } from 'module-name'`
 		var imports []ast.Decl
-		cst.IterNamedChilds(imported, func(importIdentifier *cst.Node) {
+		p.iterNamedChilds(imported, func(importIdentifier *cst.Node) {
 			if name := importIdentifier.ChildByFieldName("name"); name != nil {
 				imports = append(imports, &ast.ImportDecl{
 					Name:     ast.NewIdent(name),
@@ -743,7 +739,7 @@ func (p *parser) parseCallExpr(node *cst.Node) *ast.CallExpr {
 	args := node.ChildByFieldName("arguments")
 
 	argsExpr := make([]ast.Expr, 0, args.NamedChildCount())
-	cst.IterNamedChilds(args, func(node *cst.Node) {
+	p.iterNamedChilds(args, func(node *cst.Node) {
 		argsExpr = append(argsExpr, p.parseExpr(node))
 	})
 
@@ -752,6 +748,12 @@ func (p *parser) parseCallExpr(node *cst.Node) *ast.CallExpr {
 		Args:     argsExpr,
 		Position: ast.NewPosition(node),
 	}
+}
+
+// iterNamedChilds iterate over named childs from node calling fn using each named
+// child node from iteration ignoring nodes that are comments.
+func (p *parser) iterNamedChilds(node *cst.Node, fn func(node *cst.Node)) {
+	cst.IterNamedChildsIgnoringNode(node, Comment, fn)
 }
 
 func (p *parser) assertNodeType(node *cst.Node, typ string) {
