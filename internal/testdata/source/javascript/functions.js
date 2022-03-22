@@ -83,3 +83,11 @@ function f10(){
 	var y = "z"
 	console.log(y)
 }
+
+function f11() {
+	let a = ['a', 'b', 'c']
+	let b = new ExClass()
+	let c = new ExClass('a', 'b', 'c', f2())
+	let d = { 'k': 'v', 'k2': 'v2' }
+	let e = [{ 'k': 'v' }, { 'k': 'v' }]
+}

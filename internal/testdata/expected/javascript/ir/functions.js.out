@@ -3,6 +3,7 @@ file functions.js:
   var   a  
   func  f1  (a, b)
   func  f10 ()
+  func  f11 ()
   func  f2  (a)
   func  f3  (a, b)
   func  f4  ()
@@ -39,6 +40,26 @@ func f10():
 	%t1 = console.log(%t0)
 	%t2 = "z"
 	%t3 = console.log(%t2)
+
+# Name: f11
+# File: functions.js
+# Location: functions.js:87:0
+# Locals:
+#   0:	a
+#   1:	b
+#   2:	c
+#   3:	d
+#   4:	e
+func f11():
+0:                                                                         entry
+	%t0 = array["a","b","c"]
+	%t1 = constructor(ExClass)
+	%t2 = f2()
+	%t3 = constructor(ExClass)["a","b","c",%t2]
+	%t4 = hashmap[{"k": "v"},{"k2": "v2"}]
+	%t5 = hashmap[{"k": "v"}]
+	%t6 = hashmap[{"k": "v"}]
+	%t7 = array[%t5,%t6]
 
 # Name: f2
 # File: functions.js

@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"io"
 	"sort"
+	"strings"
 )
 
 // invalidBasicBlock represents an invalid basic block number to jump.
@@ -119,6 +120,24 @@ func (phi *Phi) String() string {
 		buf.WriteString(" #")
 		buf.WriteString(phi.Comment)
 	}
+	return buf.String()
+}
+
+func (o *Object) String() string {
+	values := make([]string, 0)
+	for _, value := range o.Values {
+		values = append(values, value.Name())
+	}
+
+	buf := bytes.NewBufferString(o.Comment)
+	if o.Type != nil {
+		buf.WriteString(fmt.Sprintf("(%s)", o.Type.Name()))
+	}
+
+	if len(o.Values) > 0 {
+		buf.WriteString(fmt.Sprintf("[%s]", strings.Join(values, ",")))
+	}
+
 	return buf.String()
 }
 

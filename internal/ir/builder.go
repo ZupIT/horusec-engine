@@ -337,6 +337,14 @@ func (b *builder) expr(fn *Function, e ast.Expr, expand bool) Value {
 		value = b.callExpr(fn, expr)
 	case *ast.BinaryExpr:
 		value = b.binaryExpr(fn, expr)
+	case *ast.KeyValueExpr:
+		return &HashMap{
+			node:  node{expr},
+			Key:   b.expr(fn, expr.Key, false /* expand */),
+			Value: b.expr(fn, expr.Value, false /* expand */),
+		}
+	case *ast.ObjectExpr:
+		value = b.objectExpr(fn, expr)
 	default:
 		unsupportedNode(expr)
 		return nil
@@ -439,9 +447,38 @@ func (b *builder) assignValue(fn *Function, lhs *ast.Ident, rhs ast.Expr, syntax
 		fn.emit(b.funcLit(fn, lhs.Name, rhs))
 	case *ast.Ident:
 		b.identAssign(fn, lhs, rhs, syntax)
+	case *ast.ObjectExpr:
+		b.objectExprFromAssign(fn, lhs, rhs, syntax)
 	default:
 		fn.addNamedLocal(lhs.Name, b.expr(fn, rhs, false /*expand*/), syntax)
 	}
+}
+
+// objectExprFromAssign parse rhs assign when it's an ast.ObjectExpr, creating a new ir.Object that can represent an
+// array, constructor or hashmap. After the parse the value is added to the function locals.
+func (b *builder) objectExprFromAssign(fn *Function, lhs *ast.Ident, rhs *ast.ObjectExpr, syntax *ast.AssignStmt) {
+	obj := b.objectExpr(fn, rhs)
+
+	fn.addNamedLocal(lhs.Name, obj, syntax)
+}
+
+// objectExpr create a new ir.Object from ast.ObjectExpr expr. The ir.Object can represent an array, constructor
+// or hashmap.
+func (b *builder) objectExpr(fn *Function, expr *ast.ObjectExpr) *Object {
+	obj := &Object{
+		node:    node{expr},
+		Comment: expr.Comment,
+	}
+
+	if expr.Type != nil {
+		obj.Type = b.expr(fn, expr.Type, false /*expand*/)
+	}
+
+	for _, expr := range expr.Elts {
+		obj.Values = append(obj.Values, b.expr(fn, expr, true /*expand*/))
+	}
+
+	return obj
 }
 
 // identAssign responsible for handling rhs values that are identifiers. The values of these identifiers can be local
