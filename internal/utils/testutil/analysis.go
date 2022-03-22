@@ -35,7 +35,7 @@ type TestCaseAnalyzer struct {
 
 // TestAnalayzer assert the assertivity of a given Analyzer.
 //
-// nolint: funlen // There is no need to break this test.
+// nolint: funlen,gocyclo // There is no need to break this test.
 func TestAnalayzer(t *testing.T, testcases []TestCaseAnalyzer) {
 	for _, tt := range testcases {
 		t.Run(tt.Name, func(t *testing.T) {
@@ -46,19 +46,29 @@ func TestAnalayzer(t *testing.T, testcases []TestCaseAnalyzer) {
 			file.Build()
 
 			issues := make([]analysis.Issue, 0)
+			report := func(issue analysis.Issue) {
+				issues = append(issues, issue)
+			}
 
 			for _, member := range file.Members {
-				if fn, ok := member.(*ir.Function); ok {
-					tt.Analyzer.Run(&analysis.Pass{
-						File:     file,
-						Function: fn,
-						Report: func(issue analysis.Issue) {
-							issues = append(issues, issue)
-						},
-					})
+				switch m := member.(type) {
+				case *ir.Function:
+					run(tt, file, m, report)
+				case *ir.Struct:
+					for _, method := range m.Methods {
+						run(tt, file, method, report)
+					}
 				}
 			}
 			assert.Equal(t, tt.ExpectedIssues, issues)
 		})
 	}
+}
+
+func run(tt TestCaseAnalyzer, file *ir.File, fn *ir.Function, report func(analysis.Issue)) {
+	tt.Analyzer.Run(&analysis.Pass{
+		File:     file,
+		Function: fn,
+		Report:   report,
+	})
 }
