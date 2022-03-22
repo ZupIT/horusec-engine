@@ -1,11 +1,15 @@
 file statements.js:
-  func  ExportStatement ()
-  func  ForInStatement  ()
-  func  ForStatement    ()
-  func  IfStatement     (a, b)
-  func  SwitchStatement ()
-  func  TryStatement    ()
-  func  WhileStatement  ()
+  func  ExportStatement                             ()
+  func  ForInStatement                              ()
+  func  ForStatement                                ()
+  func  ForStatementEmptyBody                       ()
+  func  ForStatementEndlessRecursion                ()
+  func  ForStatementIteratingOverList               (data)
+  func  ForStatementWithoutBinaryExpressionIncremet ()
+  func  IfStatement                                 (a, b)
+  func  SwitchStatement                             ()
+  func  TryStatement                                ()
+  func  WhileStatement                              ()
 
 
 
@@ -13,13 +17,13 @@ file statements.js:
 
 # Name: ExportStatement
 # File: statements.js
-# Location: statements.js:99:0
+# Location: statements.js:127:0
 func ExportStatement():
 0:                                                                         entry
 
 # Name: ForInStatement
 # File: statements.js
-# Location: statements.js:91:0
+# Location: statements.js:119:0
 # Locals:
 #   0:	values
 func ForInStatement():
@@ -29,8 +33,90 @@ func ForInStatement():
 # Name: ForStatement
 # File: statements.js
 # Location: statements.js:85:0
+# Locals:
+#   0:	i
+#   1:	i
+#   2:	i
 func ForStatement():
 0:                                                                         entry
+	jump 2
+1:                                                                      for.body
+	%t3 = %t1 + "1"
+	%t4 = console.log(%t3)
+	jump 2
+2:                                                                      for.loop
+	%t0 = "0"
+	%t1 = phi [2: %t0, 1: %t3] #i
+	%t2 = %t1 < "9"
+	if %t2 goto 1 else 3
+3:                                                                      for.done
+
+# Name: ForStatementEmptyBody
+# File: statements.js
+# Location: statements.js:112:0
+# Locals:
+#   0:	i
+#   1:	i
+#   2:	i
+func ForStatementEmptyBody():
+0:                                                                         entry
+	jump 2
+1:                                                                      for.body
+	%t3 = %t1 + "1"
+	jump 2
+2:                                                                      for.loop
+	%t0 = "0"
+	%t1 = phi [2: %t0, 1: %t3] #i
+	%t2 = %t1 < l
+	if %t2 goto 1 else 3
+3:                                                                      for.done
+
+# Name: ForStatementEndlessRecursion
+# File: statements.js
+# Location: statements.js:106:0
+func ForStatementEndlessRecursion():
+0:                                                                         entry
+	jump 1
+1:                                                                      for.body
+	%t0 = console.log("endless recursion")
+	jump 1
+2:                                                                      for.done
+
+# Name: ForStatementIteratingOverList
+# File: statements.js
+# Location: statements.js:92:0
+# Locals:
+#   0:	i
+#   1:	i
+#   2:	i
+#   3:	sum
+func ForStatementIteratingOverList(data):
+0:                                                                         entry
+	%t0 = "0"
+	jump 2
+1:                                                                      for.body
+	%t4 = %t2 + "1"
+	jump 2
+2:                                                                      for.loop
+	%t1 = "0"
+	%t2 = phi [2: %t1, 1: %t4] #i
+	%t3 = %t2 < data.length
+	if %t3 goto 1 else 3
+3:                                                                      for.done
+	return %t0
+4:                                                                   unreachable
+
+# Name: ForStatementWithoutBinaryExpressionIncremet
+# File: statements.js
+# Location: statements.js:101:0
+func ForStatementWithoutBinaryExpressionIncremet():
+0:                                                                         entry
+	jump 2
+1:                                                                      for.body
+	jump 2
+2:                                                                      for.loop
+	if c goto 1 else 3
+3:                                                                      for.done
 
 # Name: IfStatement
 # File: statements.js

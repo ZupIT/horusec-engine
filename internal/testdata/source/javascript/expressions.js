@@ -27,3 +27,11 @@ app.get('/', (req, res) => {
 app.set('/', (req, res) => {
     console.log(req, res)
 });
+
+
+function incrementExpr() {
+    let a = 0;
+    a++
+    a--
+    return a
+}

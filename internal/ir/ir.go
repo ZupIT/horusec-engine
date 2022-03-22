@@ -488,24 +488,22 @@ func (fn *Function) lookup(name string) Value {
 		return phi
 	}
 
-	edges := make([]*Var, 0)
-
-	// Try to compute the phi values recursively in all basic block predecessors and cache it.
-	fn.recursivelyLoopkup(name, fn.currentBlock, &edges)
-
-	if len(edges) == 0 {
-		// We don't find any variable at any block with the given name, so return nil.
-		return nil
-	} else if len(edges) == 1 {
-		// This meaans that the the code has just one variable declaration with the given
-		// name, so we don't need create a phi value for this case, just return the declared
-		// variable.
-		return edges[0]
-	}
-
 	phi := &Phi{
 		Comment: name,
-		Edges:   edges,
+		Edges:   make([]*Var, 0),
+	}
+
+	// Try to compute the phi values recursively in all basic block predecessors and cache it.
+	fn.recursivelyLoopkup(name, fn.currentBlock, phi, make(map[int]bool, len(fn.currentBlock.Preds)))
+
+	if len(phi.Edges) == 0 {
+		// We don't find any variable at any block with the given name, so return nil.
+		return nil
+	} else if len(phi.Edges) == 1 {
+		// This means that the the code has just one variable declaration with the given
+		// name, so we don't need create a phi value for this case, just return the declared
+		// variable.
+		return phi.Edges[0]
 	}
 
 	fn.phis[name] = phi
@@ -515,12 +513,18 @@ func (fn *Function) lookup(name string) Value {
 
 // recursivelyLoopkup recursively search for a variable with the given name on predecessors
 // blocks of the given basic block and return all founded variables.
-func (fn *Function) recursivelyLoopkup(name string, block *BasicBlock, values *[]*Var) {
+func (fn *Function) recursivelyLoopkup(name string, block *BasicBlock, phi *Phi, visitedBlocks map[int]bool) {
 	for _, block := range block.Preds {
-		if v, exists := block.locals[name]; exists {
-			*values = append(*values, v)
+		// Store already visited blocks to avoid endless recursion.
+		if _, visited := visitedBlocks[block.Index]; visited {
 			continue
 		}
-		fn.recursivelyLoopkup(name, block, values)
+		visitedBlocks[block.Index] = true
+
+		if v, exists := block.locals[name]; exists {
+			phi.Edges = append(phi.Edges, v)
+			continue
+		}
+		fn.recursivelyLoopkup(name, block, phi, visitedBlocks)
 	}
 }

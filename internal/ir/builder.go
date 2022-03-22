@@ -154,7 +154,7 @@ func (fn *Function) emit(instr Instruction) {
 // addNamedLocal creates a local variable, adds it to function fn and return it.
 //
 // Subsequent calls to fn.lookup(name) will return the same variable.
-func (fn *Function) addNamedLocal(name string, value Value, syntax ast.Node) Value {
+func (fn *Function) addNamedLocal(name string, value Value, syntax ast.Node) *Var {
 	v := fn.newVar(name, value, syntax)
 	fn.addVariable(v)
 	fn.emit(v)
@@ -165,7 +165,7 @@ func (fn *Function) addNamedLocal(name string, value Value, syntax ast.Node) Val
 //
 // The temporary name used is %tN where N is the current number of local variables
 // on fn. The % prefix is added on variable name to avoid collisions.
-func (fn *Function) addLocal(value Value, syntax ast.Node) Value {
+func (fn *Function) addLocal(value Value, syntax ast.Node) *Var {
 	return fn.addNamedLocal("", value, syntax)
 }
 
@@ -265,7 +265,8 @@ func (b *builder) stmt(fn *Function, s ast.Stmt) {
 		}
 
 		fn.currentBlock = done
-
+	case *ast.ForStatement:
+		b.forStmt(fn, stmt)
 	case *ast.BadNode:
 		// Do nothing with bad nodes.
 	default:
@@ -327,6 +328,24 @@ func (b *builder) expr(fn *Function, e ast.Expr, expand bool) Value {
 		// Expected IR:
 		// a = b.c.d
 		return b.selectorExpr(fn, expr)
+	case *ast.KeyValueExpr:
+		return &HashMap{
+			node:  node{expr},
+			Key:   b.expr(fn, expr.Key, false /* expand */),
+			Value: b.expr(fn, expr.Value, false /* expand */),
+		}
+	case *ast.IncExpr:
+		// Convert a++ to a = a + 1
+		value = &BinOp{
+			node: node{expr},
+			Op:   expr.Op[:1], // Convert ++/-- to +/-
+			Left: b.lookup(fn, expr.Arg.Name),
+			Right: &Const{
+				node:  node{nil},
+				Value: "1",
+			},
+		}
+		return fn.addNamedLocal(expr.Arg.Name, value, expr)
 
 	// Value's that are also Instruction's.
 	case *ast.FuncLit:
@@ -337,12 +356,6 @@ func (b *builder) expr(fn *Function, e ast.Expr, expand bool) Value {
 		value = b.callExpr(fn, expr)
 	case *ast.BinaryExpr:
 		value = b.binaryExpr(fn, expr)
-	case *ast.KeyValueExpr:
-		return &HashMap{
-			node:  node{expr},
-			Key:   b.expr(fn, expr.Key, false /* expand */),
-			Value: b.expr(fn, expr.Value, false /* expand */),
-		}
 	case *ast.ObjectExpr:
 		value = b.objectExpr(fn, expr)
 	default:
@@ -355,6 +368,99 @@ func (b *builder) expr(fn *Function, e ast.Expr, expand bool) Value {
 	}
 
 	return value
+}
+
+// forStmt emits code to fn for a for statement block.
+//
+// 0:                                                                         entry
+//         ...previous code before loop...
+//         jump 2
+// 1:                                                                      for.body
+//         ...body of loop...
+//         jump 2
+// 2:                                                                      for.loop
+//         if cond goto 1 else 3
+// 3:                                                                      for.done
+//         ...code after loop...
+//
+// nolint: funlen,gocyclo // For loops are complicated, we can improve this in the future.
+func (b *builder) forStmt(fn *Function, stmt *ast.ForStatement) {
+	// Create the body of for loop.
+	body := fn.newBasicBlock("for.body")
+
+	// If for statement has a condition, create a for loop block
+	// to emit loop condition. Otherwise use the body of loop
+	// to emit a jump.
+	loop := body
+	if stmt.Cond != nil {
+		loop = fn.newBasicBlock("for.loop")
+	}
+
+	// Emit a jump from previous basic block to for.loop condition.
+	emitJump(fn, loop)
+	fn.currentBlock = loop
+
+	phis := make([]*Phi, 0)
+
+	// Emit variable declaration on for statement on for.loop (if stmt.Cond is not nil, otherwise
+	// will emit on for.body) block.
+	if stmt.VarDecl != nil {
+		b.stmt(fn, stmt.VarDecl)
+
+		// Since variables created at stmt.VarDecl could be changed at stmt.Increment
+		// we should create phi-nodes to these variables created. The phi-node created
+		// here will only contain a single edge that is the variable created at stmt.VarDecl
+		// if this variable is also changed in stmt.Increment we should append this change
+		// on edges of the phi-node created here. This is necessary to represent a multiple
+		// possible values of a increment variable inside a for loop, for example:
+		// for (i = 0; i < len(data); i++) {}
+		// The variable i above can have two possible values; 0 if len(data) == 0 or
+		// i = i + 1, since this variable is incremented at every iteration.
+		for name, v := range loop.locals {
+			// Only check for variable declared on source code.
+			if v.Label != "" {
+				phi := &Phi{
+					Comment: v.Label,
+					Edges:   []*Var{v},
+				}
+				phis = append(phis, phi)
+
+				fn.addNamedLocal(name, phi, nil)
+			}
+		}
+	}
+
+	// Create for.done block to jump if for statement has a condition.
+	done := fn.newBasicBlock("for.done")
+
+	// Emit for loop condition to fn if exists.
+	if stmt.Cond != nil {
+		b.cond(fn, stmt.Cond, body, done)
+		fn.currentBlock = body
+	}
+
+	// Emit increment on for.body condition.
+	b.expr(fn, stmt.Increment, true /*expand*/)
+
+	// Here we check if the edges of phi-node created above has a change on
+	// stmt.Increment block, if has, we append this change as a new edge on
+	// phi-node.
+	for _, phi := range phis {
+		for _, edge := range phi.Edges {
+			if v, exists := body.locals[edge.Label]; exists {
+				phi.Edges = append(phi.Edges, v)
+			}
+		}
+	}
+
+	// Emit the for body on loop.body block.
+	b.stmt(fn, stmt.Body)
+
+	// Emit a jump from for.body to to for.loop again.
+	emitJump(fn, loop)
+
+	// Set the current block to for.done to finish the for loop
+	fn.currentBlock = done
 }
 
 // selectorExpr return the Value of a selector expression.
