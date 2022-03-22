@@ -134,6 +134,9 @@ func (fn *Function) newBasicBlock(comment string) *BasicBlock {
 		Index:   len(fn.Blocks),
 		Comment: comment,
 		Instrs:  make([]Instruction, 0),
+		locals:  make(map[string]*Var),
+		Preds:   make([]*BasicBlock, 0),
+		Succs:   make([]*BasicBlock, 0),
 	}
 
 	fn.Blocks = append(fn.Blocks, b)
@@ -152,12 +155,8 @@ func (fn *Function) emit(instr Instruction) {
 //
 // Subsequent calls to fn.lookup(name) will return the same variable.
 func (fn *Function) addNamedLocal(name string, value Value, syntax ast.Node) Value {
-	v := &Var{
-		node:  node{syntax},
-		name:  name,
-		Value: value,
-	}
-	fn.Locals[name] = v
+	v := fn.newVar(name, value, syntax)
+	fn.addVariable(v)
 	fn.emit(v)
 	return v
 }
@@ -167,8 +166,29 @@ func (fn *Function) addNamedLocal(name string, value Value, syntax ast.Node) Val
 // The temporary name used is %tN where N is the current number of local variables
 // on fn. The % prefix is added on variable name to avoid collisions.
 func (fn *Function) addLocal(value Value, syntax ast.Node) Value {
-	name := fmt.Sprintf("%%t%d", len(fn.Locals))
-	return fn.addNamedLocal(name, value, syntax)
+	return fn.addNamedLocal("", value, syntax)
+}
+
+// addVariable add variable v to the current basic block of fn.
+func (fn *Function) addVariable(v *Var) {
+	fn.currentBlock.locals[v.Label] = v
+	fn.nLocals++
+
+	// Just append if the variable is declared on source code.
+	if v.Label != "" {
+		fn.Locals = append(fn.Locals, v)
+	}
+}
+
+// newVar create a new variable at the current basic block of fn with the given label and value.
+func (fn *Function) newVar(label string, value Value, syntax ast.Node) *Var {
+	return &Var{
+		node:  node{syntax},
+		name:  fmt.Sprintf("%%t%d", fn.nLocals),
+		Label: label,
+		Value: value,
+		block: fn.currentBlock,
+	}
 }
 
 // emit appends an instruction to the current basic block.
@@ -264,7 +284,7 @@ func (b *builder) stmt(fn *Function, s ast.Stmt) {
 //
 // nolint: gocyclo // cyclomatic complexity is necessary for now.
 func (b *builder) expr(fn *Function, e ast.Expr, expand bool) Value {
-	var v Value
+	var value Value
 
 	switch expr := e.(type) {
 	// Value's that are *not* Instruction's (Var is an exception, see the doc above)
@@ -274,6 +294,9 @@ func (b *builder) expr(fn *Function, e ast.Expr, expand bool) Value {
 			Value: expr.Value,
 		}
 	case *ast.Ident:
+		if v := b.lookup(fn, expr.Name); v != nil {
+			return v
+		}
 		return &Var{
 			node:  node{e},
 			name:  expr.Name,
@@ -295,7 +318,7 @@ func (b *builder) expr(fn *Function, e ast.Expr, expand bool) Value {
 		// are creating a variable without a value. Maybe we should create a new IR Value
 		// that represents values that are references to other variables.
 		//
-		// E.g:
+		// Source:
 		// const a = b.c.d
 		//
 		// IR:
@@ -309,21 +332,21 @@ func (b *builder) expr(fn *Function, e ast.Expr, expand bool) Value {
 	case *ast.FuncLit:
 		// Create an anonymous function using the parent function name
 		// and the current the total of anonymouns functions as a name.
-		v = b.funcLit(fn, fmt.Sprintf("%s$%d", fn.Name(), len(fn.AnonFuncs)+1), expr)
+		value = b.funcLit(fn, fmt.Sprintf("%s$%d", fn.Name(), len(fn.AnonFuncs)+1), expr)
 	case *ast.CallExpr:
-		v = b.callExpr(fn, expr)
+		value = b.callExpr(fn, expr)
 	case *ast.BinaryExpr:
-		v = b.binaryExpr(fn, expr)
+		value = b.binaryExpr(fn, expr)
 	default:
 		unsupportedNode(expr)
 		return nil
 	}
 
 	if expand {
-		return fn.addLocal(v, e)
+		return fn.addLocal(value, e)
 	}
 
-	return v
+	return value
 }
 
 // selectorExpr return the Value of a selector expression.
@@ -444,27 +467,37 @@ func (b *builder) assignValue(fn *Function, lhs *ast.Ident, rhs ast.Expr, syntax
 // f = "x"
 //
 func (b *builder) identAssign(fn *Function, lhs, rhs *ast.Ident, syntax *ast.AssignStmt) {
-	if local := fn.lookup(rhs.Name); local != nil {
-		fn.addNamedLocal(lhs.Name, local.Value, syntax)
-
-		return
-	}
-
-	for _, param := range fn.Signature.Params {
-		if rhs.Name == param.name {
-			fn.addNamedLocal(lhs.Name, param, syntax)
-
-			return
+	if v := b.lookup(fn, rhs.Name); v != nil {
+		if g, ok := v.(*Global); ok {
+			fn.addNamedLocal(lhs.Name, b.expr(fn, g.Value, false /*expand*/), syntax)
+		} else {
+			fn.addNamedLocal(lhs.Name, v, syntax)
 		}
-	}
-
-	if global, ok := fn.File.Members[rhs.Name].(*Global); ok {
-		fn.addNamedLocal(lhs.Name, b.expr(fn, global.Value, false /*expand*/), syntax)
-
 		return
 	}
 
 	fn.addNamedLocal(lhs.Name, nil, syntax)
+}
+
+// lookup return the Value declared on source file with the given name. The search
+// order is; first check at function level, them function signature and finally for
+// global values.
+func (b *builder) lookup(fn *Function, name string) Value {
+	if v := fn.lookup(name); v != nil {
+		return v
+	}
+
+	for _, param := range fn.Signature.Params {
+		if param.name == name {
+			return param
+		}
+	}
+
+	if global, ok := fn.File.Members[name].(*Global); ok {
+		return global
+	}
+
+	return nil
 }
 
 // stmtList emits to fn code for all statements in list.
@@ -476,14 +509,7 @@ func (b *builder) stmtList(fn *Function, list []ast.Stmt) {
 
 // funcLit crate a new Closure to a given AST based function literal.
 func (b *builder) funcLit(parent *Function, name string, syntax *ast.FuncLit) *Closure {
-	fn := &Function{
-		name:   name,
-		syntax: syntax,
-		File:   parent.File,
-		parent: parent,
-		Blocks: make([]*BasicBlock, 0),
-		Locals: make(map[string]*Var),
-	}
+	fn := parent.File.NewFunction(name, syntax)
 	fn.Build()
 
 	parent.AnonFuncs = append(parent.AnonFuncs, fn)
@@ -517,7 +543,7 @@ func (b *builder) callExpr(parent *Function, call *ast.CallExpr) *Call {
 			// If identifier used on function call is declared inside the parent function
 			// we use this declared variable as argument to function call, otherwise if
 			// just parse the expression value.
-			if local := parent.lookup(ident.Name); local != nil {
+			if local := b.lookup(parent, ident.Name); local != nil {
 				args = append(args, local)
 				continue
 			}

@@ -91,6 +91,37 @@ func (s *Jump) String() string {
 	return fmt.Sprintf("jump %d", block)
 }
 
+// nolint:funlen,gocyclo // There is no nedded to split this function.
+func (phi *Phi) String() string {
+	buf := bytes.NewBufferString("phi [")
+	for i, edge := range phi.Edges {
+		if i > 0 {
+			buf.WriteString(", ")
+		}
+		// Be robust against malformed CFG.
+		if edge.block == nil {
+			buf.WriteString("??")
+			continue
+		}
+
+		// Be robust against malformed CFG.
+		edgeVal := "<nil>"
+		block := invalidBasicBlock
+		if edge != nil {
+			edgeVal = edge.Name()
+			block = edge.block.Index
+		}
+		fmt.Fprintf(buf, "%d: ", block)
+		buf.WriteString(edgeVal)
+	}
+	buf.WriteString("]")
+	if phi.Comment != "" {
+		buf.WriteString(" #")
+		buf.WriteString(phi.Comment)
+	}
+	return buf.String()
+}
+
 // WriteTo writes to w a human-readable summary of file.
 func (f *File) WriteTo(w io.Writer) (int64, error) {
 	buf := bytes.NewBufferString("")
@@ -210,8 +241,8 @@ func writeLocals(buf *bytes.Buffer, fn *Function) {
 	buf.WriteString("# Locals:\n")
 
 	names := make([]string, 0, len(fn.Locals))
-	for _, l := range fn.Locals {
-		names = append(names, l.Name())
+	for _, v := range fn.Locals {
+		names = append(names, v.Label)
 	}
 	sort.Strings(names)
 
