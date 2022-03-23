@@ -4,6 +4,7 @@ file functions.js:
   func  f1  (a, b)
   func  f10 ()
   func  f11 ()
+  func  f12 ()
   func  f2  (a)
   func  f3  (a, b)
   func  f4  ()
@@ -12,6 +13,7 @@ file functions.js:
   func  f7  (b)
   func  f8  (a)
   func  f9  (a)
+  var   i  
 
 
 
@@ -60,6 +62,14 @@ func f11():
 	%t5 = hashmap[{"k": "v"}]
 	%t6 = hashmap[{"k": "v"}]
 	%t7 = array[%t5,%t6]
+
+# Name: f12
+# File: functions.js
+# Location: functions.js:97:0
+func f12():
+0:                                                                         entry
+	%t0 = array["1","2","3"]
+	%t1 = console.log(%t0)
 
 # Name: f2
 # File: functions.js
@@ -139,7 +149,8 @@ func f7(b):
 	%t2 = "y"
 	%t3 = "x"
 	%t4 = "x"
-	%t5 = b
+	%t5 = "x"
+	%t6 = b
 
 # Name: f8
 # File: functions.js

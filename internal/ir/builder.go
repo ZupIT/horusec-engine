@@ -446,7 +446,7 @@ func (b *builder) assignValue(fn *Function, lhs *ast.Ident, rhs ast.Expr, syntax
 	case *ast.FuncLit:
 		fn.emit(b.funcLit(fn, lhs.Name, rhs))
 	case *ast.Ident:
-		b.identAssign(fn, lhs, rhs, syntax)
+		fn.addNamedLocal(lhs.Name, b.lookup(fn, rhs.Name), syntax)
 	case *ast.ObjectExpr:
 		b.objectExprFromAssign(fn, lhs, rhs, syntax)
 	default:
@@ -481,41 +481,6 @@ func (b *builder) objectExpr(fn *Function, expr *ast.ObjectExpr) *Object {
 	return obj
 }
 
-// identAssign responsible for handling rhs values that are identifiers. The values of these identifiers can be local
-// variables of a function, global variables or parameters of the function. Values within the function's context are
-// always prioritized over external values. Below is an example of code and IR for each of the scenarios listed.
-//
-// source code:
-//
-// const a = "x"
-//
-// function f1(b) {
-//   const c = "x"
-//   const d = c
-//   const e = b
-//   const f = a
-// }
-//
-// IR representation:
-//
-// c = "y"
-// d = "y"
-// e = b
-// f = "x"
-//
-func (b *builder) identAssign(fn *Function, lhs, rhs *ast.Ident, syntax *ast.AssignStmt) {
-	if v := b.lookup(fn, rhs.Name); v != nil {
-		if g, ok := v.(*Global); ok {
-			fn.addNamedLocal(lhs.Name, b.expr(fn, g.Value, false /*expand*/), syntax)
-		} else {
-			fn.addNamedLocal(lhs.Name, v, syntax)
-		}
-		return
-	}
-
-	fn.addNamedLocal(lhs.Name, nil, syntax)
-}
-
 // lookup return the Value declared on source file with the given name. The search
 // order is; first check at function level, them function signature and finally for
 // global values.
@@ -531,7 +496,7 @@ func (b *builder) lookup(fn *Function, name string) Value {
 	}
 
 	if global, ok := fn.File.Members[name].(*Global); ok {
-		return global
+		return fn.addLocal(b.expr(fn, global.Value, false /* expand */), global.Value)
 	}
 
 	return nil

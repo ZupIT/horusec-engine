@@ -91,3 +91,9 @@ function f11() {
 	let d = { 'k': 'v', 'k2': 'v2' }
 	let e = [{ 'k': 'v' }, { 'k': 'v' }]
 }
+
+const i = [1,2,3]
+
+function f12() {
+	console.log(i)
+}
