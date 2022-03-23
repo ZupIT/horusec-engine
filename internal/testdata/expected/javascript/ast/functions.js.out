@@ -4,7 +4,7 @@
      3  .  .  Name: "functions.js"
      4  .  .  Position: ast.Position {}
      5  .  }
-     6  .  Decls: []ast.Decl (len = 12) {
+     6  .  Decls: []ast.Decl (len = 13) {
      7  .  .  0: *ast.ImportDecl {
      8  .  .  .  Position: ast.Position {}
      9  .  .  .  Name: *ast.Ident {
@@ -1166,5 +1166,224 @@
   1165  .  .  .  .  }
   1166  .  .  .  }
   1167  .  .  }
-  1168  .  }
-  1169  }
+  1168  .  .  12: *ast.FuncDecl {
+  1169  .  .  .  Position: ast.Position {}
+  1170  .  .  .  Name: *ast.Ident {
+  1171  .  .  .  .  Name: "f11"
+  1172  .  .  .  .  Position: ast.Position {}
+  1173  .  .  .  }
+  1174  .  .  .  Type: *ast.FuncType {
+  1175  .  .  .  .  Position: ast.Position {}
+  1176  .  .  .  .  Params: *ast.FieldList {
+  1177  .  .  .  .  .  Position: ast.Position {}
+  1178  .  .  .  .  }
+  1179  .  .  .  }
+  1180  .  .  .  Body: *ast.BlockStmt {
+  1181  .  .  .  .  Position: ast.Position {}
+  1182  .  .  .  .  List: []ast.Stmt (len = 5) {
+  1183  .  .  .  .  .  0: *ast.AssignStmt {
+  1184  .  .  .  .  .  .  Position: ast.Position {}
+  1185  .  .  .  .  .  .  LHS: []ast.Expr (len = 1) {
+  1186  .  .  .  .  .  .  .  0: *ast.Ident {
+  1187  .  .  .  .  .  .  .  .  Name: "a"
+  1188  .  .  .  .  .  .  .  .  Position: ast.Position {}
+  1189  .  .  .  .  .  .  .  }
+  1190  .  .  .  .  .  .  }
+  1191  .  .  .  .  .  .  RHS: []ast.Expr (len = 1) {
+  1192  .  .  .  .  .  .  .  0: *ast.ObjectExpr {
+  1193  .  .  .  .  .  .  .  .  Position: ast.Position {}
+  1194  .  .  .  .  .  .  .  .  Elts: []ast.Expr (len = 3) {
+  1195  .  .  .  .  .  .  .  .  .  0: *ast.BasicLit {
+  1196  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+  1197  .  .  .  .  .  .  .  .  .  .  Kind: "string"
+  1198  .  .  .  .  .  .  .  .  .  .  Value: "a"
+  1199  .  .  .  .  .  .  .  .  .  }
+  1200  .  .  .  .  .  .  .  .  .  1: *ast.BasicLit {
+  1201  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+  1202  .  .  .  .  .  .  .  .  .  .  Kind: "string"
+  1203  .  .  .  .  .  .  .  .  .  .  Value: "b"
+  1204  .  .  .  .  .  .  .  .  .  }
+  1205  .  .  .  .  .  .  .  .  .  2: *ast.BasicLit {
+  1206  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+  1207  .  .  .  .  .  .  .  .  .  .  Kind: "string"
+  1208  .  .  .  .  .  .  .  .  .  .  Value: "c"
+  1209  .  .  .  .  .  .  .  .  .  }
+  1210  .  .  .  .  .  .  .  .  }
+  1211  .  .  .  .  .  .  .  .  Comment: "array"
+  1212  .  .  .  .  .  .  .  }
+  1213  .  .  .  .  .  .  }
+  1214  .  .  .  .  .  }
+  1215  .  .  .  .  .  1: *ast.AssignStmt {
+  1216  .  .  .  .  .  .  Position: ast.Position {}
+  1217  .  .  .  .  .  .  LHS: []ast.Expr (len = 1) {
+  1218  .  .  .  .  .  .  .  0: *ast.Ident {
+  1219  .  .  .  .  .  .  .  .  Name: "b"
+  1220  .  .  .  .  .  .  .  .  Position: ast.Position {}
+  1221  .  .  .  .  .  .  .  }
+  1222  .  .  .  .  .  .  }
+  1223  .  .  .  .  .  .  RHS: []ast.Expr (len = 1) {
+  1224  .  .  .  .  .  .  .  0: *ast.ObjectExpr {
+  1225  .  .  .  .  .  .  .  .  Position: ast.Position {}
+  1226  .  .  .  .  .  .  .  .  Name: *ast.Ident {
+  1227  .  .  .  .  .  .  .  .  .  Name: "b"
+  1228  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+  1229  .  .  .  .  .  .  .  .  }
+  1230  .  .  .  .  .  .  .  .  Type: *ast.Ident {
+  1231  .  .  .  .  .  .  .  .  .  Name: "ExClass"
+  1232  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+  1233  .  .  .  .  .  .  .  .  }
+  1234  .  .  .  .  .  .  .  .  Comment: "constructor"
+  1235  .  .  .  .  .  .  .  }
+  1236  .  .  .  .  .  .  }
+  1237  .  .  .  .  .  }
+  1238  .  .  .  .  .  2: *ast.AssignStmt {
+  1239  .  .  .  .  .  .  Position: ast.Position {}
+  1240  .  .  .  .  .  .  LHS: []ast.Expr (len = 1) {
+  1241  .  .  .  .  .  .  .  0: *ast.Ident {
+  1242  .  .  .  .  .  .  .  .  Name: "c"
+  1243  .  .  .  .  .  .  .  .  Position: ast.Position {}
+  1244  .  .  .  .  .  .  .  }
+  1245  .  .  .  .  .  .  }
+  1246  .  .  .  .  .  .  RHS: []ast.Expr (len = 1) {
+  1247  .  .  .  .  .  .  .  0: *ast.ObjectExpr {
+  1248  .  .  .  .  .  .  .  .  Position: ast.Position {}
+  1249  .  .  .  .  .  .  .  .  Name: *ast.Ident {
+  1250  .  .  .  .  .  .  .  .  .  Name: "c"
+  1251  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+  1252  .  .  .  .  .  .  .  .  }
+  1253  .  .  .  .  .  .  .  .  Type: *ast.Ident {
+  1254  .  .  .  .  .  .  .  .  .  Name: "ExClass"
+  1255  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+  1256  .  .  .  .  .  .  .  .  }
+  1257  .  .  .  .  .  .  .  .  Elts: []ast.Expr (len = 4) {
+  1258  .  .  .  .  .  .  .  .  .  0: *ast.BasicLit {
+  1259  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+  1260  .  .  .  .  .  .  .  .  .  .  Kind: "string"
+  1261  .  .  .  .  .  .  .  .  .  .  Value: "a"
+  1262  .  .  .  .  .  .  .  .  .  }
+  1263  .  .  .  .  .  .  .  .  .  1: *ast.BasicLit {
+  1264  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+  1265  .  .  .  .  .  .  .  .  .  .  Kind: "string"
+  1266  .  .  .  .  .  .  .  .  .  .  Value: "b"
+  1267  .  .  .  .  .  .  .  .  .  }
+  1268  .  .  .  .  .  .  .  .  .  2: *ast.BasicLit {
+  1269  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+  1270  .  .  .  .  .  .  .  .  .  .  Kind: "string"
+  1271  .  .  .  .  .  .  .  .  .  .  Value: "c"
+  1272  .  .  .  .  .  .  .  .  .  }
+  1273  .  .  .  .  .  .  .  .  .  3: *ast.CallExpr {
+  1274  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+  1275  .  .  .  .  .  .  .  .  .  .  Fun: *ast.Ident {
+  1276  .  .  .  .  .  .  .  .  .  .  .  Name: "f2"
+  1277  .  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+  1278  .  .  .  .  .  .  .  .  .  .  }
+  1279  .  .  .  .  .  .  .  .  .  .  Args: []ast.Expr (len = 0) {}
+  1280  .  .  .  .  .  .  .  .  .  }
+  1281  .  .  .  .  .  .  .  .  }
+  1282  .  .  .  .  .  .  .  .  Comment: "constructor"
+  1283  .  .  .  .  .  .  .  }
+  1284  .  .  .  .  .  .  }
+  1285  .  .  .  .  .  }
+  1286  .  .  .  .  .  3: *ast.AssignStmt {
+  1287  .  .  .  .  .  .  Position: ast.Position {}
+  1288  .  .  .  .  .  .  LHS: []ast.Expr (len = 1) {
+  1289  .  .  .  .  .  .  .  0: *ast.Ident {
+  1290  .  .  .  .  .  .  .  .  Name: "d"
+  1291  .  .  .  .  .  .  .  .  Position: ast.Position {}
+  1292  .  .  .  .  .  .  .  }
+  1293  .  .  .  .  .  .  }
+  1294  .  .  .  .  .  .  RHS: []ast.Expr (len = 1) {
+  1295  .  .  .  .  .  .  .  0: *ast.ObjectExpr {
+  1296  .  .  .  .  .  .  .  .  Position: ast.Position {}
+  1297  .  .  .  .  .  .  .  .  Elts: []ast.Expr (len = 2) {
+  1298  .  .  .  .  .  .  .  .  .  0: *ast.KeyValueExpr {
+  1299  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+  1300  .  .  .  .  .  .  .  .  .  .  Key: *ast.BasicLit {
+  1301  .  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+  1302  .  .  .  .  .  .  .  .  .  .  .  Kind: "string"
+  1303  .  .  .  .  .  .  .  .  .  .  .  Value: "k"
+  1304  .  .  .  .  .  .  .  .  .  .  }
+  1305  .  .  .  .  .  .  .  .  .  .  Value: *ast.BasicLit {
+  1306  .  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+  1307  .  .  .  .  .  .  .  .  .  .  .  Kind: "string"
+  1308  .  .  .  .  .  .  .  .  .  .  .  Value: "v"
+  1309  .  .  .  .  .  .  .  .  .  .  }
+  1310  .  .  .  .  .  .  .  .  .  }
+  1311  .  .  .  .  .  .  .  .  .  1: *ast.KeyValueExpr {
+  1312  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+  1313  .  .  .  .  .  .  .  .  .  .  Key: *ast.BasicLit {
+  1314  .  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+  1315  .  .  .  .  .  .  .  .  .  .  .  Kind: "string"
+  1316  .  .  .  .  .  .  .  .  .  .  .  Value: "k2"
+  1317  .  .  .  .  .  .  .  .  .  .  }
+  1318  .  .  .  .  .  .  .  .  .  .  Value: *ast.BasicLit {
+  1319  .  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+  1320  .  .  .  .  .  .  .  .  .  .  .  Kind: "string"
+  1321  .  .  .  .  .  .  .  .  .  .  .  Value: "v2"
+  1322  .  .  .  .  .  .  .  .  .  .  }
+  1323  .  .  .  .  .  .  .  .  .  }
+  1324  .  .  .  .  .  .  .  .  }
+  1325  .  .  .  .  .  .  .  .  Comment: "hashmap"
+  1326  .  .  .  .  .  .  .  }
+  1327  .  .  .  .  .  .  }
+  1328  .  .  .  .  .  }
+  1329  .  .  .  .  .  4: *ast.AssignStmt {
+  1330  .  .  .  .  .  .  Position: ast.Position {}
+  1331  .  .  .  .  .  .  LHS: []ast.Expr (len = 1) {
+  1332  .  .  .  .  .  .  .  0: *ast.Ident {
+  1333  .  .  .  .  .  .  .  .  Name: "e"
+  1334  .  .  .  .  .  .  .  .  Position: ast.Position {}
+  1335  .  .  .  .  .  .  .  }
+  1336  .  .  .  .  .  .  }
+  1337  .  .  .  .  .  .  RHS: []ast.Expr (len = 1) {
+  1338  .  .  .  .  .  .  .  0: *ast.ObjectExpr {
+  1339  .  .  .  .  .  .  .  .  Position: ast.Position {}
+  1340  .  .  .  .  .  .  .  .  Elts: []ast.Expr (len = 2) {
+  1341  .  .  .  .  .  .  .  .  .  0: *ast.ObjectExpr {
+  1342  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+  1343  .  .  .  .  .  .  .  .  .  .  Elts: []ast.Expr (len = 1) {
+  1344  .  .  .  .  .  .  .  .  .  .  .  0: *ast.KeyValueExpr {
+  1345  .  .  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+  1346  .  .  .  .  .  .  .  .  .  .  .  .  Key: *ast.BasicLit {
+  1347  .  .  .  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+  1348  .  .  .  .  .  .  .  .  .  .  .  .  .  Kind: "string"
+  1349  .  .  .  .  .  .  .  .  .  .  .  .  .  Value: "k"
+  1350  .  .  .  .  .  .  .  .  .  .  .  .  }
+  1351  .  .  .  .  .  .  .  .  .  .  .  .  Value: *ast.BasicLit {
+  1352  .  .  .  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+  1353  .  .  .  .  .  .  .  .  .  .  .  .  .  Kind: "string"
+  1354  .  .  .  .  .  .  .  .  .  .  .  .  .  Value: "v"
+  1355  .  .  .  .  .  .  .  .  .  .  .  .  }
+  1356  .  .  .  .  .  .  .  .  .  .  .  }
+  1357  .  .  .  .  .  .  .  .  .  .  }
+  1358  .  .  .  .  .  .  .  .  .  .  Comment: "hashmap"
+  1359  .  .  .  .  .  .  .  .  .  }
+  1360  .  .  .  .  .  .  .  .  .  1: *ast.ObjectExpr {
+  1361  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+  1362  .  .  .  .  .  .  .  .  .  .  Elts: []ast.Expr (len = 1) {
+  1363  .  .  .  .  .  .  .  .  .  .  .  0: *ast.KeyValueExpr {
+  1364  .  .  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+  1365  .  .  .  .  .  .  .  .  .  .  .  .  Key: *ast.BasicLit {
+  1366  .  .  .  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+  1367  .  .  .  .  .  .  .  .  .  .  .  .  .  Kind: "string"
+  1368  .  .  .  .  .  .  .  .  .  .  .  .  .  Value: "k"
+  1369  .  .  .  .  .  .  .  .  .  .  .  .  }
+  1370  .  .  .  .  .  .  .  .  .  .  .  .  Value: *ast.BasicLit {
+  1371  .  .  .  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+  1372  .  .  .  .  .  .  .  .  .  .  .  .  .  Kind: "string"
+  1373  .  .  .  .  .  .  .  .  .  .  .  .  .  Value: "v"
+  1374  .  .  .  .  .  .  .  .  .  .  .  .  }
+  1375  .  .  .  .  .  .  .  .  .  .  .  }
+  1376  .  .  .  .  .  .  .  .  .  .  }
+  1377  .  .  .  .  .  .  .  .  .  .  Comment: "hashmap"
+  1378  .  .  .  .  .  .  .  .  .  }
+  1379  .  .  .  .  .  .  .  .  }
+  1380  .  .  .  .  .  .  .  .  Comment: "array"
+  1381  .  .  .  .  .  .  .  }
+  1382  .  .  .  .  .  .  }
+  1383  .  .  .  .  .  }
+  1384  .  .  .  .  }
+  1385  .  .  .  }
+  1386  .  .  }
+  1387  .  }
+  1388  }

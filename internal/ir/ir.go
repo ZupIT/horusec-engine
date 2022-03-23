@@ -311,6 +311,33 @@ type Jump struct {
 	block *BasicBlock
 }
 
+// Object is an IR Value that represents arrays, constructors and hashmaps.
+//
+// Example printed form:
+// %t0 = array["a","b","c"]
+// %t1 = constructor(ExClass)
+//
+// The Object implements the Value interface.
+// TODO: in the future it will be necessary to improve the hashmap print
+type Object struct {
+	node
+	Type    Value
+	Comment string
+	Values  []Value
+}
+
+// HashMap is an IR Value that represents a hashmap.
+//
+// Example printed form:
+// %t0 = hashmap[{"k": "v"},{"k2": "v2"}]
+//
+// The HashMap implements the Value interface.
+type HashMap struct {
+	node
+	Key   Value
+	Value Value
+}
+
 // node is a mix-in embedded by all IR nodes to provide source code information.
 //
 // Since node is embedded by all IR nodes (Value's and Instruction's), these nodes
@@ -396,6 +423,15 @@ func (*Struct) value()           {}
 func (*Struct) member()          {}
 func (s *Struct) Name() string   { return s.name }
 func (s *Struct) String() string { return fmt.Sprintf("type %s struct", s.Name()) }
+
+func (*Object) value()         {}
+func (o *Object) Name() string { return "" }
+
+func (*HashMap) value()         {}
+func (h *HashMap) Name() string { return h.String() }
+func (h *HashMap) String() string {
+	return fmt.Sprintf("{%s: %s}", h.Key.String(), h.Value.String())
+}
 
 // Func returns the file-level function of the specified name or nil
 // if not found.

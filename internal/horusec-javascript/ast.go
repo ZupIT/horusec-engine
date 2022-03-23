@@ -544,9 +544,13 @@ func (p *parser) parseExpr(node *cst.Node) ast.Expr {
 			Type:     p.parseExpr(node.ChildByFieldName("constructor")),
 			Elts:     args,
 			Position: ast.NewPosition(node),
+			Comment:  "constructor",
 		}
 	case Object:
-		var obj ast.ObjectExpr
+		obj := ast.ObjectExpr{
+			Comment: "hashmap",
+		}
+
 		p.iterNamedChilds(node, func(pair *cst.Node) {
 			obj.Elts = append(obj.Elts, p.parseExpr(pair))
 		})
@@ -559,7 +563,10 @@ func (p *parser) parseExpr(node *cst.Node) ast.Expr {
 			Position: ast.NewPosition(node),
 		}
 	case Array:
-		var obj ast.ObjectExpr
+		obj := ast.ObjectExpr{
+			Comment: "array",
+		}
+
 		p.iterNamedChilds(node, func(node *cst.Node) {
 			obj.Elts = append(obj.Elts, p.parseExpr(node))
 		})

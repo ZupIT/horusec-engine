@@ -166,9 +166,10 @@ type (
 	// ObjectExpr node represents a object creation expression.
 	ObjectExpr struct {
 		Position
-		Name *Ident // Name of identifier or nil.
-		Type Expr   // Type of object or nil.
-		Elts []Expr // Elements used to created object or nil.
+		Name    *Ident // Name of identifier or nil.
+		Type    Expr   // Type of object or nil.
+		Elts    []Expr // Elements used to created object or nil.
+		Comment string // Optional type of the object expression; no semantic significance
 	}
 
 	// BinaryExpr node represents a binary expression.

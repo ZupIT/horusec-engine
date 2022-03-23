@@ -24,7 +24,7 @@ func ExportStatement():
 #   0:	values
 func ForInStatement():
 0:                                                                         entry
-	%t0 = nil
+	%t0 = array["a","b","c"]
 
 # Name: ForStatement
 # File: statements.js
