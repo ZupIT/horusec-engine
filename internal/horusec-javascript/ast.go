@@ -315,18 +315,26 @@ func (p *parser) parseStmt(node *cst.Node) ast.Stmt {
 			}
 		}
 	case ReturnStatement:
-		expr := node.NamedChild(0)
-		if expr.Type() == SequenceExpression {
+		if expr := node.NamedChild(0); expr != nil {
+			if expr.Type() == SequenceExpression {
+				return &ast.ReturnStmt{
+					Results:  p.parseSequenceExpr(expr),
+					Position: ast.NewPosition(node),
+				}
+			}
+
 			return &ast.ReturnStmt{
-				Results:  p.parseSequenceExpr(expr),
-				Position: ast.NewPosition(node),
+				Position: ast.NewPosition(expr),
+				Results: []ast.Expr{
+					p.parseExpr(expr),
+				},
 			}
 		}
 
+		// Return without any statement
 		return &ast.ReturnStmt{
-			Results: []ast.Expr{
-				p.parseExpr(expr),
-			},
+			Position: ast.NewPosition(node),
+			Results:  make([]ast.Expr, 0),
 		}
 	case IfStatement:
 		stmt := &ast.IfStmt{
