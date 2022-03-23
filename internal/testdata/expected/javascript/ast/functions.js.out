@@ -4,7 +4,7 @@
      3  .  .  Name: "functions.js"
      4  .  .  Position: ast.Position {}
      5  .  }
-     6  .  Decls: []ast.Decl (len = 13) {
+     6  .  Decls: []ast.Decl (len = 15) {
      7  .  .  0: *ast.ImportDecl {
      8  .  .  .  Position: ast.Position {}
      9  .  .  .  Name: *ast.Ident {
@@ -1385,5 +1385,78 @@
   1384  .  .  .  .  }
   1385  .  .  .  }
   1386  .  .  }
-  1387  .  }
-  1388  }
+  1387  .  .  13: *ast.ValueDecl {
+  1388  .  .  .  Position: ast.Position {}
+  1389  .  .  .  Names: []*ast.Ident (len = 1) {
+  1390  .  .  .  .  0: *ast.Ident {
+  1391  .  .  .  .  .  Name: "i"
+  1392  .  .  .  .  .  Position: ast.Position {}
+  1393  .  .  .  .  }
+  1394  .  .  .  }
+  1395  .  .  .  Values: []ast.Expr (len = 1) {
+  1396  .  .  .  .  0: *ast.ObjectExpr {
+  1397  .  .  .  .  .  Position: ast.Position {}
+  1398  .  .  .  .  .  Elts: []ast.Expr (len = 3) {
+  1399  .  .  .  .  .  .  0: *ast.BasicLit {
+  1400  .  .  .  .  .  .  .  Position: ast.Position {}
+  1401  .  .  .  .  .  .  .  Kind: "number"
+  1402  .  .  .  .  .  .  .  Value: "1"
+  1403  .  .  .  .  .  .  }
+  1404  .  .  .  .  .  .  1: *ast.BasicLit {
+  1405  .  .  .  .  .  .  .  Position: ast.Position {}
+  1406  .  .  .  .  .  .  .  Kind: "number"
+  1407  .  .  .  .  .  .  .  Value: "2"
+  1408  .  .  .  .  .  .  }
+  1409  .  .  .  .  .  .  2: *ast.BasicLit {
+  1410  .  .  .  .  .  .  .  Position: ast.Position {}
+  1411  .  .  .  .  .  .  .  Kind: "number"
+  1412  .  .  .  .  .  .  .  Value: "3"
+  1413  .  .  .  .  .  .  }
+  1414  .  .  .  .  .  }
+  1415  .  .  .  .  .  Comment: "array"
+  1416  .  .  .  .  }
+  1417  .  .  .  }
+  1418  .  .  }
+  1419  .  .  14: *ast.FuncDecl {
+  1420  .  .  .  Position: ast.Position {}
+  1421  .  .  .  Name: *ast.Ident {
+  1422  .  .  .  .  Name: "f12"
+  1423  .  .  .  .  Position: ast.Position {}
+  1424  .  .  .  }
+  1425  .  .  .  Type: *ast.FuncType {
+  1426  .  .  .  .  Position: ast.Position {}
+  1427  .  .  .  .  Params: *ast.FieldList {
+  1428  .  .  .  .  .  Position: ast.Position {}
+  1429  .  .  .  .  }
+  1430  .  .  .  }
+  1431  .  .  .  Body: *ast.BlockStmt {
+  1432  .  .  .  .  Position: ast.Position {}
+  1433  .  .  .  .  List: []ast.Stmt (len = 1) {
+  1434  .  .  .  .  .  0: *ast.ExprStmt {
+  1435  .  .  .  .  .  .  Position: ast.Position {}
+  1436  .  .  .  .  .  .  Expr: *ast.CallExpr {
+  1437  .  .  .  .  .  .  .  Position: ast.Position {}
+  1438  .  .  .  .  .  .  .  Fun: *ast.SelectorExpr {
+  1439  .  .  .  .  .  .  .  .  Position: ast.Position {}
+  1440  .  .  .  .  .  .  .  .  Expr: *ast.Ident {
+  1441  .  .  .  .  .  .  .  .  .  Name: "console"
+  1442  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+  1443  .  .  .  .  .  .  .  .  }
+  1444  .  .  .  .  .  .  .  .  Sel: *ast.Ident {
+  1445  .  .  .  .  .  .  .  .  .  Name: "log"
+  1446  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+  1447  .  .  .  .  .  .  .  .  }
+  1448  .  .  .  .  .  .  .  }
+  1449  .  .  .  .  .  .  .  Args: []ast.Expr (len = 1) {
+  1450  .  .  .  .  .  .  .  .  0: *ast.Ident {
+  1451  .  .  .  .  .  .  .  .  .  Name: "i"
+  1452  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+  1453  .  .  .  .  .  .  .  .  }
+  1454  .  .  .  .  .  .  .  }
+  1455  .  .  .  .  .  .  }
+  1456  .  .  .  .  .  }
+  1457  .  .  .  .  }
+  1458  .  .  .  }
+  1459  .  .  }
+  1460  .  }
+  1461  }
