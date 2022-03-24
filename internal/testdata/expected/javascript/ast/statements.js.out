@@ -4,7 +4,7 @@
      3  .  .  Name: "statements.js"
      4  .  .  Position: ast.Position {}
      5  .  }
-     6  .  Decls: []ast.Decl (len = 7) {
+     6  .  Decls: []ast.Decl (len = 11) {
      7  .  .  0: *ast.FuncDecl {
      8  .  .  .  Position: ast.Position {}
      9  .  .  .  Name: *ast.Ident {
@@ -903,168 +903,439 @@
    902  .  .  .  .  .  .  .  .  }
    903  .  .  .  .  .  .  .  }
    904  .  .  .  .  .  .  }
-   905  .  .  .  .  .  .  Cond: *ast.ExprStmt {
+   905  .  .  .  .  .  .  Cond: *ast.BinaryExpr {
    906  .  .  .  .  .  .  .  Position: ast.Position {}
-   907  .  .  .  .  .  .  .  Expr: *ast.BinaryExpr {
-   908  .  .  .  .  .  .  .  .  Position: ast.Position {}
-   909  .  .  .  .  .  .  .  .  Left: *ast.Ident {
-   910  .  .  .  .  .  .  .  .  .  Name: "i"
-   911  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
-   912  .  .  .  .  .  .  .  .  }
-   913  .  .  .  .  .  .  .  .  Op: "<"
-   914  .  .  .  .  .  .  .  .  Right: *ast.BasicLit {
-   915  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
-   916  .  .  .  .  .  .  .  .  .  Kind: "number"
-   917  .  .  .  .  .  .  .  .  .  Value: "9"
-   918  .  .  .  .  .  .  .  .  }
-   919  .  .  .  .  .  .  .  }
-   920  .  .  .  .  .  .  }
-   921  .  .  .  .  .  .  Increment: *ast.IncExpr {
-   922  .  .  .  .  .  .  .  Position: ast.Position {}
-   923  .  .  .  .  .  .  .  Arg: *ast.Ident {
-   924  .  .  .  .  .  .  .  .  Name: "i"
-   925  .  .  .  .  .  .  .  .  Position: ast.Position {}
-   926  .  .  .  .  .  .  .  }
-   927  .  .  .  .  .  .  }
-   928  .  .  .  .  .  .  Body: *ast.BlockStmt {
-   929  .  .  .  .  .  .  .  Position: ast.Position {}
-   930  .  .  .  .  .  .  .  List: []ast.Stmt (len = 1) {
-   931  .  .  .  .  .  .  .  .  0: *ast.ExprStmt {
-   932  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
-   933  .  .  .  .  .  .  .  .  .  Expr: *ast.CallExpr {
-   934  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
-   935  .  .  .  .  .  .  .  .  .  .  Fun: *ast.SelectorExpr {
-   936  .  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
-   937  .  .  .  .  .  .  .  .  .  .  .  Expr: *ast.Ident {
-   938  .  .  .  .  .  .  .  .  .  .  .  .  Name: "console"
-   939  .  .  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
-   940  .  .  .  .  .  .  .  .  .  .  .  }
-   941  .  .  .  .  .  .  .  .  .  .  .  Sel: *ast.Ident {
-   942  .  .  .  .  .  .  .  .  .  .  .  .  Name: "log"
-   943  .  .  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
-   944  .  .  .  .  .  .  .  .  .  .  .  }
-   945  .  .  .  .  .  .  .  .  .  .  }
-   946  .  .  .  .  .  .  .  .  .  .  Args: []ast.Expr (len = 1) {
-   947  .  .  .  .  .  .  .  .  .  .  .  0: *ast.Ident {
-   948  .  .  .  .  .  .  .  .  .  .  .  .  Name: "i"
-   949  .  .  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
-   950  .  .  .  .  .  .  .  .  .  .  .  }
-   951  .  .  .  .  .  .  .  .  .  .  }
-   952  .  .  .  .  .  .  .  .  .  }
-   953  .  .  .  .  .  .  .  .  }
-   954  .  .  .  .  .  .  .  }
-   955  .  .  .  .  .  .  }
-   956  .  .  .  .  .  }
-   957  .  .  .  .  }
-   958  .  .  .  }
-   959  .  .  }
-   960  .  .  5: *ast.FuncDecl {
-   961  .  .  .  Position: ast.Position {}
-   962  .  .  .  Name: *ast.Ident {
-   963  .  .  .  .  Name: "ForInStatement"
-   964  .  .  .  .  Position: ast.Position {}
-   965  .  .  .  }
-   966  .  .  .  Type: *ast.FuncType {
-   967  .  .  .  .  Position: ast.Position {}
-   968  .  .  .  .  Params: *ast.FieldList {
-   969  .  .  .  .  .  Position: ast.Position {}
-   970  .  .  .  .  }
-   971  .  .  .  }
-   972  .  .  .  Body: *ast.BlockStmt {
-   973  .  .  .  .  Position: ast.Position {}
-   974  .  .  .  .  List: []ast.Stmt (len = 2) {
-   975  .  .  .  .  .  0: *ast.AssignStmt {
-   976  .  .  .  .  .  .  Position: ast.Position {}
-   977  .  .  .  .  .  .  LHS: []ast.Expr (len = 1) {
-   978  .  .  .  .  .  .  .  0: *ast.Ident {
-   979  .  .  .  .  .  .  .  .  Name: "values"
-   980  .  .  .  .  .  .  .  .  Position: ast.Position {}
-   981  .  .  .  .  .  .  .  }
-   982  .  .  .  .  .  .  }
-   983  .  .  .  .  .  .  RHS: []ast.Expr (len = 1) {
-   984  .  .  .  .  .  .  .  0: *ast.ObjectExpr {
-   985  .  .  .  .  .  .  .  .  Position: ast.Position {}
-   986  .  .  .  .  .  .  .  .  Elts: []ast.Expr (len = 3) {
-   987  .  .  .  .  .  .  .  .  .  0: *ast.BasicLit {
-   988  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
-   989  .  .  .  .  .  .  .  .  .  .  Kind: "string"
-   990  .  .  .  .  .  .  .  .  .  .  Value: "a"
-   991  .  .  .  .  .  .  .  .  .  }
-   992  .  .  .  .  .  .  .  .  .  1: *ast.BasicLit {
-   993  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
-   994  .  .  .  .  .  .  .  .  .  .  Kind: "string"
-   995  .  .  .  .  .  .  .  .  .  .  Value: "b"
-   996  .  .  .  .  .  .  .  .  .  }
-   997  .  .  .  .  .  .  .  .  .  2: *ast.BasicLit {
-   998  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
-   999  .  .  .  .  .  .  .  .  .  .  Kind: "string"
-  1000  .  .  .  .  .  .  .  .  .  .  Value: "c"
-  1001  .  .  .  .  .  .  .  .  .  }
-  1002  .  .  .  .  .  .  .  .  }
-  1003  .  .  .  .  .  .  .  .  Comment: "array"
-  1004  .  .  .  .  .  .  .  }
-  1005  .  .  .  .  .  .  }
-  1006  .  .  .  .  .  }
-  1007  .  .  .  .  .  1: *ast.ForInStatement {
-  1008  .  .  .  .  .  .  Position: ast.Position {}
-  1009  .  .  .  .  .  .  Left: *ast.Ident {
-  1010  .  .  .  .  .  .  .  Name: "value"
-  1011  .  .  .  .  .  .  .  Position: ast.Position {}
-  1012  .  .  .  .  .  .  }
-  1013  .  .  .  .  .  .  Right: *ast.Ident {
-  1014  .  .  .  .  .  .  .  Name: "values"
-  1015  .  .  .  .  .  .  .  Position: ast.Position {}
-  1016  .  .  .  .  .  .  }
-  1017  .  .  .  .  .  .  Body: *ast.BlockStmt {
-  1018  .  .  .  .  .  .  .  Position: ast.Position {}
-  1019  .  .  .  .  .  .  .  List: []ast.Stmt (len = 1) {
-  1020  .  .  .  .  .  .  .  .  0: *ast.ExprStmt {
-  1021  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
-  1022  .  .  .  .  .  .  .  .  .  Expr: *ast.CallExpr {
-  1023  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
-  1024  .  .  .  .  .  .  .  .  .  .  Fun: *ast.SelectorExpr {
-  1025  .  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
-  1026  .  .  .  .  .  .  .  .  .  .  .  Expr: *ast.Ident {
-  1027  .  .  .  .  .  .  .  .  .  .  .  .  Name: "console"
-  1028  .  .  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
-  1029  .  .  .  .  .  .  .  .  .  .  .  }
-  1030  .  .  .  .  .  .  .  .  .  .  .  Sel: *ast.Ident {
-  1031  .  .  .  .  .  .  .  .  .  .  .  .  Name: "log"
-  1032  .  .  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
-  1033  .  .  .  .  .  .  .  .  .  .  .  }
-  1034  .  .  .  .  .  .  .  .  .  .  }
-  1035  .  .  .  .  .  .  .  .  .  .  Args: []ast.Expr (len = 1) {
-  1036  .  .  .  .  .  .  .  .  .  .  .  0: *ast.Ident {
-  1037  .  .  .  .  .  .  .  .  .  .  .  .  Name: "value"
-  1038  .  .  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
-  1039  .  .  .  .  .  .  .  .  .  .  .  }
-  1040  .  .  .  .  .  .  .  .  .  .  }
-  1041  .  .  .  .  .  .  .  .  .  }
-  1042  .  .  .  .  .  .  .  .  }
-  1043  .  .  .  .  .  .  .  }
-  1044  .  .  .  .  .  .  }
-  1045  .  .  .  .  .  }
-  1046  .  .  .  .  }
-  1047  .  .  .  }
-  1048  .  .  }
-  1049  .  .  6: *ast.FuncDecl {
-  1050  .  .  .  Position: ast.Position {}
-  1051  .  .  .  Name: *ast.Ident {
-  1052  .  .  .  .  Name: "ExportStatement"
-  1053  .  .  .  .  Position: ast.Position {}
-  1054  .  .  .  }
-  1055  .  .  .  Type: *ast.FuncType {
-  1056  .  .  .  .  Position: ast.Position {}
-  1057  .  .  .  .  Params: *ast.FieldList {
-  1058  .  .  .  .  .  Position: ast.Position {}
-  1059  .  .  .  .  }
-  1060  .  .  .  }
-  1061  .  .  .  Body: *ast.BlockStmt {
-  1062  .  .  .  .  Position: ast.Position {}
-  1063  .  .  .  .  List: []ast.Stmt (len = 1) {
-  1064  .  .  .  .  .  0: nil
+   907  .  .  .  .  .  .  .  Left: *ast.Ident {
+   908  .  .  .  .  .  .  .  .  Name: "i"
+   909  .  .  .  .  .  .  .  .  Position: ast.Position {}
+   910  .  .  .  .  .  .  .  }
+   911  .  .  .  .  .  .  .  Op: "<"
+   912  .  .  .  .  .  .  .  Right: *ast.BasicLit {
+   913  .  .  .  .  .  .  .  .  Position: ast.Position {}
+   914  .  .  .  .  .  .  .  .  Kind: "number"
+   915  .  .  .  .  .  .  .  .  Value: "9"
+   916  .  .  .  .  .  .  .  }
+   917  .  .  .  .  .  .  }
+   918  .  .  .  .  .  .  Increment: *ast.IncExpr {
+   919  .  .  .  .  .  .  .  Position: ast.Position {}
+   920  .  .  .  .  .  .  .  Op: "++"
+   921  .  .  .  .  .  .  .  Arg: *ast.Ident {
+   922  .  .  .  .  .  .  .  .  Name: "i"
+   923  .  .  .  .  .  .  .  .  Position: ast.Position {}
+   924  .  .  .  .  .  .  .  }
+   925  .  .  .  .  .  .  }
+   926  .  .  .  .  .  .  Body: *ast.BlockStmt {
+   927  .  .  .  .  .  .  .  Position: ast.Position {}
+   928  .  .  .  .  .  .  .  List: []ast.Stmt (len = 1) {
+   929  .  .  .  .  .  .  .  .  0: *ast.ExprStmt {
+   930  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+   931  .  .  .  .  .  .  .  .  .  Expr: *ast.CallExpr {
+   932  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+   933  .  .  .  .  .  .  .  .  .  .  Fun: *ast.SelectorExpr {
+   934  .  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+   935  .  .  .  .  .  .  .  .  .  .  .  Expr: *ast.Ident {
+   936  .  .  .  .  .  .  .  .  .  .  .  .  Name: "console"
+   937  .  .  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+   938  .  .  .  .  .  .  .  .  .  .  .  }
+   939  .  .  .  .  .  .  .  .  .  .  .  Sel: *ast.Ident {
+   940  .  .  .  .  .  .  .  .  .  .  .  .  Name: "log"
+   941  .  .  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+   942  .  .  .  .  .  .  .  .  .  .  .  }
+   943  .  .  .  .  .  .  .  .  .  .  }
+   944  .  .  .  .  .  .  .  .  .  .  Args: []ast.Expr (len = 1) {
+   945  .  .  .  .  .  .  .  .  .  .  .  0: *ast.Ident {
+   946  .  .  .  .  .  .  .  .  .  .  .  .  Name: "i"
+   947  .  .  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+   948  .  .  .  .  .  .  .  .  .  .  .  }
+   949  .  .  .  .  .  .  .  .  .  .  }
+   950  .  .  .  .  .  .  .  .  .  }
+   951  .  .  .  .  .  .  .  .  }
+   952  .  .  .  .  .  .  .  }
+   953  .  .  .  .  .  .  }
+   954  .  .  .  .  .  }
+   955  .  .  .  .  }
+   956  .  .  .  }
+   957  .  .  }
+   958  .  .  5: *ast.FuncDecl {
+   959  .  .  .  Position: ast.Position {}
+   960  .  .  .  Name: *ast.Ident {
+   961  .  .  .  .  Name: "ForStatementIteratingOverList"
+   962  .  .  .  .  Position: ast.Position {}
+   963  .  .  .  }
+   964  .  .  .  Type: *ast.FuncType {
+   965  .  .  .  .  Position: ast.Position {}
+   966  .  .  .  .  Params: *ast.FieldList {
+   967  .  .  .  .  .  Position: ast.Position {}
+   968  .  .  .  .  .  List: []*ast.Field (len = 1) {
+   969  .  .  .  .  .  .  0: *ast.Field {
+   970  .  .  .  .  .  .  .  Position: ast.Position {}
+   971  .  .  .  .  .  .  .  Name: *ast.Ident {
+   972  .  .  .  .  .  .  .  .  Name: "data"
+   973  .  .  .  .  .  .  .  .  Position: ast.Position {}
+   974  .  .  .  .  .  .  .  }
+   975  .  .  .  .  .  .  }
+   976  .  .  .  .  .  }
+   977  .  .  .  .  }
+   978  .  .  .  }
+   979  .  .  .  Body: *ast.BlockStmt {
+   980  .  .  .  .  Position: ast.Position {}
+   981  .  .  .  .  List: []ast.Stmt (len = 3) {
+   982  .  .  .  .  .  0: *ast.AssignStmt {
+   983  .  .  .  .  .  .  Position: ast.Position {}
+   984  .  .  .  .  .  .  LHS: []ast.Expr (len = 1) {
+   985  .  .  .  .  .  .  .  0: *ast.Ident {
+   986  .  .  .  .  .  .  .  .  Name: "sum"
+   987  .  .  .  .  .  .  .  .  Position: ast.Position {}
+   988  .  .  .  .  .  .  .  }
+   989  .  .  .  .  .  .  }
+   990  .  .  .  .  .  .  RHS: []ast.Expr (len = 1) {
+   991  .  .  .  .  .  .  .  0: *ast.BasicLit {
+   992  .  .  .  .  .  .  .  .  Position: ast.Position {}
+   993  .  .  .  .  .  .  .  .  Kind: "number"
+   994  .  .  .  .  .  .  .  .  Value: "0"
+   995  .  .  .  .  .  .  .  }
+   996  .  .  .  .  .  .  }
+   997  .  .  .  .  .  }
+   998  .  .  .  .  .  1: *ast.ForStatement {
+   999  .  .  .  .  .  .  Position: ast.Position {}
+  1000  .  .  .  .  .  .  VarDecl: *ast.AssignStmt {
+  1001  .  .  .  .  .  .  .  Position: ast.Position {}
+  1002  .  .  .  .  .  .  .  LHS: []ast.Expr (len = 1) {
+  1003  .  .  .  .  .  .  .  .  0: *ast.Ident {
+  1004  .  .  .  .  .  .  .  .  .  Name: "i"
+  1005  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+  1006  .  .  .  .  .  .  .  .  }
+  1007  .  .  .  .  .  .  .  }
+  1008  .  .  .  .  .  .  .  RHS: []ast.Expr (len = 1) {
+  1009  .  .  .  .  .  .  .  .  0: *ast.BasicLit {
+  1010  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+  1011  .  .  .  .  .  .  .  .  .  Kind: "number"
+  1012  .  .  .  .  .  .  .  .  .  Value: "0"
+  1013  .  .  .  .  .  .  .  .  }
+  1014  .  .  .  .  .  .  .  }
+  1015  .  .  .  .  .  .  }
+  1016  .  .  .  .  .  .  Cond: *ast.BinaryExpr {
+  1017  .  .  .  .  .  .  .  Position: ast.Position {}
+  1018  .  .  .  .  .  .  .  Left: *ast.Ident {
+  1019  .  .  .  .  .  .  .  .  Name: "i"
+  1020  .  .  .  .  .  .  .  .  Position: ast.Position {}
+  1021  .  .  .  .  .  .  .  }
+  1022  .  .  .  .  .  .  .  Op: "<"
+  1023  .  .  .  .  .  .  .  Right: *ast.SelectorExpr {
+  1024  .  .  .  .  .  .  .  .  Position: ast.Position {}
+  1025  .  .  .  .  .  .  .  .  Expr: *ast.Ident {
+  1026  .  .  .  .  .  .  .  .  .  Name: "data"
+  1027  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+  1028  .  .  .  .  .  .  .  .  }
+  1029  .  .  .  .  .  .  .  .  Sel: *ast.Ident {
+  1030  .  .  .  .  .  .  .  .  .  Name: "length"
+  1031  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+  1032  .  .  .  .  .  .  .  .  }
+  1033  .  .  .  .  .  .  .  }
+  1034  .  .  .  .  .  .  }
+  1035  .  .  .  .  .  .  Increment: *ast.IncExpr {
+  1036  .  .  .  .  .  .  .  Position: ast.Position {}
+  1037  .  .  .  .  .  .  .  Op: "++"
+  1038  .  .  .  .  .  .  .  Arg: *ast.Ident {
+  1039  .  .  .  .  .  .  .  .  Name: "i"
+  1040  .  .  .  .  .  .  .  .  Position: ast.Position {}
+  1041  .  .  .  .  .  .  .  }
+  1042  .  .  .  .  .  .  }
+  1043  .  .  .  .  .  .  Body: *ast.BlockStmt {
+  1044  .  .  .  .  .  .  .  Position: ast.Position {}
+  1045  .  .  .  .  .  .  .  List: []ast.Stmt (len = 1) {
+  1046  .  .  .  .  .  .  .  .  0: *ast.ExprStmt {
+  1047  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+  1048  .  .  .  .  .  .  .  .  .  Expr: *ast.BadNode {
+  1049  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+  1050  .  .  .  .  .  .  .  .  .  .  Comment: "unsupported node type <augmented_assignment_expression>"
+  1051  .  .  .  .  .  .  .  .  .  }
+  1052  .  .  .  .  .  .  .  .  }
+  1053  .  .  .  .  .  .  .  }
+  1054  .  .  .  .  .  .  }
+  1055  .  .  .  .  .  }
+  1056  .  .  .  .  .  2: *ast.ReturnStmt {
+  1057  .  .  .  .  .  .  Position: ast.Position {}
+  1058  .  .  .  .  .  .  Results: []ast.Expr (len = 1) {
+  1059  .  .  .  .  .  .  .  0: *ast.Ident {
+  1060  .  .  .  .  .  .  .  .  Name: "sum"
+  1061  .  .  .  .  .  .  .  .  Position: ast.Position {}
+  1062  .  .  .  .  .  .  .  }
+  1063  .  .  .  .  .  .  }
+  1064  .  .  .  .  .  }
   1065  .  .  .  .  }
   1066  .  .  .  }
   1067  .  .  }
-  1068  .  }
-  1069  }
+  1068  .  .  6: *ast.FuncDecl {
+  1069  .  .  .  Position: ast.Position {}
+  1070  .  .  .  Name: *ast.Ident {
+  1071  .  .  .  .  Name: "ForStatementWithoutBinaryExpressionIncremet"
+  1072  .  .  .  .  Position: ast.Position {}
+  1073  .  .  .  }
+  1074  .  .  .  Type: *ast.FuncType {
+  1075  .  .  .  .  Position: ast.Position {}
+  1076  .  .  .  .  Params: *ast.FieldList {
+  1077  .  .  .  .  .  Position: ast.Position {}
+  1078  .  .  .  .  }
+  1079  .  .  .  }
+  1080  .  .  .  Body: *ast.BlockStmt {
+  1081  .  .  .  .  Position: ast.Position {}
+  1082  .  .  .  .  List: []ast.Stmt (len = 1) {
+  1083  .  .  .  .  .  0: *ast.ForStatement {
+  1084  .  .  .  .  .  .  Position: ast.Position {}
+  1085  .  .  .  .  .  .  VarDecl: *ast.AssignStmt {
+  1086  .  .  .  .  .  .  .  Position: ast.Position {}
+  1087  .  .  .  .  .  .  .  LHS: []ast.Expr (len = 2) {
+  1088  .  .  .  .  .  .  .  .  0: *ast.Ident {
+  1089  .  .  .  .  .  .  .  .  .  Name: "a"
+  1090  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+  1091  .  .  .  .  .  .  .  .  }
+  1092  .  .  .  .  .  .  .  .  1: *ast.Ident {
+  1093  .  .  .  .  .  .  .  .  .  Name: "b"
+  1094  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+  1095  .  .  .  .  .  .  .  .  }
+  1096  .  .  .  .  .  .  .  }
+  1097  .  .  .  .  .  .  .  RHS: []ast.Expr (len = 0) {}
+  1098  .  .  .  .  .  .  }
+  1099  .  .  .  .  .  .  Cond: *ast.Ident {
+  1100  .  .  .  .  .  .  .  Name: "c"
+  1101  .  .  .  .  .  .  .  Position: ast.Position {}
+  1102  .  .  .  .  .  .  }
+  1103  .  .  .  .  .  .  Increment: *ast.Ident {
+  1104  .  .  .  .  .  .  .  Name: "d"
+  1105  .  .  .  .  .  .  .  Position: ast.Position {}
+  1106  .  .  .  .  .  .  }
+  1107  .  .  .  .  .  .  Body: *ast.BlockStmt {
+  1108  .  .  .  .  .  .  .  Position: ast.Position {}
+  1109  .  .  .  .  .  .  .  List: []ast.Stmt (len = 1) {
+  1110  .  .  .  .  .  .  .  .  0: *ast.BadNode {
+  1111  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+  1112  .  .  .  .  .  .  .  .  .  Comment: "unsupported node type <identifier>"
+  1113  .  .  .  .  .  .  .  .  }
+  1114  .  .  .  .  .  .  .  }
+  1115  .  .  .  .  .  .  }
+  1116  .  .  .  .  .  }
+  1117  .  .  .  .  }
+  1118  .  .  .  }
+  1119  .  .  }
+  1120  .  .  7: *ast.FuncDecl {
+  1121  .  .  .  Position: ast.Position {}
+  1122  .  .  .  Name: *ast.Ident {
+  1123  .  .  .  .  Name: "ForStatementEndlessRecursion"
+  1124  .  .  .  .  Position: ast.Position {}
+  1125  .  .  .  }
+  1126  .  .  .  Type: *ast.FuncType {
+  1127  .  .  .  .  Position: ast.Position {}
+  1128  .  .  .  .  Params: *ast.FieldList {
+  1129  .  .  .  .  .  Position: ast.Position {}
+  1130  .  .  .  .  }
+  1131  .  .  .  }
+  1132  .  .  .  Body: *ast.BlockStmt {
+  1133  .  .  .  .  Position: ast.Position {}
+  1134  .  .  .  .  List: []ast.Stmt (len = 1) {
+  1135  .  .  .  .  .  0: *ast.ForStatement {
+  1136  .  .  .  .  .  .  Position: ast.Position {}
+  1137  .  .  .  .  .  .  Body: *ast.BlockStmt {
+  1138  .  .  .  .  .  .  .  Position: ast.Position {}
+  1139  .  .  .  .  .  .  .  List: []ast.Stmt (len = 1) {
+  1140  .  .  .  .  .  .  .  .  0: *ast.ExprStmt {
+  1141  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+  1142  .  .  .  .  .  .  .  .  .  Expr: *ast.CallExpr {
+  1143  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+  1144  .  .  .  .  .  .  .  .  .  .  Fun: *ast.SelectorExpr {
+  1145  .  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+  1146  .  .  .  .  .  .  .  .  .  .  .  Expr: *ast.Ident {
+  1147  .  .  .  .  .  .  .  .  .  .  .  .  Name: "console"
+  1148  .  .  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+  1149  .  .  .  .  .  .  .  .  .  .  .  }
+  1150  .  .  .  .  .  .  .  .  .  .  .  Sel: *ast.Ident {
+  1151  .  .  .  .  .  .  .  .  .  .  .  .  Name: "log"
+  1152  .  .  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+  1153  .  .  .  .  .  .  .  .  .  .  .  }
+  1154  .  .  .  .  .  .  .  .  .  .  }
+  1155  .  .  .  .  .  .  .  .  .  .  Args: []ast.Expr (len = 1) {
+  1156  .  .  .  .  .  .  .  .  .  .  .  0: *ast.BasicLit {
+  1157  .  .  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+  1158  .  .  .  .  .  .  .  .  .  .  .  .  Kind: "string"
+  1159  .  .  .  .  .  .  .  .  .  .  .  .  Value: "endless recursion"
+  1160  .  .  .  .  .  .  .  .  .  .  .  }
+  1161  .  .  .  .  .  .  .  .  .  .  }
+  1162  .  .  .  .  .  .  .  .  .  }
+  1163  .  .  .  .  .  .  .  .  }
+  1164  .  .  .  .  .  .  .  }
+  1165  .  .  .  .  .  .  }
+  1166  .  .  .  .  .  }
+  1167  .  .  .  .  }
+  1168  .  .  .  }
+  1169  .  .  }
+  1170  .  .  8: *ast.FuncDecl {
+  1171  .  .  .  Position: ast.Position {}
+  1172  .  .  .  Name: *ast.Ident {
+  1173  .  .  .  .  Name: "ForStatementEmptyBody"
+  1174  .  .  .  .  Position: ast.Position {}
+  1175  .  .  .  }
+  1176  .  .  .  Type: *ast.FuncType {
+  1177  .  .  .  .  Position: ast.Position {}
+  1178  .  .  .  .  Params: *ast.FieldList {
+  1179  .  .  .  .  .  Position: ast.Position {}
+  1180  .  .  .  .  }
+  1181  .  .  .  }
+  1182  .  .  .  Body: *ast.BlockStmt {
+  1183  .  .  .  .  Position: ast.Position {}
+  1184  .  .  .  .  List: []ast.Stmt (len = 1) {
+  1185  .  .  .  .  .  0: *ast.ForStatement {
+  1186  .  .  .  .  .  .  Position: ast.Position {}
+  1187  .  .  .  .  .  .  VarDecl: *ast.AssignStmt {
+  1188  .  .  .  .  .  .  .  Position: ast.Position {}
+  1189  .  .  .  .  .  .  .  LHS: []ast.Expr (len = 1) {
+  1190  .  .  .  .  .  .  .  .  0: *ast.Ident {
+  1191  .  .  .  .  .  .  .  .  .  Name: "i"
+  1192  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+  1193  .  .  .  .  .  .  .  .  }
+  1194  .  .  .  .  .  .  .  }
+  1195  .  .  .  .  .  .  .  RHS: []ast.Expr (len = 1) {
+  1196  .  .  .  .  .  .  .  .  0: *ast.BasicLit {
+  1197  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+  1198  .  .  .  .  .  .  .  .  .  Kind: "number"
+  1199  .  .  .  .  .  .  .  .  .  Value: "0"
+  1200  .  .  .  .  .  .  .  .  }
+  1201  .  .  .  .  .  .  .  }
+  1202  .  .  .  .  .  .  }
+  1203  .  .  .  .  .  .  Cond: *ast.BinaryExpr {
+  1204  .  .  .  .  .  .  .  Position: ast.Position {}
+  1205  .  .  .  .  .  .  .  Left: *ast.Ident {
+  1206  .  .  .  .  .  .  .  .  Name: "i"
+  1207  .  .  .  .  .  .  .  .  Position: ast.Position {}
+  1208  .  .  .  .  .  .  .  }
+  1209  .  .  .  .  .  .  .  Op: "<"
+  1210  .  .  .  .  .  .  .  Right: *ast.Ident {
+  1211  .  .  .  .  .  .  .  .  Name: "l"
+  1212  .  .  .  .  .  .  .  .  Position: ast.Position {}
+  1213  .  .  .  .  .  .  .  }
+  1214  .  .  .  .  .  .  }
+  1215  .  .  .  .  .  .  Increment: *ast.IncExpr {
+  1216  .  .  .  .  .  .  .  Position: ast.Position {}
+  1217  .  .  .  .  .  .  .  Op: "++"
+  1218  .  .  .  .  .  .  .  Arg: *ast.Ident {
+  1219  .  .  .  .  .  .  .  .  Name: "i"
+  1220  .  .  .  .  .  .  .  .  Position: ast.Position {}
+  1221  .  .  .  .  .  .  .  }
+  1222  .  .  .  .  .  .  }
+  1223  .  .  .  .  .  .  Body: *ast.BlockStmt {
+  1224  .  .  .  .  .  .  .  Position: ast.Position {}
+  1225  .  .  .  .  .  .  .  List: []ast.Stmt (len = 0) {}
+  1226  .  .  .  .  .  .  }
+  1227  .  .  .  .  .  }
+  1228  .  .  .  .  }
+  1229  .  .  .  }
+  1230  .  .  }
+  1231  .  .  9: *ast.FuncDecl {
+  1232  .  .  .  Position: ast.Position {}
+  1233  .  .  .  Name: *ast.Ident {
+  1234  .  .  .  .  Name: "ForInStatement"
+  1235  .  .  .  .  Position: ast.Position {}
+  1236  .  .  .  }
+  1237  .  .  .  Type: *ast.FuncType {
+  1238  .  .  .  .  Position: ast.Position {}
+  1239  .  .  .  .  Params: *ast.FieldList {
+  1240  .  .  .  .  .  Position: ast.Position {}
+  1241  .  .  .  .  }
+  1242  .  .  .  }
+  1243  .  .  .  Body: *ast.BlockStmt {
+  1244  .  .  .  .  Position: ast.Position {}
+  1245  .  .  .  .  List: []ast.Stmt (len = 2) {
+  1246  .  .  .  .  .  0: *ast.AssignStmt {
+  1247  .  .  .  .  .  .  Position: ast.Position {}
+  1248  .  .  .  .  .  .  LHS: []ast.Expr (len = 1) {
+  1249  .  .  .  .  .  .  .  0: *ast.Ident {
+  1250  .  .  .  .  .  .  .  .  Name: "values"
+  1251  .  .  .  .  .  .  .  .  Position: ast.Position {}
+  1252  .  .  .  .  .  .  .  }
+  1253  .  .  .  .  .  .  }
+  1254  .  .  .  .  .  .  RHS: []ast.Expr (len = 1) {
+  1255  .  .  .  .  .  .  .  0: *ast.ObjectExpr {
+  1256  .  .  .  .  .  .  .  .  Position: ast.Position {}
+  1257  .  .  .  .  .  .  .  .  Elts: []ast.Expr (len = 3) {
+  1258  .  .  .  .  .  .  .  .  .  0: *ast.BasicLit {
+  1259  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+  1260  .  .  .  .  .  .  .  .  .  .  Kind: "string"
+  1261  .  .  .  .  .  .  .  .  .  .  Value: "a"
+  1262  .  .  .  .  .  .  .  .  .  }
+  1263  .  .  .  .  .  .  .  .  .  1: *ast.BasicLit {
+  1264  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+  1265  .  .  .  .  .  .  .  .  .  .  Kind: "string"
+  1266  .  .  .  .  .  .  .  .  .  .  Value: "b"
+  1267  .  .  .  .  .  .  .  .  .  }
+  1268  .  .  .  .  .  .  .  .  .  2: *ast.BasicLit {
+  1269  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+  1270  .  .  .  .  .  .  .  .  .  .  Kind: "string"
+  1271  .  .  .  .  .  .  .  .  .  .  Value: "c"
+  1272  .  .  .  .  .  .  .  .  .  }
+  1273  .  .  .  .  .  .  .  .  }
+  1274  .  .  .  .  .  .  .  .  Comment: "array"
+  1275  .  .  .  .  .  .  .  }
+  1276  .  .  .  .  .  .  }
+  1277  .  .  .  .  .  }
+  1278  .  .  .  .  .  1: *ast.ForInStatement {
+  1279  .  .  .  .  .  .  Position: ast.Position {}
+  1280  .  .  .  .  .  .  Left: *ast.Ident {
+  1281  .  .  .  .  .  .  .  Name: "value"
+  1282  .  .  .  .  .  .  .  Position: ast.Position {}
+  1283  .  .  .  .  .  .  }
+  1284  .  .  .  .  .  .  Right: *ast.Ident {
+  1285  .  .  .  .  .  .  .  Name: "values"
+  1286  .  .  .  .  .  .  .  Position: ast.Position {}
+  1287  .  .  .  .  .  .  }
+  1288  .  .  .  .  .  .  Body: *ast.BlockStmt {
+  1289  .  .  .  .  .  .  .  Position: ast.Position {}
+  1290  .  .  .  .  .  .  .  List: []ast.Stmt (len = 1) {
+  1291  .  .  .  .  .  .  .  .  0: *ast.ExprStmt {
+  1292  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+  1293  .  .  .  .  .  .  .  .  .  Expr: *ast.CallExpr {
+  1294  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+  1295  .  .  .  .  .  .  .  .  .  .  Fun: *ast.SelectorExpr {
+  1296  .  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+  1297  .  .  .  .  .  .  .  .  .  .  .  Expr: *ast.Ident {
+  1298  .  .  .  .  .  .  .  .  .  .  .  .  Name: "console"
+  1299  .  .  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+  1300  .  .  .  .  .  .  .  .  .  .  .  }
+  1301  .  .  .  .  .  .  .  .  .  .  .  Sel: *ast.Ident {
+  1302  .  .  .  .  .  .  .  .  .  .  .  .  Name: "log"
+  1303  .  .  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+  1304  .  .  .  .  .  .  .  .  .  .  .  }
+  1305  .  .  .  .  .  .  .  .  .  .  }
+  1306  .  .  .  .  .  .  .  .  .  .  Args: []ast.Expr (len = 1) {
+  1307  .  .  .  .  .  .  .  .  .  .  .  0: *ast.Ident {
+  1308  .  .  .  .  .  .  .  .  .  .  .  .  Name: "value"
+  1309  .  .  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+  1310  .  .  .  .  .  .  .  .  .  .  .  }
+  1311  .  .  .  .  .  .  .  .  .  .  }
+  1312  .  .  .  .  .  .  .  .  .  }
+  1313  .  .  .  .  .  .  .  .  }
+  1314  .  .  .  .  .  .  .  }
+  1315  .  .  .  .  .  .  }
+  1316  .  .  .  .  .  }
+  1317  .  .  .  .  }
+  1318  .  .  .  }
+  1319  .  .  }
+  1320  .  .  10: *ast.FuncDecl {
+  1321  .  .  .  Position: ast.Position {}
+  1322  .  .  .  Name: *ast.Ident {
+  1323  .  .  .  .  Name: "ExportStatement"
+  1324  .  .  .  .  Position: ast.Position {}
+  1325  .  .  .  }
+  1326  .  .  .  Type: *ast.FuncType {
+  1327  .  .  .  .  Position: ast.Position {}
+  1328  .  .  .  .  Params: *ast.FieldList {
+  1329  .  .  .  .  .  Position: ast.Position {}
+  1330  .  .  .  .  }
+  1331  .  .  .  }
+  1332  .  .  .  Body: *ast.BlockStmt {
+  1333  .  .  .  .  Position: ast.Position {}
+  1334  .  .  .  .  List: []ast.Stmt (len = 1) {
+  1335  .  .  .  .  .  0: nil
+  1336  .  .  .  .  }
+  1337  .  .  .  }
+  1338  .  .  }
+  1339  .  }
+  1340  }

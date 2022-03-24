@@ -1,20 +1,36 @@
 file expressions.js:
-  import  express
-  func  %fn2    ()
-  var   app    
+  import  express      
+  func  %fn3          ()
+  var   app          
+  func  incrementExpr ()
 
 
 
 ============================
 
-# Name: %fn2
+# Name: %fn3
 # File: expressions.js
 # Location: expressions.js:1:0
-func %fn2():
+func %fn3():
 0:                                                                         entry
 	%t0 = console.log("testing")
-	%t1 = make closure %fn2$1 
+	%t1 = make closure %fn3$1 
 	%t2 = app.get("/", %t1)
-	%t3 = make closure %fn2$2 
+	%t3 = make closure %fn3$2 
 	%t4 = app.set("/", %t3)
+
+# Name: incrementExpr
+# File: expressions.js
+# Location: expressions.js:32:0
+# Locals:
+#   0:	a
+#   1:	a
+#   2:	a
+func incrementExpr():
+0:                                                                         entry
+	%t0 = "0"
+	%t1 = %t0 + "1"
+	%t2 = %t1 - "1"
+	return %t2
+1:                                                                   unreachable
 

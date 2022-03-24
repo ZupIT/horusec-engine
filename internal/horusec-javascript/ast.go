@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// nolint:funlen,gocyclo // We need a lot of lines and if to parse CST to AST
+// nolint:funlen,gocyclo,gocognit // We need a lot of lines and if's to parse CST to AST
 package javascript
 
 import (
@@ -445,11 +445,16 @@ func (p *parser) parseStmt(node *cst.Node) ast.Stmt {
 
 		return stmt
 	case ForStatement:
+		var incExpr ast.Expr
+		if inc := node.ChildByFieldName("increment"); inc != nil {
+			incExpr = p.parseExpr(inc)
+		}
+
 		return &ast.ForStatement{
 			Position:  ast.NewPosition(node),
 			VarDecl:   p.parseStmt(node.ChildByFieldName("initializer")),
-			Cond:      p.parseStmt(node.ChildByFieldName("condition")),
-			Increment: p.parseExpr(node.ChildByFieldName("increment")),
+			Cond:      p.parseExpr(node.ChildByFieldName("condition")),
+			Increment: incExpr,
 			Body:      p.parseFuncBody(node.ChildByFieldName("body")),
 		}
 	case ForInStatement:
@@ -487,7 +492,7 @@ func (p *parser) parseStmt(node *cst.Node) ast.Stmt {
 		stmt.Body = body
 
 		return stmt
-	case ExportStatement:
+	case ExportStatement, EmptyStatement:
 		// Since export statements will not be very useful information in our ast for now,
 		// we will ignore this statement.
 		return nil
@@ -639,8 +644,12 @@ func (p *parser) parseExpr(node *cst.Node) ast.Expr {
 		return p.parseExpr(node.NamedChild(0))
 	case UpdateExpression:
 		return &ast.IncExpr{
-			Arg: ast.NewIdent(node.ChildByFieldName("argument")),
+			Position: ast.NewPosition(node),
+			Op:       node.ChildByFieldName("operator").Type(), // Type will return the operador cleaned.
+			Arg:      ast.NewIdent(node.ChildByFieldName("argument")),
 		}
+	case EmptyStatement:
+		return nil
 	default:
 		return ast.NewUnsupportedNode(node)
 	}

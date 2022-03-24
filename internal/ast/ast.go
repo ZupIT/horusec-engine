@@ -204,6 +204,7 @@ type (
 	// IncExpr node represents a variable increment expression
 	IncExpr struct {
 		Position
+		Op  string // Operator. // TODO: This should be a concrete type.
 		Arg *Ident // identifier of the argument being incremented
 	}
 )
@@ -314,7 +315,7 @@ type (
 	ForStatement struct {
 		Position
 		VarDecl   Stmt       // For initializer
-		Cond      Stmt       // Condition needed to match
+		Cond      Expr       // Condition needed to match
 		Increment Expr       // For Increment expression
 		Body      *BlockStmt // For body
 	}
@@ -435,4 +436,9 @@ func NewIdent(node *cst.Node) *Ident {
 // IsNosec return true if the given slice of bytes contains nosec directive.
 func IsNosec(s []byte) bool {
 	return bytes.Contains(s, nosec)
+}
+
+func (n *BadNode) String() string {
+	pos := n.Pos().start
+	return fmt.Sprintf("%s %d:%d", n.Comment, pos.Row, pos.Column)
 }

@@ -85,6 +85,7 @@ const (
 	StatementIdentifier = "statement_identifier"
 	LabeledStatement    = "labeled_statement"
 	ExportStatement     = "export_statement"
+	EmptyStatement      = "empty_statement"
 
 	// ------------------------------------------------
 	//

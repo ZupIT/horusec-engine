@@ -86,6 +86,34 @@ function ForStatement() {
     for (let i = 0; i < 9; i++) {
         console.log(i);
     }
+
+}
+
+function ForStatementIteratingOverList(data) {
+    let sum = 0;
+    for (let i =0; i < data.length; i++) {
+        sum += i;
+    }
+
+    return sum
+}
+
+function ForStatementWithoutBinaryExpressionIncremet() {
+    for (var a, b; c; d)
+        e;
+}
+
+function ForStatementEndlessRecursion() {
+    for (;;) {
+        console.log("endless recursion");
+    }
+}
+
+function ForStatementEmptyBody() {
+    for (var i = 0
+        ; i < l
+        ; i++) {
+    }
 }
 
 function ForInStatement() {
