@@ -541,19 +541,20 @@ func (p *parser) parseExpr(node *cst.Node) ast.Expr {
 			Position: ast.NewPosition(node),
 		}
 	case NewExpression:
-		parent := node.Parent()
-		p.assertNodeType(parent, VariableDeclarator)
+		var name *ast.Ident
+		if parent := node.Parent(); parent.Type() == VariableDeclarator {
+			if n := parent.ChildByFieldName("name"); n != nil && n.Type() == Identifier {
+				name = ast.NewIdent(n)
+			}
+		}
 
 		var args []ast.Expr
 		p.iterNamedChilds(node.ChildByFieldName("arguments"), func(node *cst.Node) {
 			args = append(args, p.parseExpr(node))
 		})
 
-		name := parent.ChildByFieldName("name")
-		p.assertNodeType(name, Identifier)
-
 		return &ast.ObjectExpr{
-			Name:     ast.NewIdent(name),
+			Name:     name,
 			Type:     p.parseExpr(node.ChildByFieldName("constructor")),
 			Elts:     args,
 			Position: ast.NewPosition(node),

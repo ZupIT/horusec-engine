@@ -4,7 +4,7 @@
      3  .  .  Name: "var_declarations.js"
      4  .  .  Position: ast.Position {}
      5  .  }
-     6  .  Decls: []ast.Decl (len = 10) {
+     6  .  Decls: []ast.Decl (len = 11) {
      7  .  .  0: *ast.ValueDecl {
      8  .  .  .  Position: ast.Position {}
      9  .  .  .  Names: []*ast.Ident (len = 1) {
@@ -317,5 +317,50 @@
    316  .  .  .  .  }
    317  .  .  .  }
    318  .  .  }
-   319  .  }
-   320  }
+   319  .  .  10: *ast.FuncDecl {
+   320  .  .  .  Position: ast.Position {}
+   321  .  .  .  Name: *ast.Ident {
+   322  .  .  .  .  Name: "f1"
+   323  .  .  .  .  Position: ast.Position {}
+   324  .  .  .  }
+   325  .  .  .  Type: *ast.FuncType {
+   326  .  .  .  .  Position: ast.Position {}
+   327  .  .  .  .  Params: *ast.FieldList {
+   328  .  .  .  .  .  Position: ast.Position {}
+   329  .  .  .  .  }
+   330  .  .  .  }
+   331  .  .  .  Body: *ast.BlockStmt {
+   332  .  .  .  .  Position: ast.Position {}
+   333  .  .  .  .  List: []ast.Stmt (len = 1) {
+   334  .  .  .  .  .  0: *ast.ExprStmt {
+   335  .  .  .  .  .  .  Position: ast.Position {}
+   336  .  .  .  .  .  .  Expr: *ast.CallExpr {
+   337  .  .  .  .  .  .  .  Position: ast.Position {}
+   338  .  .  .  .  .  .  .  Fun: *ast.SelectorExpr {
+   339  .  .  .  .  .  .  .  .  Position: ast.Position {}
+   340  .  .  .  .  .  .  .  .  Expr: *ast.Ident {
+   341  .  .  .  .  .  .  .  .  .  Name: "console"
+   342  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+   343  .  .  .  .  .  .  .  .  }
+   344  .  .  .  .  .  .  .  .  Sel: *ast.Ident {
+   345  .  .  .  .  .  .  .  .  .  Name: "log"
+   346  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+   347  .  .  .  .  .  .  .  .  }
+   348  .  .  .  .  .  .  .  }
+   349  .  .  .  .  .  .  .  Args: []ast.Expr (len = 1) {
+   350  .  .  .  .  .  .  .  .  0: *ast.ObjectExpr {
+   351  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+   352  .  .  .  .  .  .  .  .  .  Type: *ast.Ident {
+   353  .  .  .  .  .  .  .  .  .  .  Name: "Object"
+   354  .  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+   355  .  .  .  .  .  .  .  .  .  }
+   356  .  .  .  .  .  .  .  .  .  Comment: "constructor"
+   357  .  .  .  .  .  .  .  .  }
+   358  .  .  .  .  .  .  .  }
+   359  .  .  .  .  .  .  }
+   360  .  .  .  .  .  }
+   361  .  .  .  .  }
+   362  .  .  .  }
+   363  .  .  }
+   364  .  }
+   365  }

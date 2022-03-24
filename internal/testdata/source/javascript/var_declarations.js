@@ -33,3 +33,7 @@ const h = 1, b = 2;
 let i;
 
 let foo = bar();
+
+function f1() {
+    console.log(new Object())
+}
