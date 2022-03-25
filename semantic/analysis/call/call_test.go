@@ -124,6 +124,101 @@ func TestAnalyzerCall(t *testing.T) {
 				},
 			},
 		},
+		{
+			Name: "MatchCallUsingAliases",
+			Src: `
+import { spawn as exec } from 'child_process';
+const process = require('child_process');
+
+function f(cmd) { 
+	exec(cmd)
+	process.spawn(cmd)
+}
+			`,
+			Analyzer: &call.Analyzer{
+				Name:      "child_process.spawn",
+				ArgsIndex: call.NoArguments,
+			},
+			ExpectedIssues: []analysis.Issue{
+				{
+					Filename:    "MatchCallUsingAliases",
+					StartOffset: 111,
+					EndOffset:   120,
+					Line:        6,
+					Column:      1,
+				},
+				{
+					Filename:    "MatchCallUsingAliases",
+					StartOffset: 122,
+					EndOffset:   140,
+					Line:        7,
+					Column:      1,
+				},
+			},
+		},
+		{
+			Name: "MatchNestedCall",
+			Src: `
+function f1(cmd) { 
+	return Math.Random()
+}
+
+function f2(cmd) { 
+	const x = 10 * Math.Random()
+}
+			`,
+			Analyzer: &call.Analyzer{
+				Name:      "Math.Random",
+				ArgsIndex: call.NoArguments,
+			},
+			ExpectedIssues: []analysis.Issue{
+				{
+					Filename:    "MatchNestedCall",
+					StartOffset: 29,
+					EndOffset:   42,
+					Line:        3,
+					Column:      8,
+				},
+				{
+					Filename:    "MatchNestedCall",
+					StartOffset: 82,
+					EndOffset:   95,
+					Line:        7,
+					Column:      16,
+				},
+			},
+		},
+		{
+			Name: "MatchCallFromClassMethod",
+			Src: `
+import fs from 'fs';
+class C {
+	readFile(path) {
+		fs.readFile(path, (data, err) => {
+			if (err) {
+				console.log(err)
+				return
+			}
+			console.log(data)
+		})
+	}
+}
+			`,
+			Analyzer: &call.Analyzer{
+				Name:      "fs.readFile",
+				ArgsIndex: 1,
+				ArgValue:  value.IsConst,
+			},
+			ExpectedIssues: []analysis.Issue{
+				{
+					Filename:    "MatchCallFromClassMethod",
+					StartOffset: 52,
+					EndOffset:   163,
+					Line:        5,
+					Column:      2,
+				},
+			},
+		},
 	}
 	testutil.TestAnalayzer(t, testcases)
 }
