@@ -4,7 +4,7 @@
      3  .  .  Name: "functions.js"
      4  .  .  Position: ast.Position {}
      5  .  }
-     6  .  Decls: []ast.Decl (len = 15) {
+     6  .  Decls: []ast.Decl (len = 16) {
      7  .  .  0: *ast.ImportDecl {
      8  .  .  .  Position: ast.Position {}
      9  .  .  .  Name: *ast.Ident {
@@ -1458,5 +1458,64 @@
   1457  .  .  .  .  }
   1458  .  .  .  }
   1459  .  .  }
-  1460  .  }
-  1461  }
+  1460  .  .  15: *ast.FuncDecl {
+  1461  .  .  .  Position: ast.Position {}
+  1462  .  .  .  Name: *ast.Ident {
+  1463  .  .  .  .  Name: "f13"
+  1464  .  .  .  .  Position: ast.Position {}
+  1465  .  .  .  }
+  1466  .  .  .  Type: *ast.FuncType {
+  1467  .  .  .  .  Position: ast.Position {}
+  1468  .  .  .  .  Params: *ast.FieldList {
+  1469  .  .  .  .  .  Position: ast.Position {}
+  1470  .  .  .  .  }
+  1471  .  .  .  }
+  1472  .  .  .  Body: *ast.BlockStmt {
+  1473  .  .  .  .  Position: ast.Position {}
+  1474  .  .  .  .  List: []ast.Stmt (len = 2) {
+  1475  .  .  .  .  .  0: *ast.AssignStmt {
+  1476  .  .  .  .  .  .  Position: ast.Position {}
+  1477  .  .  .  .  .  .  LHS: []ast.Expr (len = 1) {
+  1478  .  .  .  .  .  .  .  0: *ast.Ident {
+  1479  .  .  .  .  .  .  .  .  Name: "a"
+  1480  .  .  .  .  .  .  .  .  Position: ast.Position {}
+  1481  .  .  .  .  .  .  .  }
+  1482  .  .  .  .  .  .  }
+  1483  .  .  .  .  .  .  RHS: []ast.Expr (len = 1) {
+  1484  .  .  .  .  .  .  .  0: *ast.ObjectExpr {
+  1485  .  .  .  .  .  .  .  .  Position: ast.Position {}
+  1486  .  .  .  .  .  .  .  .  Name: *ast.Ident {
+  1487  .  .  .  .  .  .  .  .  .  Name: "a"
+  1488  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+  1489  .  .  .  .  .  .  .  .  }
+  1490  .  .  .  .  .  .  .  .  Type: *ast.Ident {
+  1491  .  .  .  .  .  .  .  .  .  Name: "A"
+  1492  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+  1493  .  .  .  .  .  .  .  .  }
+  1494  .  .  .  .  .  .  .  .  Comment: "constructor"
+  1495  .  .  .  .  .  .  .  }
+  1496  .  .  .  .  .  .  }
+  1497  .  .  .  .  .  }
+  1498  .  .  .  .  .  1: *ast.ExprStmt {
+  1499  .  .  .  .  .  .  Position: ast.Position {}
+  1500  .  .  .  .  .  .  Expr: *ast.CallExpr {
+  1501  .  .  .  .  .  .  .  Position: ast.Position {}
+  1502  .  .  .  .  .  .  .  Fun: *ast.SelectorExpr {
+  1503  .  .  .  .  .  .  .  .  Position: ast.Position {}
+  1504  .  .  .  .  .  .  .  .  Expr: *ast.Ident {
+  1505  .  .  .  .  .  .  .  .  .  Name: "a"
+  1506  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+  1507  .  .  .  .  .  .  .  .  }
+  1508  .  .  .  .  .  .  .  .  Sel: *ast.Ident {
+  1509  .  .  .  .  .  .  .  .  .  Name: "foo"
+  1510  .  .  .  .  .  .  .  .  .  Position: ast.Position {}
+  1511  .  .  .  .  .  .  .  .  }
+  1512  .  .  .  .  .  .  .  }
+  1513  .  .  .  .  .  .  .  Args: []ast.Expr (len = 0) {}
+  1514  .  .  .  .  .  .  }
+  1515  .  .  .  .  .  }
+  1516  .  .  .  .  }
+  1517  .  .  .  }
+  1518  .  .  }
+  1519  .  }
+  1520  }

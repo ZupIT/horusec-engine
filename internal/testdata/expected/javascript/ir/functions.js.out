@@ -5,6 +5,7 @@ file functions.js:
   func  f10 ()
   func  f11 ()
   func  f12 ()
+  func  f13 ()
   func  f2  (a)
   func  f3  (a, b)
   func  f4  ()
@@ -70,6 +71,16 @@ func f12():
 0:                                                                         entry
 	%t0 = array["1","2","3"]
 	%t1 = console.log(%t0)
+
+# Name: f13
+# File: functions.js
+# Location: functions.js:101:0
+# Locals:
+#   0:	a
+func f13():
+0:                                                                         entry
+	%t0 = constructor(A)
+	%t1 = %t0.foo()
 
 # Name: f2
 # File: functions.js
@@ -167,8 +178,8 @@ func f8(a):
 # File: functions.js
 # Location: functions.js:69:0
 # Locals:
-#   0:	a
-#   1:	a.b
+#   0:	%t4.b
+#   1:	a
 #   2:	b
 func f9(a):
 0:                                                                         entry

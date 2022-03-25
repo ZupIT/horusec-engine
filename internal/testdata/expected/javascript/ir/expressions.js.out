@@ -15,9 +15,11 @@ func %fn3():
 0:                                                                         entry
 	%t0 = console.log("testing")
 	%t1 = make closure %fn3$1 
-	%t2 = app.get("/", %t1)
-	%t3 = make closure %fn3$2 
-	%t4 = app.set("/", %t3)
+	%t2 = express.express()
+	%t3 = %t2.get("/", %t1)
+	%t4 = make closure %fn3$2 
+	%t5 = express.express()
+	%t6 = %t5.set("/", %t4)
 
 # Name: incrementExpr
 # File: expressions.js

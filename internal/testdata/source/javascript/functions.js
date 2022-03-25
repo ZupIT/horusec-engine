@@ -97,3 +97,8 @@ const i = [1,2,3]
 function f12() {
 	console.log(i)
 }
+
+function f13() {
+    let a = new A();
+    a.foo()
+}
