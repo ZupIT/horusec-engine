@@ -5,6 +5,7 @@ file var_declarations.js:
   var   d  
   var   e  
   var   f  
+  func  f1  ()
   var   foo
   func  g   (a, b)
   var   h  
@@ -13,6 +14,14 @@ file var_declarations.js:
 
 
 ============================
+
+# Name: f1
+# File: var_declarations.js
+# Location: var_declarations.js:37:0
+func f1():
+0:                                                                         entry
+	%t0 = constructor(Object)
+	%t1 = console.log(%t0)
 
 # Name: g
 # File: var_declarations.js
