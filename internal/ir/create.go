@@ -52,8 +52,8 @@ func NewFile(f *ast.File) *File {
 				Path:  decl.Path.Name,
 				Alias: identNameIfNotNil(decl.Alias),
 			}
-			file.Members[importt.Name()] = importt
-			file.imported[importt.Name()] = importt
+			file.Members[importt.ImportName()] = importt
+			file.imported[importt.ImportName()] = importt
 		case *ast.ValueDecl:
 			for _, g := range valueDecl(decl) {
 				file.Members[g.Name()] = g
