@@ -89,6 +89,9 @@ func (r *Rule) Run(path string) ([]engine.Finding, error) {
 			}
 		case *ir.Function:
 			r.run(m, report)
+			for _, fn := range m.AnonFuncs {
+				r.run(fn, report)
+			}
 		}
 	}
 
