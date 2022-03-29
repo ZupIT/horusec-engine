@@ -81,6 +81,24 @@ func (a isConst) Run(v ir.Value) bool {
 	return false
 }
 
+// KeyValue implements analysis.AnalyzerValue interface.
+//
+// KeyValue analyzer check if an ir.Value is a hash map and if
+// it is a map check if has the same key and value from Key and
+// Value fields.
+type KeyValue struct {
+	Key   string // Expected key from hash map.
+	Value string // Expected value from hash map.
+}
+
+// Run implements analysis.AnalyzerValue interface.
+func (kv KeyValue) Run(value ir.Value) bool {
+	if hm, ok := value.(*ir.HashMap); ok {
+		return (Contains{[]string{kv.Key}}).Run(hm.Key) && (Contains{[]string{kv.Value}}).Run(hm.Value)
+	}
+	return false
+}
+
 func runPhiNode(phi *ir.Phi, analyzer analysis.AnalyzerValue) bool {
 	values := make([]ir.Value, 0, len(phi.Edges))
 	for _, edge := range phi.Edges {
