@@ -18,10 +18,13 @@ file var_declarations.js:
 # Name: f1
 # File: var_declarations.js
 # Location: var_declarations.js:37:0
+# Locals:
+#   0:	a
 func f1():
 0:                                                                         entry
 	%t0 = constructor(Object)
 	%t1 = console.log(%t0)
+	%t2 = hashmap[{"foo": "bar"},{"baz": "something"}]
 
 # Name: g
 # File: var_declarations.js

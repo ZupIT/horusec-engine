@@ -36,4 +36,5 @@ let foo = bar();
 
 function f1() {
     console.log(new Object())
+    let a = {"foo": "bar", baz: "something"}
 }

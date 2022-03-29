@@ -572,7 +572,7 @@ func (p *parser) parseExpr(node *cst.Node) ast.Expr {
 		return &obj
 	case Pair:
 		return &ast.KeyValueExpr{
-			Key:      p.parseExpr(node.ChildByFieldName("key")),
+			Key:      p.keyFromPair(node.ChildByFieldName("key")),
 			Value:    p.parseExpr(node.ChildByFieldName("value")),
 			Position: ast.NewPosition(node),
 		}
@@ -654,6 +654,21 @@ func (p *parser) parseExpr(node *cst.Node) ast.Expr {
 	default:
 		return ast.NewUnsupportedNode(node)
 	}
+}
+
+// keyFromPair return the expression that represents a key from a pair node. If the key
+// of pair is a property_indentifier keyFromPair return an ast.BasicLit with the value
+// of property, this is necessary to avoid nil keys on IR, since the property identifier
+// is commonly handled as a identifier.
+func (p *parser) keyFromPair(node *cst.Node) ast.Expr {
+	if node.Type() == PropertyIdentifier {
+		return &ast.BasicLit{
+			Position: ast.NewPosition(node),
+			Kind:     "string",
+			Value:    string(node.Value()),
+		}
+	}
+	return p.parseExpr(node)
 }
 
 func (p *parser) parseRequireCallExpr(node *cst.Node) ast.Decl {
