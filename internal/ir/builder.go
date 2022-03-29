@@ -267,11 +267,111 @@ func (b *builder) stmt(fn *Function, s ast.Stmt) {
 		fn.currentBlock = done
 	case *ast.ForStatement:
 		b.forStmt(fn, stmt)
+	case *ast.TryStmt:
+		b.tryStatement(fn, stmt)
 	case *ast.BadNode:
 		// Do nothing with bad nodes.
 	default:
 		unsupportedNode(stmt)
 	}
+}
+
+// tryStatement parse the ast.TryStmt to it's IR representation.
+//
+// nolint:gocyclo // centralizes all the try statement parse, necessary complexity.
+func (b *builder) tryStatement(fn *Function, stmt *ast.TryStmt) {
+	// Create the 'try.then' and 'try.done' blocks.
+	then := fn.newBasicBlock("try.then")
+	done := fn.newBasicBlock("try.done")
+
+	// set the 'try.then' block and process the try statement body.
+	fn.currentBlock = then
+	b.stmt(fn, stmt.Body)
+
+	// In case the try statement don't have a finalizer, use done instead.
+	finally := done
+
+	// If the statement contains a finalizer, creates a new 'try.finally' basic block and parse the finalizer body.
+	if stmt.Finalizer != nil {
+		finally = fn.newBasicBlock("try.finally")
+		fn.currentBlock = finally
+
+		// parse the all the statements of the finalizer body.
+		for _, s := range stmt.Finalizer.List {
+			b.stmt(fn, s)
+		}
+
+		// since that after the finally statement the try statement is over, emits a jump to the done basic block.
+		emitJump(fn, done)
+
+		// if there's no catch clause but there's a finally statement, a jump is emitted to the 'try.finally' block
+		// in the 'try.then' block.
+		if len(stmt.CatchClause) == 0 {
+			fn.currentBlock = then
+			emitJump(fn, finally)
+		}
+	}
+
+	// In case the try statement don't have any catch clause, use done instead.
+	catch := done
+
+	// If the try statement contains at least one catch clause a basic block named 'try.catch' will be created.
+	// This block will contain all the conditions related to the catch clauses exceptions, and they possible jumps.
+	// Also, a new jump is added to the 'try.then' block into to the new 'try.catch' block.
+	// Ex of the 'try.then' block:
+	//
+	//  1:						 try.then
+	// 		console.log('try body')
+	// 		jump 2
+	//
+	// Ex of the 'try.catch' block:
+	//
+	//  2:						 try.catch
+	// 		if ex goto 'try.catch.N' else 'try.finally'
+	// 		if ex goto 'try.catch.N' else 'try.finally'
+	//
+	if len(stmt.CatchClause) > 0 {
+		catch = fn.newBasicBlock("try.catch")
+		fn.currentBlock = then
+		emitJump(fn, catch)
+	}
+
+	// parse all the catch clauses in the try statement, for each different clause will create a new basic block in
+	// the following pattern: 'try.catch.N'.
+	// Ex:
+	//
+	// 3:						 try.catch.0
+	// 	console.log(ex)
+	// 	jump N
+	//
+	// 3:						 try.catch.1
+	// 	console.log(ex)
+	// 	jump N
+	for i, c := range stmt.CatchClause {
+		// creates a new catch basic block and parse the catch body
+		catchBlock := fn.newBasicBlock(fmt.Sprintf("try.catch.%d", i))
+		fn.currentBlock = catchBlock
+		b.stmt(fn, c.Body)
+
+		// checks if there's a finalizer in the try statement, if so, it's added a jump to the 'try.finally', in case
+		// there's no finally statement, a jump to the 'try.done' block is added. After the jump, in both scenarios a
+		// goto is added to the 'try.catch' block informing a new 'try.catch.N' possible flow.
+		// Ex:
+		//
+		//  "if ex goto 'try.catch.N' else 'try.finally'" added when there's a finally statement
+		//  "if ex goto 'try.catch.N' else 'try.done'" added when there's no finally statement
+		if stmt.Finalizer != nil {
+			emitJump(fn, finally)
+			fn.currentBlock = catch
+			b.cond(fn, c.Parameter, catchBlock, finally)
+		} else {
+			emitJump(fn, done)
+			fn.currentBlock = catch
+			b.cond(fn, c.Parameter, catchBlock, done)
+		}
+	}
+
+	fn.currentBlock = done
 }
 
 // expr lowers a single-result expression e to IR form and return the Value defined by the expression.

@@ -9,6 +9,8 @@ file statements.js:
   func  IfStatement                                 (a, b)
   func  SwitchStatement                             ()
   func  TryStatement                                ()
+  func  TryStatementWithoutCatch                    ()
+  func  TryStatementWithoutFinally                  ()
   func  WhileStatement                              ()
 
 
@@ -17,13 +19,13 @@ file statements.js:
 
 # Name: ExportStatement
 # File: statements.js
-# Location: statements.js:127:0
+# Location: statements.js:159:0
 func ExportStatement():
 0:                                                                         entry
 
 # Name: ForInStatement
 # File: statements.js
-# Location: statements.js:119:0
+# Location: statements.js:151:0
 # Locals:
 #   0:	values
 func ForInStatement():
@@ -32,7 +34,7 @@ func ForInStatement():
 
 # Name: ForStatement
 # File: statements.js
-# Location: statements.js:85:0
+# Location: statements.js:117:0
 # Locals:
 #   0:	i
 #   1:	i
@@ -53,7 +55,7 @@ func ForStatement():
 
 # Name: ForStatementEmptyBody
 # File: statements.js
-# Location: statements.js:112:0
+# Location: statements.js:144:0
 # Locals:
 #   0:	i
 #   1:	i
@@ -73,7 +75,7 @@ func ForStatementEmptyBody():
 
 # Name: ForStatementEndlessRecursion
 # File: statements.js
-# Location: statements.js:106:0
+# Location: statements.js:138:0
 func ForStatementEndlessRecursion():
 0:                                                                         entry
 	jump 1
@@ -84,7 +86,7 @@ func ForStatementEndlessRecursion():
 
 # Name: ForStatementIteratingOverList
 # File: statements.js
-# Location: statements.js:92:0
+# Location: statements.js:124:0
 # Locals:
 #   0:	i
 #   1:	i
@@ -108,7 +110,7 @@ func ForStatementIteratingOverList(data):
 
 # Name: ForStatementWithoutBinaryExpressionIncremet
 # File: statements.js
-# Location: statements.js:101:0
+# Location: statements.js:133:0
 func ForStatementWithoutBinaryExpressionIncremet():
 0:                                                                         entry
 	jump 2
@@ -153,7 +155,7 @@ func IfStatement(a, b):
 
 # Name: SwitchStatement
 # File: statements.js
-# Location: statements.js:67:0
+# Location: statements.js:99:0
 # Locals:
 #   0:	fruits
 func SwitchStatement():
@@ -165,10 +167,58 @@ func SwitchStatement():
 # Location: statements.js:30:0
 func TryStatement():
 0:                                                                         entry
+	%t0 = console.log("try entry")
+1:                                                                      try.then
+	%t1 = console.log("try body")
+	jump 4
+2:                                                                      try.done
+	%t5 = console.log("try done")
+3:                                                                   try.finally
+	%t2 = console.log("try finally")
+	jump 2
+4:                                                                     try.catch
+	if e goto 5 else 3
+5:                                                                   try.catch.0
+	%t3 = console.log(e)
+	%t4 = console.log("try catch")
+	jump 3
+
+# Name: TryStatementWithoutCatch
+# File: statements.js
+# Location: statements.js:61:0
+func TryStatementWithoutCatch():
+0:                                                                         entry
+	%t0 = console.log("try entry")
+1:                                                                      try.then
+	%t1 = console.log("try body")
+	jump 3
+2:                                                                      try.done
+	%t3 = console.log("try done")
+3:                                                                   try.finally
+	%t2 = console.log("try finally")
+	jump 2
+
+# Name: TryStatementWithoutFinally
+# File: statements.js
+# Location: statements.js:47:0
+func TryStatementWithoutFinally():
+0:                                                                         entry
+	%t0 = console.log("try entry")
+1:                                                                      try.then
+	%t1 = console.log("try body")
+	jump 3
+2:                                                                      try.done
+	%t4 = console.log("try done")
+3:                                                                     try.catch
+	if e goto 4 else 2
+4:                                                                   try.catch.0
+	%t2 = console.log(e)
+	%t3 = console.log("try catch")
+	jump 2
 
 # Name: WhileStatement
 # File: statements.js
-# Location: statements.js:42:0
+# Location: statements.js:74:0
 func WhileStatement():
 0:                                                                         entry
 
