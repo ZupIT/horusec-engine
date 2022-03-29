@@ -484,12 +484,18 @@ func (b *builder) selectorExpr(fn *Function, expr ast.Expr) Value {
 
 	switch e := expr.(type) {
 	case *ast.Ident:
-		// e.Name could be an alias imported name, so we need to check if this
-		// identifier is imported so we use your real name. Otherwise we just
-		// use the expression identifier name.
 		if importt := fn.File.ImportedPackage(e.Name); importt != nil {
+			// e.Name could be an alias imported name, so we need to check if this
+			// identifier is imported so we use your real name. Otherwise we just
+			// use the expression identifier name.
 			name = importt.Path
+		} else if v := b.lookup(fn, e.Name); v != nil {
+			// e.Name could also be an identifier to a previously declared variable
+			// so we lookup to get the correctly name.
+			name = v.Name()
 		} else {
+			// Otherwise we just use the identifier name, since we can't find any
+			// reference to this identifier.
 			name = e.Name
 		}
 	case *ast.SelectorExpr:
