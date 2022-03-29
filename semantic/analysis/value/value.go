@@ -36,6 +36,8 @@ type Contains struct {
 }
 
 // Run implements analysis.AnalyzerValue.Run.
+//
+// nolint: funlen,gocyclo // We need to do some type checking here.
 func (a Contains) Run(v ir.Value) bool {
 	switch value := v.(type) {
 	case *ir.Const:
@@ -47,6 +49,10 @@ func (a Contains) Run(v ir.Value) bool {
 		}
 	case *ir.Var:
 		return a.Run(value.Value)
+	case *ir.Phi:
+		return runPhiNode(value, a)
+	case *ir.Object:
+		return runValues(value.Values, a)
 	}
 
 	return false
@@ -60,8 +66,6 @@ type isConst struct{}
 // Run check if a Value v is a constante value. If v is a variable or a phi
 // value, Run will recursivily check the value of variable and the edges of
 // phi node.
-//
-// nolint: funlen,gocyclo // Some type checks is needed here.
 func (a isConst) Run(v ir.Value) bool {
 	switch value := v.(type) {
 	case *ir.Const:
@@ -69,13 +73,27 @@ func (a isConst) Run(v ir.Value) bool {
 	case *ir.Var:
 		return a.Run(value.Value)
 	case *ir.Phi:
-		for _, edge := range value.Edges {
-			if !a.Run(edge) {
-				return false
-			}
-		}
-		return true
+		return runPhiNode(value, a)
+	case *ir.Object:
+		return runValues(value.Values, a)
 	}
 
 	return false
+}
+
+func runPhiNode(phi *ir.Phi, analyzer analysis.AnalyzerValue) bool {
+	values := make([]ir.Value, 0, len(phi.Edges))
+	for _, edge := range phi.Edges {
+		values = append(values, edge)
+	}
+	return runValues(values, analyzer)
+}
+
+func runValues(values []ir.Value, analyzer analysis.AnalyzerValue) bool {
+	for _, v := range values {
+		if !analyzer.Run(v) {
+			return false
+		}
+	}
+	return true
 }

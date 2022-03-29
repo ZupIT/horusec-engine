@@ -174,6 +174,62 @@ function f(arg) {
 				},
 			},
 		},
+		{
+			Name: "MatchConstFromObject",
+			Src: `
+function f(a) {
+	if (a) {
+		const values = [a, "b", "c"]
+	} else {
+		const values = ["b", "c"]
+	}
+	insecure(values);
+}
+			`,
+			Analyzer: &call.Analyzer{
+				Name:      "insecure",
+				ArgsIndex: call.AllArguments,
+				ArgValue:  value.IsConst,
+			},
+			ExpectedIssues: []analysis.Issue{
+				{
+					Filename:    "MatchConstFromObject",
+					StartOffset: 100,
+					EndOffset:   116,
+					Line:        8,
+					Column:      1,
+				},
+			},
+		},
+		{
+			Name: "MatchContainsFromObject",
+			Src: `
+function f(a) {
+	if (someCondition) {
+		const value = ["secure", "other", a]
+	} else {
+		const value = ["insecure", "other"]
+	}
+	insecure(value);
+}
+			`,
+			Analyzer: &call.Analyzer{
+				Name:      "insecure",
+				ArgsIndex: call.AllArguments,
+				ArgValue: value.Contains{
+					Values: []string{"secure"},
+				},
+			},
+			ExpectedIssues: []analysis.Issue{
+				{
+					Filename:    "MatchContainsFromObject",
+					StartOffset: 130,
+					EndOffset:   145,
+					Line:        8,
+					Column:      1,
+				},
+			},
+		},
 	}
 
 	testutil.TestAnalayzer(t, testcases)
