@@ -219,6 +219,29 @@ class C {
 				},
 			},
 		},
+		{
+			Name: "MatchNestedAnonoymounsFunctionCall",
+			Src: `
+function f() {
+	foo(() => {
+		insecure();
+	})
+}
+			`,
+			Analyzer: &call.Analyzer{
+				Name:      "insecure",
+				ArgsIndex: call.NoArguments,
+			},
+			ExpectedIssues: []analysis.Issue{
+				{
+					Filename:    "MatchNestedAnonoymounsFunctionCall",
+					StartOffset: 31,
+					EndOffset:   41,
+					Line:        4,
+					Column:      2,
+				},
+			},
+		},
 	}
 	testutil.TestAnalayzer(t, testcases)
 }

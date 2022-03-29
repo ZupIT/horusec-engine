@@ -54,6 +54,9 @@ func TestAnalayzer(t *testing.T, testcases []TestCaseAnalyzer) {
 				switch m := member.(type) {
 				case *ir.Function:
 					run(tt, file, m, report)
+					for _, fn := range m.AnonFuncs {
+						run(tt, file, fn, report)
+					}
 				case *ir.Struct:
 					for _, method := range m.Methods {
 						run(tt, file, method, report)
