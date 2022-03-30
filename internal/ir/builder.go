@@ -466,48 +466,67 @@ func (b *builder) forStmt(fn *Function, stmt *ast.ForStatement) {
 // selectorExpr return the Value of a selector expression.
 //
 // The value returned will be a selector expression entire resolve. If the selector
-// expression contains call expressions, these expressions will be separated and temp
-// variables will be created to store these call expressions and these local variables
-// will be used on the resolve selector expression string.
+// expression contains call expressions (or any expression that can be expanded), these
+// expressions will be separated and temp variables will be created to store these call
+// expressions and these local variables will be used on the resolve selector expression
+// string.
 //
 // Example:
-// Source: a.b.c()
-// Return: Var{name: a.b.c()}
-// Source: a.b().c.d()
-// Return: Var{name: %t0.c.d()} // Where %t0 store the a.b() call expression.
+// Source:
+//	a.b.c()
+// IR:
+//	%t0 = a.b.c()
 //
-// The expr value is expected to be an *ast.SelectorExpr. Since the selector expression
-// can contains other selector expressions, its necessary to expected an ast.Expr to
-// resolve recursivily *ast.SelectorExpr.
-func (b *builder) selectorExpr(fn *Function, expr ast.Expr) Value {
-	var name string
+// Source:
+//	a.b().c.d()
+// IR:
+//	%t0 = a.b()
+//	%t1 = %t0.c.d()
+//
+// Selector expressions that represents methods calls are printed using the object type
+// instead the variable name:
+//
+// Source:
+//	let foo = new Foo()
+//	foo.something()
+// IR:
+//	%t0 = constructor(Foo)
+//	%t1 = Foo.something()
+func (b *builder) selectorExpr(fn *Function, expr *ast.SelectorExpr) Value {
+	var value Value
 
-	switch e := expr.(type) {
+	switch e := expr.Expr.(type) {
 	case *ast.Ident:
-		if importt := fn.File.ImportedPackage(e.Name); importt != nil {
-			// e.Name could be an alias imported name, so we need to check if this
-			// identifier is imported so we use your real name. Otherwise we just
-			// use the expression identifier name.
-			name = importt.Path
-		} else if v := b.lookup(fn, e.Name); v != nil {
-			// e.Name could also be an identifier to a previously declared variable
-			// so we lookup to get the correctly name.
-			name = v.Name()
+		if v := b.lookup(fn, e.Name); v != nil {
+			// e.Name could be an identifier to a declared Value, that could be a
+			// a variable or a imported member so we lookup to get the correctly name.
+			value = v
 		} else {
 			// Otherwise we just use the identifier name, since we can't find any
 			// reference to this identifier.
-			name = e.Name
+			value = &Var{
+				node:  node{e},
+				name:  e.Name,
+				Label: e.Name,
+				Value: nil,
+			}
 		}
 	case *ast.SelectorExpr:
-		name = fmt.Sprintf("%s.%s", b.selectorExpr(fn, e.Expr).Name(), e.Sel.Name)
+		value = b.selectorExpr(fn, e)
 	default:
-		return b.expr(fn, e, true /*expand */)
+		value = b.expr(fn, e, true /*expand */)
 	}
 
-	return &Var{
+	return &Selector{
 		node:  node{expr},
-		name:  name,
-		Value: nil,
+		Value: value,
+		// Since we can lookup the variable from value context we just create
+		// a variable with a nil value.
+		Field: &Var{
+			node:  node{expr.Sel},
+			name:  expr.Sel.Name,
+			Value: nil,
+		},
 	}
 }
 
@@ -594,8 +613,10 @@ func (b *builder) objectExpr(fn *Function, expr *ast.ObjectExpr) *Object {
 }
 
 // lookup return the Value declared on source file with the given name. The search
-// order is; first check at function level, them function signature and finally for
-// global values.
+// order is; first check at function level, them function signature, them global values
+// on file and finally for a imported value.
+//
+// nolint: gocyclo // We need to lookup the value declaration in to many places.
 func (b *builder) lookup(fn *Function, name string) Value {
 	if v := fn.lookup(name); v != nil {
 		return v
@@ -609,6 +630,10 @@ func (b *builder) lookup(fn *Function, name string) Value {
 
 	if global, ok := fn.File.Members[name].(*Global); ok {
 		return fn.addLocal(b.expr(fn, global.Value, false /* expand */), global.Value)
+	}
+
+	if importt := fn.File.ImportedPackage(name); importt != nil {
+		return importt
 	}
 
 	return nil

@@ -80,7 +80,7 @@ func f12():
 func f13():
 0:                                                                         entry
 	%t0 = constructor(A)
-	%t1 = %t0.foo()
+	%t1 = A.foo()
 
 # Name: f2
 # File: functions.js
@@ -188,6 +188,6 @@ func f9(a):
 	%t2 = a.b.c()
 	%t3 = a.b("10")
 	%t4 = %t3.c.d("20")
-	%t5 = nil
+	%t5 = %t4.b.c.d.e
 	%t6 = c()
 

@@ -98,7 +98,7 @@ type BasicBlock struct {
 
 // Function represents a function or method with the parameters and signature.
 //
-// The Function implements Member interface.
+// The Function implements Member and Value interfaces.
 type Function struct {
 	name      string        // Function name.
 	File      *File         // File that this function belongs.
@@ -182,6 +182,20 @@ type Template struct {
 	node
 	Value string  // Template string.
 	Subs  []Value // Substitution values.
+}
+
+// Selector value represents a parsed *ast.SelectorExpr which holds
+// the field being acessed and the value used to access this field.
+//
+// Example printed form:
+//	%t0 = a.b.c()
+//	%t1 = %t0.d.e()
+//
+// The Selector implements Value interface.
+type Selector struct {
+	node
+	Field *Var  // Field selector being accessed.
+	Value Value // Value used to access Field.
 }
 
 // Phi instruction represents an SSA φ-node, which combines values
@@ -349,6 +363,10 @@ type node struct {
 // Pos implements ast.Node interface.
 func (n node) Pos() ast.Position { return n.syntax.Pos() }
 
+// ------------------------------------------------------------------------
+// Implementations of Member, Value and Instruction interfaces.
+// ------------------------------------------------------------------------
+
 func (c *Const) value()         {}
 func (c *Const) Name() string   { return fmt.Sprintf("%q", c.Value) }
 func (c *Const) String() string { return c.Name() }
@@ -404,33 +422,75 @@ func (*Phi) instr()       {}
 func (*Phi) value()       {}
 func (*Phi) Name() string { return "" }
 
-func (*Function) member()         {}
-func (fn *Function) Name() string { return fn.name }
+func (*Function) value()            {}
+func (*Function) member()           {}
+func (fn *Function) Name() string   { return fn.name }
+func (fn *Function) String() string { return "" }
 
 func (*File) member()        {}
 func (f *File) Name() string { return f.name }
 
-func (*ExternalMember) member() {}
-func (m *ExternalMember) Name() string {
-	if m.Alias != "" {
-		return m.Alias
-	}
-
-	return m.name
-}
+func (*ExternalMember) value()           {}
+func (*ExternalMember) member()          {}
+func (m *ExternalMember) Name() string   { return m.Path }
+func (m *ExternalMember) String() string { return m.Name() }
 
 func (*Struct) value()           {}
 func (*Struct) member()          {}
 func (s *Struct) Name() string   { return s.name }
 func (s *Struct) String() string { return fmt.Sprintf("type %s struct", s.Name()) }
 
-func (*Object) value()         {}
-func (o *Object) Name() string { return "" }
+func (*Object) value() {}
+func (o *Object) Name() string {
+	if o.Type != nil {
+		return o.Type.Name()
+	}
+	return ""
+}
 
 func (*HashMap) value()         {}
 func (h *HashMap) Name() string { return h.String() }
 func (h *HashMap) String() string {
 	return fmt.Sprintf("{%s: %s}", h.Key.String(), h.Value.String())
+}
+
+func (*Selector) value() {}
+
+// nolint: funlen // This linter considers lines commented out which makes no sense.
+func (s *Selector) Name() string {
+	// If the value of Selector is a variable we need to check if
+	// the value of this variable is a object declaration, if it is
+	// we use the object name (if its not empty) instead the variable
+	// name, since the field being acessed is a value from a object.
+	//
+	// TODO(matheus): We should find a better approach to deal with this.
+
+	var name string
+
+	if v, ok := s.Value.(*Var); ok {
+		if obj, ok := v.Value.(*Object); ok {
+			name = obj.Name()
+		}
+	}
+
+	if name == "" {
+		name = s.Value.Name()
+	}
+
+	return fmt.Sprintf("%s.%s", name, s.Field.Name())
+}
+func (s *Selector) String() string { return s.Name() }
+
+// ------------------------------------------------------------------------
+
+// ImportName return the name used on source code from a imported package.
+// Could be an  alias or the real name.
+func (m *ExternalMember) ImportName() string {
+	if m.Alias != "" {
+		return m.Alias
+	}
+
+	return m.name
 }
 
 // Func returns the file-level function of the specified name or nil

@@ -242,6 +242,32 @@ function f() {
 				},
 			},
 		},
+		{
+			Name: "MatchMethodCallFromObject",
+			Src: `
+class T {
+	insecure() {}
+}
+
+function f() {
+	let x = new T();
+	x.insecure();
+}
+			`,
+			Analyzer: &call.Analyzer{
+				Name:      "T.insecure",
+				ArgsIndex: call.NoArguments,
+			},
+			ExpectedIssues: []analysis.Issue{
+				{
+					Filename:    "MatchMethodCallFromObject",
+					StartOffset: 63,
+					EndOffset:   75,
+					Line:        8,
+					Column:      1,
+				},
+			},
+		},
 	}
 	testutil.TestAnalayzer(t, testcases)
 }
