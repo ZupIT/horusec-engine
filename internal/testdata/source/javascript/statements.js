@@ -28,15 +28,47 @@ function IfStatement(a, b) {
 }
 
 function TryStatement() {
+    console.log('try entry')
+
     try {
-        const value = 'test'
-        console.log(value)
-    } catch (err) {
-        console.error(err)
-    } finally {
-        let sum = 1 + 1
-        console.log(sum)
+        console.log('try body')
     }
+    catch (e) {
+        console.log(e)
+        console.log('try catch')
+    }
+    finally {
+        console.log('try finally')
+    }
+
+    console.log('try done')
+}
+
+function TryStatementWithoutFinally() {
+    console.log('try entry')
+
+    try {
+        console.log('try body')
+    }
+    catch (e) {
+        console.log(e)
+        console.log('try catch')
+    }
+
+    console.log('try done')
+}
+
+function TryStatementWithoutCatch() {
+    console.log('try entry')
+
+    try {
+        console.log('try body')
+    }
+    finally {
+        console.log('try finally')
+    }
+
+    console.log('try done')
 }
 
 function WhileStatement() {
