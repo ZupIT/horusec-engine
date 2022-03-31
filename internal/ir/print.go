@@ -25,6 +25,10 @@ import (
 // invalidBasicBlock represents an invalid basic block number to jump.
 const invalidBasicBlock = -1
 
+func (b *BasicBlock) String() string {
+	return fmt.Sprintf("%s:%d", b.Comment, b.Index)
+}
+
 func (f *File) String() string {
 	return "file " + f.name
 }
