@@ -269,6 +269,8 @@ func (b *builder) stmt(fn *Function, s ast.Stmt) {
 		b.tryStatement(fn, stmt)
 	case *ast.WhileStmt:
 		b.whileStmt(fn, stmt)
+	case *ast.SwitchStatement:
+		b.switchStatement(fn, stmt)
 	case *ast.BadNode:
 		// Do nothing with bad nodes.
 	default:
@@ -372,6 +374,183 @@ func (b *builder) tryStatement(fn *Function, stmt *ast.TryStmt) {
 	}
 
 	fn.currentBlock = done
+}
+
+// switchStatement parse the ast.SwitchStatement to it's IR representation, the idea is to treat it as a normal if
+// condition.
+//
+// 0:                                                                       entry
+//        %t0 = console.log("switch entry")
+//        %t1 = "2"
+//        %t4 = %t1 == "1"
+//        if %t4 goto 3 else 2
+// 1:                                                                       if.done
+//        %t5 = console.log("switch done")
+// 2:                                                                       if.else
+//        %t2 = console.log("switch case default")
+//        jump 1
+// 3:                                                                       if.then
+//        %t3 = console.log("switch case 1")
+//        jump 1
+// 4:                                                                       if.done
+//
+// TODO: In the future, it would be interesting to review this code in search of improvements and reduce the complexity.
+// nolint:gocyclo // despite the complexity, the idea is to centralize all switch case handling here
+func (b *builder) switchStatement(fn *Function, stmt *ast.SwitchStatement) {
+	// get the function current block.
+	previouslyBlock := fn.currentBlock
+
+	// creates a new done block.
+	done := fn.newBasicBlock("if.done")
+
+	// separate the 'ast.SwitchCase' statements from the 'ast.SwitchDefault', also remove the possible bad nodes that
+	// can be in the 'stmt.Body.List' slice.
+	cases, defaultCase := b.getSwitchCasesAndDefault(stmt)
+
+	// create a new basic block to represents the 'ast.SwitchDefault' statement
+	defaultBlock := done
+
+	// check if the switch statement contains a default case.
+	if defaultCase != nil {
+		defaultBlock = fn.newBasicBlock("if.else")
+		fn.currentBlock = defaultBlock
+
+		// parse the switch default case body.
+		for _, v := range defaultCase.Body {
+			b.stmt(fn, v)
+		}
+
+		// since that after the default case statement the switch has ended, a jump is emitted to the done block.
+		emitJump(fn, done)
+
+		// since there's a possibility of a switch statement contains only a default case, this condition is necessary
+		// to treat this scenario.
+		if cases == nil {
+			fn.currentBlock = previouslyBlock
+			emitJump(fn, defaultBlock)
+		}
+	}
+
+	// creates a map to store the switch 'then' and 'done' blocks
+	thenBlocks := make(map[int]*BasicBlock, len(cases))
+	doneBlocks := make(map[int]*BasicBlock, len(cases))
+
+	for i, c := range cases {
+		// if it's the first iteration of the for, a 'then' and a 'done' block it's going to be created, for the next
+		// iterations the blocks are already be created, so instead of creating we are going to use the existing ones.
+		if i == 0 {
+			thenBlocks[i] = fn.newBasicBlock("if.then")
+			doneBlocks[i] = fn.newBasicBlock("if.done")
+		}
+
+		// set the  actual iteration 'then' block
+		fn.currentBlock = thenBlocks[i]
+
+		// parse the 'ast.SwitchCase' body
+		for _, v := range c.Body {
+			b.stmt(fn, v)
+		}
+
+		// set the current block as the actual iteration 'then' block and emmit a jump to the 'done' block.
+		// This happens cause after matching the condition of a case, the switch statement is over, and we can jump
+		// to the done block.
+		fn.currentBlock = thenBlocks[i]
+		emitJump(fn, done)
+
+		// checks if it's the last case, is so, the case it's already has been processed and there's no more flows to
+		// process. There is just one exception to this, that is when the switch statement contains just one case and
+		// a new condition is created to validate this. After these validations, the for is ended.
+		if len(cases) == i+1 {
+			// validate if it's the only case in the statement, is so, creates a new CFG condition.
+			if i == 0 {
+				// set the current block as the entry block.
+				fn.currentBlock = previouslyBlock
+
+				// a new condition is created with the 'then' block of this iteration and the 'defaultBlock' as else.
+				// If there's no default case, the 'else' of the condition will be the 'done' block.
+				b.cond(fn, b.switchCondExpr(c.Position, stmt.Value, c.Cond), thenBlocks[i], defaultBlock)
+			}
+
+			break
+		}
+
+		// if it's the first case, the condition of the CFG needs to be created in the entry block.
+		if i == 0 {
+			fn.currentBlock = previouslyBlock
+			b.cond(fn, b.switchCondExpr(c.Position, stmt.Value, c.Cond), thenBlocks[i], doneBlocks[i])
+		}
+
+		// the following steps creates the next iteration blocks, they are going to be stored in the 'thenBlocks'
+		// and 'doneBlocks', since we need to write they condition of the CFG in this iteration and use them in the
+		// next iteration to parse the body.
+		expr := b.switchCondExpr(c.Position, stmt.Value, cases[i+1].Cond)
+
+		// check if this iteration it's the next to last, if so creates just 'then' block of the next iteration.
+		if len(cases)-1 == i+1 {
+			thenBlocks[i+1] = fn.newBasicBlock("if.then")
+
+			// set the current block as the actual iteration done block
+			fn.currentBlock = doneBlocks[i]
+
+			// a new condition is created with the next iteration 'then' block of this iteration and the 'defaultBlock'
+			// as else. If there's no default case, the 'else' of the condition will be the 'done' block.
+			b.cond(fn, expr, thenBlocks[i+1], defaultBlock)
+		} else {
+			// if it's not the next to last case from the switch, a new 'then' and 'done' block are created.
+			// These blocks represent the next case of the switch statement, and the CFG condition is going to be
+			// written the into the actual case 'done' block. Since these blocks are going to be used in the next
+			// iteration, they are stored in the 'thenBlocks' and 'doneBlocks' maps.
+			thenBlocks[i+1] = fn.newBasicBlock("if.then")
+			doneBlocks[i+1] = fn.newBasicBlock("if.done")
+
+			fn.currentBlock = doneBlocks[i]
+			b.cond(fn, expr, thenBlocks[i+1], doneBlocks[i+1])
+		}
+	}
+
+	fn.currentBlock = done
+}
+
+// switchCondExpr creates a new binary expression that checks if the left value is equal the right value.
+// Since we represent the switch cases as normals ifs, we need to create the binary expression that represents
+// the condition for each case.
+func (b *builder) switchCondExpr(position ast.Position, left, right ast.Expr) *ast.BinaryExpr {
+	return &ast.BinaryExpr{
+		Position: position,
+		Left:     left,
+		Op:       "==",
+		Right:    right,
+	}
+}
+
+// getSwitchCasesAndDefault separate the 'ast.SwitchCase' statements from the 'ast.SwitchDefault', also remove the
+// possible bad nodes that can be in the 'stmt.Body.List' slice, for example commented cases from the switch.
+// EX:
+//    console.log("switch entry")
+//    let foo = 'bar'
+//
+//    switch (foo) {
+//        // case 'a':
+//        //     console.log('bad node, should be ignored')
+//        case 'b':
+//            console.log('switch case 1, should be appended')
+//        default:
+//            console.log("switch case default, should be returned")
+//    }
+//
+//    console.log("switch done")
+//
+func (b *builder) getSwitchCasesAndDefault(stmt *ast.SwitchStatement) (c []*ast.SwitchCase, d *ast.SwitchDefault) {
+	for _, s := range stmt.Body.List {
+		switch s := s.(type) {
+		case *ast.SwitchDefault:
+			d = s
+		case *ast.SwitchCase:
+			c = append(c, s)
+		}
+	}
+
+	return
 }
 
 // expr lowers a single-result expression e to IR form and return the Value defined by the expression.

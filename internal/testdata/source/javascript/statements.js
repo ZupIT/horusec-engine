@@ -17,7 +17,7 @@
 function IfStatement(a, b) {
     if (a >= 10) {
         a = b * 2
-    } else if(a <= 5) {
+    } else if (a <= 5) {
         a = b + a;
     } else {
         a = a + b
@@ -73,13 +73,13 @@ function TryStatementWithoutCatch() {
 
 function WhileStatement() {
     let i = 0;
-    while ( i <= 5){
+    while (i <= 5) {
         console.log('test')
-        if (i === 2){
+        if (i === 2) {
             console.log("two")
             continue
         }
-        if (i === 4 ){
+        if (i === 4) {
             console.log("finish")
             break
         }
@@ -90,13 +90,13 @@ function WhileStatement() {
 
 function LabeledWhileStatement() {
     let x = 0;
-    whileStmt :while ( x <= 5){
+    whileStmt: while (x <= 5) {
         console.log('test')
-        if (i === 4 ){
+        if (i === 4) {
             console.log("finish")
             break whileStmt
         }
-        if (i === 2){
+        if (i === 2) {
             console.log("two")
             continue whileStmt
         }
@@ -105,21 +105,117 @@ function LabeledWhileStatement() {
 }
 
 function SwitchStatement() {
+    console.log("switch entry")
     let fruits = 'Oranges'
 
     switch (fruits) {
         case 'Oranges':
-            console.log('Oranges')
+            console.log("switch case 1")
             break
         case 'Mangoes':
-            console.log('Mangoes')
+            console.log("switch case 2")
             break
         case 'Papayas':
-            console.log('Papayas')
+            console.log("switch case 3")
             break
         default:
-            console.log('No fruits')
+            console.log("switch case default")
     }
+
+    console.log("switch done")
+}
+
+function SwitchStatementWithoutDefault() {
+    console.log("switch entry")
+    let fruits = 'Oranges'
+
+    switch (fruits) {
+        case 'Oranges':
+            console.log("switch case 1")
+            break
+        case 'Mangoes':
+            console.log("switch case 2")
+            break
+        case 'Papayas':
+            console.log("switch case 3")
+            break
+    }
+
+    console.log("switch done")
+}
+
+function SwitchStatementOnlyDefault() {
+    console.log("switch entry")
+    let fruits = 'Oranges'
+
+    switch (fruits) {
+        default:
+            console.log("switch case default")
+    }
+
+    console.log("switch done")
+}
+
+
+function SwitchStatementOnlyOneCase() {
+    console.log("switch entry")
+    let fruits = 'Oranges'
+
+    switch (fruits) {
+        case 'Oranges':
+            console.log("switch case 1")
+            break
+    }
+
+    console.log("switch done")
+}
+
+function SwitchStatementWithBadNodesAndDefault() {
+    console.log("switch entry")
+    let fruits = 'Oranges'
+
+    switch (fruits) {
+        // case 'Oranges':
+        //     console.log("switch case 1")
+        //     break
+        default:
+            console.log("switch case default")
+    }
+
+    console.log("switch done")
+}
+
+function SwitchStatementWithBadNode() {
+    console.log("switch entry")
+    let fruits = 'Oranges'
+
+    switch (fruits) {
+        // case 'Oranges':
+        //     console.log("switch case 1")
+        //     break
+        case 'Mangoes':
+            console.log("switch case 2")
+            break
+        case 'Papayas':
+            console.log("switch case 3")
+            break
+    }
+
+    console.log("switch done")
+}
+
+function SwitchStatementJustOneCaseAndDefault() {
+    console.log("switch entry")
+    let foo = 2
+
+    switch (foo) {
+        case 1:
+            console.log("switch case 1")
+        default:
+            console.log("switch case default")
+    }
+
+    console.log("switch done")
 }
 
 function ForStatement() {
@@ -131,7 +227,7 @@ function ForStatement() {
 
 function ForStatementIteratingOverList(data) {
     let sum = 0;
-    for (let i =0; i < data.length; i++) {
+    for (let i = 0; i < data.length; i++) {
         sum += i;
     }
 
@@ -144,7 +240,7 @@ function ForStatementWithoutBinaryExpressionIncremet() {
 }
 
 function ForStatementEndlessRecursion() {
-    for (;;) {
+    for (; ;) {
         console.log("endless recursion");
     }
 }

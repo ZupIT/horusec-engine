@@ -9,6 +9,12 @@ file statements.js:
   func  IfStatement                                 (a, b)
   func  LabeledWhileStatement                       ()
   func  SwitchStatement                             ()
+  func  SwitchStatementJustOneCaseAndDefault        ()
+  func  SwitchStatementOnlyDefault                  ()
+  func  SwitchStatementOnlyOneCase                  ()
+  func  SwitchStatementWithBadNode                  ()
+  func  SwitchStatementWithBadNodesAndDefault       ()
+  func  SwitchStatementWithoutDefault               ()
   func  TryStatement                                ()
   func  TryStatementWithoutCatch                    ()
   func  TryStatementWithoutFinally                  ()
@@ -20,13 +26,13 @@ file statements.js:
 
 # Name: ExportStatement
 # File: statements.js
-# Location: statements.js:167:0
+# Location: statements.js:263:0
 func ExportStatement():
 0:                                                                         entry
 
 # Name: ForInStatement
 # File: statements.js
-# Location: statements.js:159:0
+# Location: statements.js:255:0
 # Locals:
 #   0:	values
 func ForInStatement():
@@ -35,7 +41,7 @@ func ForInStatement():
 
 # Name: ForStatement
 # File: statements.js
-# Location: statements.js:125:0
+# Location: statements.js:221:0
 # Locals:
 #   0:	i
 #   1:	i
@@ -56,7 +62,7 @@ func ForStatement():
 
 # Name: ForStatementEmptyBody
 # File: statements.js
-# Location: statements.js:152:0
+# Location: statements.js:248:0
 # Locals:
 #   0:	i
 #   1:	i
@@ -76,7 +82,7 @@ func ForStatementEmptyBody():
 
 # Name: ForStatementEndlessRecursion
 # File: statements.js
-# Location: statements.js:146:0
+# Location: statements.js:242:0
 func ForStatementEndlessRecursion():
 0:                                                                         entry
 	jump 1
@@ -87,7 +93,7 @@ func ForStatementEndlessRecursion():
 
 # Name: ForStatementIteratingOverList
 # File: statements.js
-# Location: statements.js:132:0
+# Location: statements.js:228:0
 # Locals:
 #   0:	i
 #   1:	i
@@ -111,7 +117,7 @@ func ForStatementIteratingOverList(data):
 
 # Name: ForStatementWithoutBinaryExpressionIncremet
 # File: statements.js
-# Location: statements.js:141:0
+# Location: statements.js:237:0
 func ForStatementWithoutBinaryExpressionIncremet():
 0:                                                                         entry
 	jump 2
@@ -170,7 +176,153 @@ func LabeledWhileStatement():
 #   0:	fruits
 func SwitchStatement():
 0:                                                                         entry
-	%t0 = "Oranges"
+	%t0 = console.log("switch entry")
+	%t1 = "Oranges"
+	%t4 = %t1 == "Oranges"
+	if %t4 goto 3 else 4
+1:                                                                       if.done
+	%t9 = console.log("switch done")
+2:                                                                       if.else
+	%t2 = console.log("switch case default")
+	jump 1
+3:                                                                       if.then
+	%t3 = console.log("switch case 1")
+	jump 1
+4:                                                                       if.done
+	%t5 = %t1 == "Mangoes"
+	if %t5 goto 5 else 6
+5:                                                                       if.then
+	%t6 = console.log("switch case 2")
+	jump 1
+6:                                                                       if.done
+	%t7 = %t1 == "Papayas"
+	if %t7 goto 7 else 2
+7:                                                                       if.then
+	%t8 = console.log("switch case 3")
+	jump 1
+
+# Name: SwitchStatementJustOneCaseAndDefault
+# File: statements.js
+# Location: statements.js:207:0
+# Locals:
+#   0:	foo
+func SwitchStatementJustOneCaseAndDefault():
+0:                                                                         entry
+	%t0 = console.log("switch entry")
+	%t1 = "2"
+	%t4 = %t1 == "1"
+	if %t4 goto 3 else 2
+1:                                                                       if.done
+	%t5 = console.log("switch done")
+2:                                                                       if.else
+	%t2 = console.log("switch case default")
+	jump 1
+3:                                                                       if.then
+	%t3 = console.log("switch case 1")
+	jump 1
+4:                                                                       if.done
+
+# Name: SwitchStatementOnlyDefault
+# File: statements.js
+# Location: statements.js:147:0
+# Locals:
+#   0:	fruits
+func SwitchStatementOnlyDefault():
+0:                                                                         entry
+	%t0 = console.log("switch entry")
+	%t1 = "Oranges"
+	jump 2
+1:                                                                       if.done
+	%t3 = console.log("switch done")
+2:                                                                       if.else
+	%t2 = console.log("switch case default")
+	jump 1
+
+# Name: SwitchStatementOnlyOneCase
+# File: statements.js
+# Location: statements.js:160:0
+# Locals:
+#   0:	fruits
+func SwitchStatementOnlyOneCase():
+0:                                                                         entry
+	%t0 = console.log("switch entry")
+	%t1 = "Oranges"
+	%t3 = %t1 == "Oranges"
+	if %t3 goto 2 else 1
+1:                                                                       if.done
+	%t4 = console.log("switch done")
+2:                                                                       if.then
+	%t2 = console.log("switch case 1")
+	jump 1
+3:                                                                       if.done
+
+# Name: SwitchStatementWithBadNode
+# File: statements.js
+# Location: statements.js:188:0
+# Locals:
+#   0:	fruits
+func SwitchStatementWithBadNode():
+0:                                                                         entry
+	%t0 = console.log("switch entry")
+	%t1 = "Oranges"
+	%t3 = %t1 == "Mangoes"
+	if %t3 goto 2 else 3
+1:                                                                       if.done
+	%t6 = console.log("switch done")
+2:                                                                       if.then
+	%t2 = console.log("switch case 2")
+	jump 1
+3:                                                                       if.done
+	%t4 = %t1 == "Papayas"
+	if %t4 goto 4 else 1
+4:                                                                       if.then
+	%t5 = console.log("switch case 3")
+	jump 1
+
+# Name: SwitchStatementWithBadNodesAndDefault
+# File: statements.js
+# Location: statements.js:173:0
+# Locals:
+#   0:	fruits
+func SwitchStatementWithBadNodesAndDefault():
+0:                                                                         entry
+	%t0 = console.log("switch entry")
+	%t1 = "Oranges"
+	jump 2
+1:                                                                       if.done
+	%t3 = console.log("switch done")
+2:                                                                       if.else
+	%t2 = console.log("switch case default")
+	jump 1
+
+# Name: SwitchStatementWithoutDefault
+# File: statements.js
+# Location: statements.js:128:0
+# Locals:
+#   0:	fruits
+func SwitchStatementWithoutDefault():
+0:                                                                         entry
+	%t0 = console.log("switch entry")
+	%t1 = "Oranges"
+	%t3 = %t1 == "Oranges"
+	if %t3 goto 2 else 3
+1:                                                                       if.done
+	%t8 = console.log("switch done")
+2:                                                                       if.then
+	%t2 = console.log("switch case 1")
+	jump 1
+3:                                                                       if.done
+	%t4 = %t1 == "Mangoes"
+	if %t4 goto 4 else 5
+4:                                                                       if.then
+	%t5 = console.log("switch case 2")
+	jump 1
+5:                                                                       if.done
+	%t6 = %t1 == "Papayas"
+	if %t6 goto 6 else 1
+6:                                                                       if.then
+	%t7 = console.log("switch case 3")
+	jump 1
 
 # Name: TryStatement
 # File: statements.js
