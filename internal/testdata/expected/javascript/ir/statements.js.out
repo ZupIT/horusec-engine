@@ -7,6 +7,7 @@ file statements.js:
   func  ForStatementIteratingOverList               (data)
   func  ForStatementWithoutBinaryExpressionIncremet ()
   func  IfStatement                                 (a, b)
+  func  LabeledWhileStatement                       ()
   func  SwitchStatement                             ()
   func  TryStatement                                ()
   func  TryStatementWithoutCatch                    ()
@@ -19,13 +20,13 @@ file statements.js:
 
 # Name: ExportStatement
 # File: statements.js
-# Location: statements.js:159:0
+# Location: statements.js:167:0
 func ExportStatement():
 0:                                                                         entry
 
 # Name: ForInStatement
 # File: statements.js
-# Location: statements.js:151:0
+# Location: statements.js:159:0
 # Locals:
 #   0:	values
 func ForInStatement():
@@ -34,7 +35,7 @@ func ForInStatement():
 
 # Name: ForStatement
 # File: statements.js
-# Location: statements.js:117:0
+# Location: statements.js:125:0
 # Locals:
 #   0:	i
 #   1:	i
@@ -55,7 +56,7 @@ func ForStatement():
 
 # Name: ForStatementEmptyBody
 # File: statements.js
-# Location: statements.js:144:0
+# Location: statements.js:152:0
 # Locals:
 #   0:	i
 #   1:	i
@@ -75,7 +76,7 @@ func ForStatementEmptyBody():
 
 # Name: ForStatementEndlessRecursion
 # File: statements.js
-# Location: statements.js:138:0
+# Location: statements.js:146:0
 func ForStatementEndlessRecursion():
 0:                                                                         entry
 	jump 1
@@ -86,7 +87,7 @@ func ForStatementEndlessRecursion():
 
 # Name: ForStatementIteratingOverList
 # File: statements.js
-# Location: statements.js:124:0
+# Location: statements.js:132:0
 # Locals:
 #   0:	i
 #   1:	i
@@ -110,7 +111,7 @@ func ForStatementIteratingOverList(data):
 
 # Name: ForStatementWithoutBinaryExpressionIncremet
 # File: statements.js
-# Location: statements.js:133:0
+# Location: statements.js:141:0
 func ForStatementWithoutBinaryExpressionIncremet():
 0:                                                                         entry
 	jump 2
@@ -153,9 +154,18 @@ func IfStatement(a, b):
 	jump 5
 7:                                                                   unreachable
 
+# Name: LabeledWhileStatement
+# File: statements.js
+# Location: statements.js:91:0
+# Locals:
+#   0:	x
+func LabeledWhileStatement():
+0:                                                                         entry
+	%t0 = "0"
+
 # Name: SwitchStatement
 # File: statements.js
-# Location: statements.js:99:0
+# Location: statements.js:107:0
 # Locals:
 #   0:	fruits
 func SwitchStatement():
@@ -219,6 +229,32 @@ func TryStatementWithoutFinally():
 # Name: WhileStatement
 # File: statements.js
 # Location: statements.js:74:0
+# Locals:
+#   0:	i
+#   1:	i
 func WhileStatement():
 0:                                                                         entry
+	%t0 = "0"
+	jump 2
+1:                                                                    while.body
+	%t2 = console.log("test")
+	%t3 = %t0 === "2"
+	if %t3 goto 4 else 5
+2:                                                                    while.cond
+	%t1 = %t0 <= "5"
+	if %t1 goto 1 else 3
+3:                                                                    while.done
+	%t8 = console.log("finish")
+4:                                                                       if.then
+	%t4 = console.log("two")
+	jump 5
+5:                                                                       if.done
+	%t5 = %t0 === "4"
+	if %t5 goto 6 else 7
+6:                                                                       if.then
+	%t6 = console.log("finish")
+	jump 7
+7:                                                                       if.done
+	%t7 = %t0 + "1"
+	jump 2
 

@@ -189,6 +189,11 @@ func (fn *Function) newVar(label string, value Value, syntax ast.Node) *Var {
 	}
 }
 
+// finishBody finalizes the function after IR code generation of its body.
+func (fn *Function) finishBody() {
+	fn.currentBlock = nil
+}
+
 // emit appends an instruction to the current basic block.
 // If the instruction defines a Value, it is returned.
 func (b *BasicBlock) emit(i Instruction) {
@@ -205,11 +210,6 @@ func (b *builder) buildFunction(fn *Function, body *ast.BlockStmt) {
 	fn.currentBlock = fn.newBasicBlock("entry")
 	b.stmt(fn, body)
 	fn.finishBody()
-}
-
-// finishBody finalizes the function after IR code generation of its body.
-func (fn *Function) finishBody() {
-	fn.currentBlock = nil
 }
 
 // stmt convert a statement s to a IR form.
@@ -267,6 +267,8 @@ func (b *builder) stmt(fn *Function, s ast.Stmt) {
 		b.forStmt(fn, stmt)
 	case *ast.TryStmt:
 		b.tryStatement(fn, stmt)
+	case *ast.WhileStmt:
+		b.whileStmt(fn, stmt)
 	case *ast.BadNode:
 		// Do nothing with bad nodes.
 	default:
@@ -453,6 +455,63 @@ func (b *builder) expr(fn *Function, e ast.Expr, expand bool) Value {
 	}
 
 	return value
+}
+
+// whileStmt emits code to fn for a while statement block.
+// 0:                                                                         entry
+// 		...previous code before loop...
+// 		jump 2
+// 1:                                                                    while.body
+// 		...body of while loop...
+// 2:                                                                    while.cond
+// 		if cond goto 1 else 3
+// 3:                                                                    while.done
+// 		...code after while loop...
+//
+// TODO(matheus): Improve the IR generation for incomplete blocks.
+//
+// Incomplete blocks are blocks that further predecessors will be added after processing
+// the code inside the block. Since the code can use variable defined in predecessors
+// blocks (that was not added yet) we can't create correctly phi values to these variables
+// so in this case we consider the variable value for the predecessor block that was already
+// processed at the this point. In this case, the while.cond block is an incomplete block because
+// the while.body block is added as predecessor after issuing the code of while.cond block.
+func (b *builder) whileStmt(fn *Function, stmt *ast.WhileStmt) {
+	// Create the while body.
+	body := fn.newBasicBlock("while.body")
+
+	// Create the while condition, if the while statement don't have
+	// a condition, use the while.body to recursively jump.
+	cond := body
+
+	if stmt.Cond != nil {
+		// If while has a condition, create a while.cond block to jump
+		// otherwise jump to while.body.
+		cond = fn.newBasicBlock("while.cond")
+	}
+
+	// Jump and set current block to cond, could be while.body or while.cond blocks.
+	emitJump(fn, cond)
+	fn.currentBlock = cond
+
+	// Create the while done block that holds code after the while statement.
+	done := fn.newBasicBlock("while.done")
+
+	if stmt.Cond != nil {
+		// Emit the while condition if exists and set the current block
+		// from while.cond to while.body.
+		b.cond(fn, stmt.Cond, body, done)
+		fn.currentBlock = body
+	}
+
+	// Emit the while body and emit a jump from while.body to while.cond to represent
+	// the loop. Note that if while statement don't have a condition this emission will
+	// be for the while.body again to represent the endless recursion.
+	b.stmt(fn, stmt.Body)
+	emitJump(fn, cond)
+
+	// Set current block to while.done to further processing code after while statement.
+	fn.currentBlock = done
 }
 
 // forStmt emits code to fn for a for statement block.

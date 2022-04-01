@@ -72,17 +72,7 @@ function TryStatementWithoutCatch() {
 }
 
 function WhileStatement() {
-    whileStmt :while ( i <= 5){
-        console.log('test')
-        if (i === 4 ){
-            console.log("finish")
-            break whileStmt
-        }
-        if (i === 2){
-            console.log("two")
-            continue whileStmt
-        }
-    }
+    let i = 0;
     while ( i <= 5){
         console.log('test')
         if (i === 2){
@@ -93,6 +83,24 @@ function WhileStatement() {
             console.log("finish")
             break
         }
+        i++;
+    }
+    console.log("finish")
+}
+
+function LabeledWhileStatement() {
+    let x = 0;
+    whileStmt :while ( x <= 5){
+        console.log('test')
+        if (i === 4 ){
+            console.log("finish")
+            break whileStmt
+        }
+        if (i === 2){
+            console.log("two")
+            continue whileStmt
+        }
+        x++;
     }
 }
 
