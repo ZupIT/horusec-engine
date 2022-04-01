@@ -230,6 +230,31 @@ function f(a) {
 				},
 			},
 		},
+		{
+			Name: "MatchKeyValue",
+			Src: `
+function f(a) {
+	insecure({secure: false});
+}
+			`,
+			Analyzer: &call.Analyzer{
+				Name:      "insecure",
+				ArgsIndex: call.AllArguments,
+				ArgValue: value.KeyValue{
+					Key:   "secure",
+					Value: "false",
+				},
+			},
+			ExpectedIssues: []analysis.Issue{
+				{
+					Filename:    "MatchKeyValue",
+					StartOffset: 18,
+					EndOffset:   43,
+					Line:        3,
+					Column:      1,
+				},
+			},
+		},
 	}
 
 	testutil.TestAnalayzer(t, testcases)
