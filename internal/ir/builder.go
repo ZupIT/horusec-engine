@@ -145,8 +145,6 @@ func (fn *Function) newBasicBlock(comment string) *BasicBlock {
 }
 
 // emit add a new instruction on current basic block of function.
-//
-// If the instruction defines a Value, it is returned.
 func (fn *Function) emit(instr Instruction) {
 	fn.currentBlock.emit(instr)
 }
