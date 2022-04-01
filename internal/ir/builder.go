@@ -414,19 +414,6 @@ func (b *builder) expr(fn *Function, e ast.Expr, expand bool) Value {
 			Subs:  values,
 		}
 	case *ast.SelectorExpr:
-		// TODO(matheus): If the variable value is an ast.SelectorExpr a new variable is
-		// create, but when printing this variable, their value will nil, because here we
-		// are creating a variable without a value. Maybe we should create a new IR Value
-		// that represents values that are references to other variables.
-		//
-		// Source:
-		// const a = b.c.d
-		//
-		// IR:
-		// a = nil
-		//
-		// Expected IR:
-		// a = b.c.d
 		return b.selectorExpr(fn, expr)
 	case *ast.KeyValueExpr:
 		return &HashMap{
