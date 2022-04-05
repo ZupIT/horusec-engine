@@ -103,6 +103,7 @@ func (f *File) NewFunction(name string, syntax ast.Node) *Function {
 		phis:      make(map[string]*Phi),
 		nLocals:   0,
 		parent:    nil,
+		lblocks:   make(map[string]*lblock),
 	}
 
 	return fn

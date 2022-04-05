@@ -194,10 +194,56 @@ func (fn *Function) finishBody() {
 	fn.currentBlock = nil
 }
 
+// labelledBlock returns the branch target associated with the specified label, creating it if needed.
+func (fn *Function) labelledBlock(name string) *lblock {
+	label, exists := fn.lblocks[name]
+	if !exists {
+		label = &lblock{_goto: fn.newBasicBlock(name)}
+		fn.lblocks[name] = label
+	}
+	return label
+}
+
 // emit appends an instruction to the current basic block.
 // If the instruction defines a Value, it is returned.
 func (b *BasicBlock) emit(i Instruction) {
 	b.Instrs = append(b.Instrs, i)
+}
+
+// targets holds the destination associated for unlabelled for/while/switch stmts.
+// We push/pop one of these as we enter/leave each statement construct.
+type targets []*lblock
+
+// push add a new block on stack.
+func (t *targets) push(label *lblock) {
+	*t = append(*t, label)
+}
+
+// pop remove the last block from stack.
+func (t *targets) pop() {
+	if len(*t) == 0 {
+		panic("empty targets stack to pop")
+	}
+	old := *t
+	n := len(old)
+	old[n-1] = nil // avoid memory leak
+	*t = old[:n-1]
+}
+
+// head return the last item from stack without removing.
+func (t targets) head() *lblock {
+	n := len(t)
+	if n == 0 {
+		return nil
+	}
+	return t[n-1]
+}
+
+// lblock contains destinations associated with for/while/switch stmts.
+type lblock struct {
+	_goto     *BasicBlock
+	_break    *BasicBlock
+	_continue *BasicBlock
 }
 
 // builder controls how a function is converted from AST to a IR.
@@ -216,6 +262,9 @@ func (b *builder) buildFunction(fn *Function, body *ast.BlockStmt) {
 //
 // nolint:gocyclo // Its better centralize all stmt to IR conversion on a single function.
 func (b *builder) stmt(fn *Function, s ast.Stmt) {
+	var label *lblock
+
+start:
 	switch stmt := s.(type) {
 	case *ast.BlockStmt:
 		b.stmtList(fn, stmt.List)
@@ -264,13 +313,46 @@ func (b *builder) stmt(fn *Function, s ast.Stmt) {
 
 		fn.currentBlock = done
 	case *ast.ForStatement:
-		b.forStmt(fn, stmt)
+		b.forStmt(fn, stmt, label)
 	case *ast.TryStmt:
 		b.tryStatement(fn, stmt)
 	case *ast.WhileStmt:
-		b.whileStmt(fn, stmt)
+		b.whileStmt(fn, stmt, label)
 	case *ast.SwitchStatement:
 		b.switchStatement(fn, stmt)
+	case *ast.LabeledStatement:
+		label = fn.labelledBlock(stmt.Label.Name)
+		emitJump(fn, label._goto)
+		fn.currentBlock = label._goto
+		s = stmt.Body
+		goto start // effectively: tailcall stmt(fn, s.Stmt, label)
+
+	case *ast.BreakStatement, *ast.ContinueStatement:
+		var block *BasicBlock
+
+		switch s := stmt.(type) {
+		case *ast.BreakStatement:
+			if s.Label != nil {
+				block = fn.labelledBlock(s.Label.Name)._break
+			} else {
+				if h := fn.targets.head(); h != nil {
+					block = h._break
+				}
+			}
+		case *ast.ContinueStatement:
+			if s.Label != nil {
+				block = fn.labelledBlock(s.Label.Name)._continue
+			} else {
+				if h := fn.targets.head(); h != nil {
+					block = h._continue
+				}
+			}
+		}
+
+		if block != nil {
+			emitJump(fn, block)
+			fn.currentBlock = fn.newBasicBlock("unreachable")
+		}
 	case *ast.BadNode:
 		// Do nothing with bad nodes.
 	default:
@@ -567,7 +649,7 @@ func (b *builder) expr(fn *Function, e ast.Expr, expand bool) Value {
 // so in this case we consider the variable value for the predecessor block that was already
 // processed at the this point. In this case, the while.cond block is an incomplete block because
 // the while.body block is added as predecessor after issuing the code of while.cond block.
-func (b *builder) whileStmt(fn *Function, stmt *ast.WhileStmt) {
+func (b *builder) whileStmt(fn *Function, stmt *ast.WhileStmt, label *lblock) {
 	// Create the while body.
 	body := fn.newBasicBlock("while.body")
 
@@ -588,6 +670,12 @@ func (b *builder) whileStmt(fn *Function, stmt *ast.WhileStmt) {
 	// Create the while done block that holds code after the while statement.
 	done := fn.newBasicBlock("while.done")
 
+	if label != nil {
+		// whileStmt is processing a labeled statement, so we set the break and continue jumps.
+		label._break = done
+		label._continue = cond
+	}
+
 	if stmt.Cond != nil {
 		// Emit the while condition if exists and set the current block
 		// from while.cond to while.body.
@@ -595,11 +683,20 @@ func (b *builder) whileStmt(fn *Function, stmt *ast.WhileStmt) {
 		fn.currentBlock = body
 	}
 
+	// Push the new target block to process the loop body.
+	fn.targets.push(&lblock{
+		_break:    done,
+		_continue: cond,
+	})
+
 	// Emit the while body and emit a jump from while.body to while.cond to represent
 	// the loop. Note that if while statement don't have a condition this emission will
 	// be for the while.body again to represent the endless recursion.
 	b.stmt(fn, stmt.Body)
 	emitJump(fn, cond)
+
+	// Since the body was already parsed, pop the target block from stack.
+	fn.targets.pop()
 
 	// Set current block to while.done to further processing code after while statement.
 	fn.currentBlock = done
@@ -619,7 +716,7 @@ func (b *builder) whileStmt(fn *Function, stmt *ast.WhileStmt) {
 //         ...code after loop...
 //
 // nolint: funlen,gocyclo // For loops are complicated, we can improve this in the future.
-func (b *builder) forStmt(fn *Function, stmt *ast.ForStatement) {
+func (b *builder) forStmt(fn *Function, stmt *ast.ForStatement, label *lblock) {
 	// Create the body of for loop.
 	body := fn.newBasicBlock("for.body")
 
@@ -668,6 +765,12 @@ func (b *builder) forStmt(fn *Function, stmt *ast.ForStatement) {
 	// Create for.done block to jump if for statement has a condition.
 	done := fn.newBasicBlock("for.done")
 
+	if label != nil {
+		// forStmt is processing a labeled statement, so we set the break and continue jumps.
+		label._break = done
+		label._continue = loop
+	}
+
 	// Emit for loop condition to fn if exists.
 	if stmt.Cond != nil {
 		b.cond(fn, stmt.Cond, body, done)
@@ -688,8 +791,17 @@ func (b *builder) forStmt(fn *Function, stmt *ast.ForStatement) {
 		}
 	}
 
+	// Push the new target block to process the loop body.
+	fn.targets.push(&lblock{
+		_break:    done,
+		_continue: loop,
+	})
+
 	// Emit the for body on loop.body block.
 	b.stmt(fn, stmt.Body)
+
+	// Since the body was already parsed, pop the target block from stack.
+	fn.targets.pop()
 
 	// Emit a jump from for.body to to for.loop again.
 	emitJump(fn, loop)

@@ -7,7 +7,9 @@ file statements.js:
   func  ForStatementIteratingOverList               (data)
   func  ForStatementWithoutBinaryExpressionIncremet ()
   func  IfStatement                                 (a, b)
+  func  LabeledForStatement                         ()
   func  LabeledWhileStatement                       ()
+  func  NestedForStatement                          ()
   func  SwitchStatement                             ()
   func  SwitchStatementJustOneCaseAndDefault        ()
   func  SwitchStatementOnlyDefault                  ()
@@ -26,13 +28,13 @@ file statements.js:
 
 # Name: ExportStatement
 # File: statements.js
-# Location: statements.js:263:0
+# Location: statements.js:297:0
 func ExportStatement():
 0:                                                                         entry
 
 # Name: ForInStatement
 # File: statements.js
-# Location: statements.js:255:0
+# Location: statements.js:289:0
 # Locals:
 #   0:	values
 func ForInStatement():
@@ -41,7 +43,7 @@ func ForInStatement():
 
 # Name: ForStatement
 # File: statements.js
-# Location: statements.js:221:0
+# Location: statements.js:255:0
 # Locals:
 #   0:	i
 #   1:	i
@@ -62,7 +64,7 @@ func ForStatement():
 
 # Name: ForStatementEmptyBody
 # File: statements.js
-# Location: statements.js:248:0
+# Location: statements.js:282:0
 # Locals:
 #   0:	i
 #   1:	i
@@ -82,7 +84,7 @@ func ForStatementEmptyBody():
 
 # Name: ForStatementEndlessRecursion
 # File: statements.js
-# Location: statements.js:242:0
+# Location: statements.js:276:0
 func ForStatementEndlessRecursion():
 0:                                                                         entry
 	jump 1
@@ -93,7 +95,7 @@ func ForStatementEndlessRecursion():
 
 # Name: ForStatementIteratingOverList
 # File: statements.js
-# Location: statements.js:228:0
+# Location: statements.js:262:0
 # Locals:
 #   0:	i
 #   1:	i
@@ -117,7 +119,7 @@ func ForStatementIteratingOverList(data):
 
 # Name: ForStatementWithoutBinaryExpressionIncremet
 # File: statements.js
-# Location: statements.js:237:0
+# Location: statements.js:271:0
 func ForStatementWithoutBinaryExpressionIncremet():
 0:                                                                         entry
 	jump 2
@@ -160,18 +162,160 @@ func IfStatement(a, b):
 	jump 5
 7:                                                                   unreachable
 
+# Name: LabeledForStatement
+# File: statements.js
+# Location: statements.js:107:0
+# Locals:
+#   0:	i
+#   1:	i
+#   2:	i
+#   3:	j
+#   4:	j
+#   5:	j
+func LabeledForStatement():
+0:                                                                         entry
+	jump 1
+1:                                                                         outer
+	jump 3
+2:                                                                      for.body
+	%t3 = %t1 + "1"
+	jump 6
+3:                                                                      for.loop
+	%t0 = "0"
+	%t1 = phi [3: %t0, 2: %t3] #i
+	%t2 = %t1 < "20"
+	if %t2 goto 2 else 4
+4:                                                                      for.done
+5:                                                                      for.body
+	%t7 = %t5 + "1"
+	%t8 = %t7 == %t3
+	if %t8 goto 8 else 9
+6:                                                                      for.loop
+	%t4 = "0"
+	%t5 = phi [6: %t4, 5: %t7] #j
+	%t6 = %t5 < "10"
+	if %t6 goto 5 else 7
+7:                                                                      for.done
+	%t11 = %t3 % "2"
+	%t12 = %t11 === "0"
+	if %t12 goto 14 else 15
+8:                                                                       if.then
+	jump 3
+9:                                                                       if.done
+	%t9 = %t7 / "5"
+	%t10 = %t9 > "2"
+	if %t10 goto 11 else 12
+10:                                                                  unreachable
+	jump 9
+11:                                                                      if.then
+	jump 7
+12:                                                                      if.done
+	jump 6
+13:                                                                  unreachable
+	jump 12
+14:                                                                      if.then
+	jump 4
+15:                                                                      if.done
+	jump 3
+16:                                                                  unreachable
+	jump 15
+
 # Name: LabeledWhileStatement
 # File: statements.js
 # Location: statements.js:91:0
 # Locals:
 #   0:	x
+#   1:	x
 func LabeledWhileStatement():
 0:                                                                         entry
 	%t0 = "0"
+	jump 1
+1:                                                                     whileStmt
+	jump 3
+2:                                                                    while.body
+	%t2 = console.log("test")
+	%t3 = i === "4"
+	if %t3 goto 5 else 6
+3:                                                                    while.cond
+	%t1 = %t0 <= "5"
+	if %t1 goto 2 else 4
+4:                                                                    while.done
+5:                                                                       if.then
+	%t4 = console.log("finish")
+	jump 4
+6:                                                                       if.done
+	%t5 = i === "2"
+	if %t5 goto 8 else 9
+7:                                                                   unreachable
+	jump 6
+8:                                                                       if.then
+	%t6 = console.log("two")
+	jump 3
+9:                                                                       if.done
+	%t7 = %t0 + "1"
+	jump 3
+10:                                                                  unreachable
+	jump 9
+
+# Name: NestedForStatement
+# File: statements.js
+# Location: statements.js:124:0
+# Locals:
+#   0:	i
+#   1:	i
+#   2:	i
+#   3:	j
+#   4:	j
+#   5:	j
+func NestedForStatement():
+0:                                                                         entry
+	jump 2
+1:                                                                      for.body
+	%t3 = %t1 + "1"
+	jump 5
+2:                                                                      for.loop
+	%t0 = "0"
+	%t1 = phi [2: %t0, 1: %t3] #i
+	%t2 = %t1 < "20"
+	if %t2 goto 1 else 3
+3:                                                                      for.done
+4:                                                                      for.body
+	%t7 = %t5 + "1"
+	%t8 = %t7 == %t3
+	if %t8 goto 7 else 8
+5:                                                                      for.loop
+	%t4 = "0"
+	%t5 = phi [5: %t4, 4: %t7] #j
+	%t6 = %t5 < "10"
+	if %t6 goto 4 else 6
+6:                                                                      for.done
+	%t11 = %t3 % "2"
+	%t12 = %t11 === "0"
+	if %t12 goto 13 else 14
+7:                                                                       if.then
+	jump 5
+8:                                                                       if.done
+	%t9 = %t7 / "5"
+	%t10 = %t9 > "2"
+	if %t10 goto 10 else 11
+9:                                                                   unreachable
+	jump 8
+10:                                                                      if.then
+	jump 6
+11:                                                                      if.done
+	jump 5
+12:                                                                  unreachable
+	jump 11
+13:                                                                      if.then
+	jump 3
+14:                                                                      if.done
+	jump 2
+15:                                                                  unreachable
+	jump 14
 
 # Name: SwitchStatement
 # File: statements.js
-# Location: statements.js:107:0
+# Location: statements.js:141:0
 # Locals:
 #   0:	fruits
 func SwitchStatement():
@@ -205,7 +349,7 @@ func SwitchStatement():
 
 # Name: SwitchStatementJustOneCaseAndDefault
 # File: statements.js
-# Location: statements.js:207:0
+# Location: statements.js:241:0
 # Locals:
 #   0:	foo
 func SwitchStatementJustOneCaseAndDefault():
@@ -227,7 +371,7 @@ func SwitchStatementJustOneCaseAndDefault():
 
 # Name: SwitchStatementOnlyDefault
 # File: statements.js
-# Location: statements.js:147:0
+# Location: statements.js:181:0
 # Locals:
 #   0:	fruits
 func SwitchStatementOnlyDefault():
@@ -243,7 +387,7 @@ func SwitchStatementOnlyDefault():
 
 # Name: SwitchStatementOnlyOneCase
 # File: statements.js
-# Location: statements.js:160:0
+# Location: statements.js:194:0
 # Locals:
 #   0:	fruits
 func SwitchStatementOnlyOneCase():
@@ -260,7 +404,7 @@ func SwitchStatementOnlyOneCase():
 
 # Name: SwitchStatementWithBadNode
 # File: statements.js
-# Location: statements.js:188:0
+# Location: statements.js:222:0
 # Locals:
 #   0:	fruits
 func SwitchStatementWithBadNode():
@@ -283,7 +427,7 @@ func SwitchStatementWithBadNode():
 
 # Name: SwitchStatementWithBadNodesAndDefault
 # File: statements.js
-# Location: statements.js:173:0
+# Location: statements.js:207:0
 # Locals:
 #   0:	fruits
 func SwitchStatementWithBadNodesAndDefault():
@@ -299,7 +443,7 @@ func SwitchStatementWithBadNodesAndDefault():
 
 # Name: SwitchStatementWithoutDefault
 # File: statements.js
-# Location: statements.js:128:0
+# Location: statements.js:162:0
 # Locals:
 #   0:	fruits
 func SwitchStatementWithoutDefault():
@@ -401,14 +545,18 @@ func WhileStatement():
 	%t8 = console.log("finish")
 4:                                                                       if.then
 	%t4 = console.log("two")
-	jump 5
+	jump 2
 5:                                                                       if.done
 	%t5 = %t0 === "4"
-	if %t5 goto 6 else 7
-6:                                                                       if.then
+	if %t5 goto 7 else 8
+6:                                                                   unreachable
+	jump 5
+7:                                                                       if.then
 	%t6 = console.log("finish")
-	jump 7
-7:                                                                       if.done
+	jump 3
+8:                                                                       if.done
 	%t7 = %t0 + "1"
 	jump 2
+9:                                                                   unreachable
+	jump 8
 

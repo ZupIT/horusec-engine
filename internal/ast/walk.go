@@ -197,7 +197,7 @@ func Walk(v Visitor, node Node) {
 		if n.Label != nil {
 			Walk(v, n.Label)
 		}
-		walkStmtList(v, n.Body)
+		Walk(v, n.Body)
 
 	// Declarations
 	case *ImportDecl:

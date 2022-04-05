@@ -114,7 +114,9 @@ type Function struct {
 
 	// The following fields are set transiently during building,
 	// then cleared.
-	currentBlock *BasicBlock // Where to add instructions.
+	currentBlock *BasicBlock        // Where to add instructions.
+	lblocks      map[string]*lblock // Labeled blocks.
+	targets      targets            // Stack of branch targets.
 }
 
 // Signature represents a function or method signature.

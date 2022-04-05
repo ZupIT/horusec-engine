@@ -104,6 +104,40 @@ function LabeledWhileStatement() {
     }
 }
 
+function LabeledForStatement() {
+    outer: for (let i = 0; i < 20; i++) {
+        for (let j = 0; j < 10; j++) {
+            if (j == i) {
+                continue outer;
+            }
+            if (j / 5 > 2) {
+                break;
+            }
+        }
+        if (i % 2 === 0) {
+            break;
+        }
+
+    }
+}
+
+function NestedForStatement() {
+    for (let i = 0; i < 20; i++) {
+        for (let j = 0; j < 10; j++) {
+            if (j == i) {
+                continue;
+            }
+            if (j / 5 > 2) {
+                break;
+            }
+        }
+        if (i % 2 === 0) {
+            break;
+        }
+
+    }
+}
+
 function SwitchStatement() {
     console.log("switch entry")
     let fruits = 'Oranges'

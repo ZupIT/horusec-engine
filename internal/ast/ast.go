@@ -345,7 +345,7 @@ type (
 	LabeledStatement struct {
 		Position
 		Label *Ident // LabeledStatement label
-		Body  []Stmt
+		Body  Stmt
 	}
 )
 

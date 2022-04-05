@@ -479,17 +479,16 @@ func (p *parser) parseStmt(node *cst.Node) ast.Stmt {
 		stmt := &ast.LabeledStatement{
 			Position: ast.NewPosition(node),
 		}
-		body := make([]ast.Stmt, 0, node.NamedChildCount())
 
-		// The first named child of switch case is the condition, here we just need to iterate over the
-		// statements of switch case. The condition of switch case is parsed above.
-		for i := 1; i < node.NamedChildCount(); i++ {
-			body = append(body, p.parseStmt(node.NamedChild(i)))
+		// labeled_statemtn can have two named child nodes; label and body. Here we check if we have
+		// the body of labeled statement, if we, parse it as the body of labeled statement.
+		if node.NamedChildCount() > 1 {
+			stmt.Body = p.parseStmt(node.NamedChild(1))
 		}
+
 		if label := node.ChildByFieldName("label"); label != nil {
 			stmt.Label = ast.NewIdent(label)
 		}
-		stmt.Body = body
 
 		return stmt
 	case ExportStatement, EmptyStatement:
