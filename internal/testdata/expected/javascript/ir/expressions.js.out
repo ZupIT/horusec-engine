@@ -1,23 +1,24 @@
 file expressions.js:
   import  express      
-  func  %fn3          ()
+  func  %fn4          ()
   var   app          
   func  incrementExpr ()
+  func  subscriptExpr ()
 
 
 
 ============================
 
-# Name: %fn3
+# Name: %fn4
 # File: expressions.js
 # Location: expressions.js:1:0
-func %fn3():
+func %fn4():
 0:                                                                         entry
 	%t0 = console.log("testing")
-	%t1 = make closure %fn3$1 
+	%t1 = make closure %fn4$1 
 	%t2 = express.express()
 	%t3 = %t2.get("/", %t1)
-	%t4 = make closure %fn3$2 
+	%t4 = make closure %fn4$2 
 	%t5 = express.express()
 	%t6 = %t5.set("/", %t4)
 
@@ -35,4 +36,19 @@ func incrementExpr():
 	%t2 = %t1 - "1"
 	return %t2
 1:                                                                   unreachable
+
+# Name: subscriptExpr
+# File: expressions.js
+# Location: expressions.js:39:0
+# Locals:
+#   0:	i
+#   1:	values
+func subscriptExpr():
+0:                                                                         entry
+	%t0 = array["a","b","c"]
+	%t1 = "0"
+	%t2 = %t0[%t1]
+	%t3 = console.log(%t2)
+	%t4 = %t0["1"]
+	%t5 = console.log(%t4)
 

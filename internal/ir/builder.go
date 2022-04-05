@@ -624,6 +624,12 @@ func (b *builder) expr(fn *Function, e ast.Expr, expand bool) Value {
 		value = b.binaryExpr(fn, expr)
 	case *ast.ObjectExpr:
 		value = b.objectExpr(fn, expr)
+	case *ast.SubscriptExpr:
+		value = &Lookup{
+			node:   node{expr},
+			Object: b.expr(fn, expr.Object, true /* expand */),
+			Index:  b.expr(fn, expr.Index, true /* expand */),
+		}
 	default:
 		unsupportedNode(expr)
 		return nil

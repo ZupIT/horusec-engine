@@ -352,6 +352,20 @@ type HashMap struct {
 	Value Value
 }
 
+// Lookup instruction yields element from Index of Object.
+//
+// Example printed form:
+// %t0 = array["a","b","c"]
+// %t1 = "0"
+// %t2 = %t0[%t1]
+//
+// The Lookup implements the Value and Instruction interfaces.
+type Lookup struct {
+	node
+	Object Value // object being subscript by the index
+	Index  Value // value used to subscript the object
+}
+
 // node is a mix-in embedded by all IR nodes to provide source code information.
 //
 // Since node is embedded by all IR nodes (Value's and Instruction's), these nodes
@@ -453,6 +467,11 @@ func (h *HashMap) Name() string { return h.String() }
 func (h *HashMap) String() string {
 	return fmt.Sprintf("{%s: %s}", h.Key.String(), h.Value.String())
 }
+
+func (*Lookup) value()           {}
+func (*Lookup) instr()           {}
+func (l *Lookup) Name() string   { return l.Object.Name() }
+func (l *Lookup) String() string { return fmt.Sprintf("%s[%s]", l.Name(), l.Index.Name()) }
 
 func (*Selector) value() {}
 

@@ -56,6 +56,7 @@ const (
 	TemplateString          = "template_string"
 	Function                = "function"
 	UpdateExpression        = "update_expression"
+	SubscriptExpression     = "subscript_expression"
 
 	// ------------------------------------------------
 	//
