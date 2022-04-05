@@ -649,6 +649,12 @@ func (p *parser) parseExpr(node *cst.Node) ast.Expr {
 			Op:       node.ChildByFieldName("operator").Type(), // Type will return the operador cleaned.
 			Arg:      ast.NewIdent(node.ChildByFieldName("argument")),
 		}
+	case SubscriptExpression:
+		return &ast.SubscriptExpr{
+			Position: ast.NewPosition(node),
+			Object:   p.parseExpr(node.ChildByFieldName("object")),
+			Index:    p.parseExpr(node.ChildByFieldName("index")),
+		}
 	case EmptyStatement:
 		return nil
 	default:

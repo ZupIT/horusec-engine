@@ -35,3 +35,12 @@ function incrementExpr() {
     a--
     return a
 }
+
+function subscriptExpr() {
+    const values = ['a', 'b', 'c'];
+
+    let i = 0
+
+    console.log(values[i])
+    console.log(values[1])
+}

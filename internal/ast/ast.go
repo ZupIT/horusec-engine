@@ -207,22 +207,30 @@ type (
 		Op  string // Operator. // TODO: This should be a concrete type.
 		Arg *Ident // identifier of the argument being incremented
 	}
+
+	// SubscriptExpr node represents a subscript expression
+	SubscriptExpr struct {
+		Position
+		Object Expr // array object
+		Index  Expr // index of the subscript
+	}
 )
 
-func (*Ident) expr()        {}
-func (*Field) expr()        {}
-func (*FieldList) expr()    {}
-func (*BasicLit) expr()     {}
-func (*BinaryExpr) expr()   {}
-func (*CallExpr) expr()     {}
-func (*SelectorExpr) expr() {}
-func (*ObjectExpr) expr()   {}
-func (*KeyValueExpr) expr() {}
-func (*FuncType) expr()     {}
-func (*FuncLit) expr()      {}
-func (*TemplateExpr) expr() {}
-func (*IncExpr) expr()      {}
-func (*BadNode) expr()      {}
+func (*Ident) expr()         {}
+func (*Field) expr()         {}
+func (*FieldList) expr()     {}
+func (*BasicLit) expr()      {}
+func (*BinaryExpr) expr()    {}
+func (*CallExpr) expr()      {}
+func (*SelectorExpr) expr()  {}
+func (*ObjectExpr) expr()    {}
+func (*KeyValueExpr) expr()  {}
+func (*FuncType) expr()      {}
+func (*FuncLit) expr()       {}
+func (*TemplateExpr) expr()  {}
+func (*IncExpr) expr()       {}
+func (*BadNode) expr()       {}
+func (*SubscriptExpr) expr() {}
 
 // ----------------------------------------------------------------------------
 // Statements
