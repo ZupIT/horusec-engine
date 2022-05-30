@@ -55,7 +55,7 @@ func TestEngineRun(t *testing.T) {
 			projectPath:      filepath.Join("text", "examples"),
 			extensions:       []string{AcceptAnyExtension},
 			rules:            newRuleMock([]Finding{{}}, nil),
-			expectedFindings: 225,
+			expectedFindings: 237,
 			err:              false,
 		},
 		{

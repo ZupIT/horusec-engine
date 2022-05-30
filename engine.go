@@ -17,6 +17,7 @@ package engine
 import (
 	"context"
 	"io/fs"
+	"os"
 	"path/filepath"
 	"strings"
 	"sync"
@@ -177,5 +178,5 @@ func (e *Engine) isInvalidExtension(path string) bool {
 
 // isFileFromGitFolder check if a file is in a .git folder
 func (e *Engine) isFileFromGitFolder(path string) bool {
-	return strings.Contains(path, ".git")
+	return strings.Contains(path, ".git"+string(os.PathSeparator))
 }
