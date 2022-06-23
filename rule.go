@@ -26,6 +26,7 @@ type Metadata struct {
 	Description   string
 	Severity      string
 	Confidence    string
+	Filter        string
 	CWEs          []string
 	CVEs          []string
 	Mitigation    string
