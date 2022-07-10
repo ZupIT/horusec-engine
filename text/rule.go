@@ -19,12 +19,11 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"path/filepath"
 	"regexp"
-	"strings"
+
+	"github.com/bmatcuk/doublestar"
 
 	engine "github.com/ZupIT/horusec-engine"
-	"github.com/bmatcuk/doublestar"
 )
 
 // MatchType represents the possibles match types of the engine
@@ -65,16 +64,9 @@ type Rule struct {
 // file with it. The text file contains all information needed to find the vulnerable code when the regular expressions
 // match. There's also a validation to ignore binary files
 func (r *Rule) Run(path string) ([]engine.Finding, error) {
-	if len(r.Filter) < 1 {
-		r.Filter = "**"
-	}
-	matched, _ := doublestar.Match(strings.TrimSpace(r.Filter), filepath.ToSlash(path))
-	if !matched {
+	content, err := r.getFilteredFileContent(path)
+	if content == nil || err != nil {
 		return nil, nil
-	}
-	content, err := r.getFileContent(path)
-	if err != nil {
-		return nil, err
 	}
 
 	if r.isBinary(content) {
@@ -87,6 +79,24 @@ func (r *Rule) Run(path string) ([]engine.Finding, error) {
 	}
 
 	return r.runByRuleType(textFile)
+}
+
+func (r *Rule) getFilteredFileContent(path string) ([]byte, error) {
+	if len(r.Filter) < 1 {
+		r.Filter = "**"
+	}
+
+	matched, _ := doublestar.Match(r.Filter, path)
+	if !matched {
+		return nil, nil
+	}
+
+	content, err := r.getFileContent(path)
+	if err != nil {
+		return nil, err
+	}
+
+	return content, nil
 }
 
 // getFileContent opens the file using the file path, reads and returns its contents as bytes. After all done closes
