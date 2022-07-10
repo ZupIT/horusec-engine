@@ -21,7 +21,7 @@ import (
 	"os"
 	"regexp"
 
-	"github.com/bmatcuk/doublestar"
+	"github.com/bmatcuk/doublestar/v4"
 
 	engine "github.com/ZupIT/horusec-engine"
 )
