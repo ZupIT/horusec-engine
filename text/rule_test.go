@@ -27,6 +27,7 @@ func TestRun(t *testing.T) {
 		name             string
 		filepath         string
 		matchType        MatchType
+		filter           string
 		expressions      []*regexp.Regexp
 		expectedFindings int
 	}{
@@ -34,6 +35,7 @@ func TestRun(t *testing.T) {
 			name:      "Should return 1 findings with match type AndMatch and go sample",
 			filepath:  filepath.Join("examples", "go", "example1", "api", "server.go"),
 			matchType: AndMatch,
+			filter:    "**/*.go",
 			expressions: []*regexp.Regexp{
 				regexp.MustCompile(`Logger\.Fatal`),
 				regexp.MustCompile(`echoInstance.Start`),
@@ -44,6 +46,7 @@ func TestRun(t *testing.T) {
 			name:      "Should return 3 findings with match type OrMatch and go sample",
 			filepath:  filepath.Join("examples", "go", "example1", "api", "server.go"),
 			matchType: OrMatch,
+			filter:    "**/*.go",
 			expressions: []*regexp.Regexp{
 				regexp.MustCompile(`echoInstance\.Use\(middleware`),
 			},
@@ -53,6 +56,7 @@ func TestRun(t *testing.T) {
 			name:      "Should return 1 findings with match type NotMatch and go sample",
 			filepath:  filepath.Join("examples", "go", "example1", "api", "server.go"),
 			matchType: NotMatch,
+			filter:    "**/*.go",
 			expressions: []*regexp.Regexp{
 				regexp.MustCompile(`should-not-match`),
 			},
@@ -62,6 +66,7 @@ func TestRun(t *testing.T) {
 			name:      "Should return 0 findings with match type AndMatch and go sample",
 			filepath:  filepath.Join("examples", "go", "example1", "api", "server.go"),
 			matchType: AndMatch,
+			filter:    "**/*.go",
 			expressions: []*regexp.Regexp{
 				regexp.MustCompile(`should-not-match`),
 				regexp.MustCompile(`echoInstance.Start`),
@@ -72,6 +77,7 @@ func TestRun(t *testing.T) {
 			name:      "Should return 0 findings with match type OrMatch and go sample",
 			filepath:  filepath.Join("examples", "go", "example1", "api", "server.go"),
 			matchType: OrMatch,
+			filter:    "**/*.go",
 			expressions: []*regexp.Regexp{
 				regexp.MustCompile(`should-not-match`),
 			},
@@ -81,6 +87,7 @@ func TestRun(t *testing.T) {
 			name:      "Should return 0 findings with match type NotMatch and go sample",
 			filepath:  filepath.Join("examples", "go", "example1", "api", "server.go"),
 			matchType: NotMatch,
+			filter:    "**/*.go",
 			expressions: []*regexp.Regexp{
 				regexp.MustCompile(`Logger\.Fatal`),
 			},
@@ -90,6 +97,7 @@ func TestRun(t *testing.T) {
 			name:      "Should return 1 findings with match type AndMatch and python sample",
 			filepath:  filepath.Join("examples", "python", "example1", "main.py"),
 			matchType: AndMatch,
+			filter:    "**/*.py",
 			expressions: []*regexp.Regexp{
 				regexp.MustCompile(`secret =`),
 				regexp.MustCompile(`password =`),
@@ -101,6 +109,7 @@ func TestRun(t *testing.T) {
 			name:      "Should return 3 findings with match type OrMatch and python sample",
 			filepath:  filepath.Join("examples", "python", "example1", "main.py"),
 			matchType: OrMatch,
+			filter:    "**/*.py",
 			expressions: []*regexp.Regexp{
 				regexp.MustCompile(`secret =`),
 				regexp.MustCompile(`password =`),
@@ -113,6 +122,7 @@ func TestRun(t *testing.T) {
 			name:      "Should return 1 findings with match type NotMatch and python sample",
 			filepath:  filepath.Join("examples", "python", "example1", "main.py"),
 			matchType: NotMatch,
+			filter:    "**/*.py",
 			expressions: []*regexp.Regexp{
 				regexp.MustCompile(`should-not-match`),
 			},
@@ -122,6 +132,7 @@ func TestRun(t *testing.T) {
 			name:      "Should return 0 findings with match type AndMatch and python sample",
 			filepath:  filepath.Join("examples", "python", "example1", "main.py"),
 			matchType: AndMatch,
+			filter:    "**/*.py",
 			expressions: []*regexp.Regexp{
 				regexp.MustCompile(`secret =`),
 				regexp.MustCompile(`password =`),
@@ -133,6 +144,7 @@ func TestRun(t *testing.T) {
 			name:      "Should return 0 findings with match type OrMatch and python sample",
 			filepath:  filepath.Join("examples", "python", "example1", "main.py"),
 			matchType: OrMatch,
+			filter:    "**/*.py",
 			expressions: []*regexp.Regexp{
 				regexp.MustCompile(`should-not-match`),
 				regexp.MustCompile(`should-not-match`),
@@ -143,8 +155,32 @@ func TestRun(t *testing.T) {
 			name:      "Should return 0 findings with match type NotMatch and python sample",
 			filepath:  filepath.Join("examples", "python", "example1", "main.py"),
 			matchType: NotMatch,
+			filter:    "**/*.py",
 			expressions: []*regexp.Regexp{
 				regexp.MustCompile(`secret =`),
+			},
+			expectedFindings: 0,
+		},
+		{
+			name:      "Should return 0 findings with non existing filename",
+			filepath:  filepath.Join("examples", "python", "example1", "main.py"),
+			matchType: NotMatch,
+			filter:    "**/non-existing-file.py",
+			expressions: []*regexp.Regexp{
+				regexp.MustCompile(`secret =`),
+			},
+			expectedFindings: 0,
+		},
+		{
+			name:      "Should not return 3 findings with non existing filtered filename",
+			filepath:  filepath.Join("examples", "python", "example1", "main.py"),
+			matchType: OrMatch,
+			filter:    "**/*.go",
+			expressions: []*regexp.Regexp{
+				regexp.MustCompile(`secret =`),
+				regexp.MustCompile(`password =`),
+				regexp.MustCompile(`command =`),
+				regexp.MustCompile(`print(secret)`),
 			},
 			expectedFindings: 0,
 		},
@@ -156,6 +192,7 @@ func TestRun(t *testing.T) {
 				Type:        testCase.matchType,
 				Expressions: testCase.expressions,
 			}
+			rule.Metadata.Filter = testCase.filter
 
 			findings, err := rule.Run(testCase.filepath)
 			assert.NoError(t, err)
