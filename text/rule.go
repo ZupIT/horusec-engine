@@ -82,10 +82,6 @@ func (r *Rule) Run(path string) ([]engine.Finding, error) {
 }
 
 func (r *Rule) getFilteredFileContent(path string) ([]byte, error) {
-	if len(r.Filter) < 1 {
-		r.Filter = "**"
-	}
-
 	matched, _ := doublestar.Match(r.Filter, path)
 	if !matched {
 		return nil, nil
