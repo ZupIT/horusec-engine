@@ -1,6 +1,6 @@
 module github.com/ZupIT/horusec-engine
 
-go 1.14
+go 1.19
 
 require (
 	github.com/ZupIT/horusec-devkit v1.0.24
